@@ -29,8 +29,8 @@ server.use(cookieParser());
 import { presentTime } from './lib/utils.js';
 import { validateUser } from './auth/auth.js';
 
-// import { db, databaseConnectionTest } from './config/database.js';
-// import Models from './models/models.js';
+import { db, databaseConnectionTest } from './config/database.js';
+import Models from './models/models.js';
 
 
 
@@ -98,8 +98,8 @@ server.use((req, res) => {
 ///////////////////////////////////         THE SERVER         /////////////////////////////////////
 
 async function startServer(){
-    // await databaseConnectionTest(db);
-    // if (process.env.SYNCMODELS==='true') {await Models.syncModels()};
+    await databaseConnectionTest(db);
+    if (process.env.SYNCMODELS==='true') {await Models.syncModels()};
     let port = process.env.PORT??80;
     let listeningURL = process.env.LISTENINGURL??'http://localhost';
     server.listen(port, () => {
