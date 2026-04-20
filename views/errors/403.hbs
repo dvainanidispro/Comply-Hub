@@ -1,0 +1,34 @@
+<div class="container-fluid">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 text-center">
+            <div class="error-template">
+                <h1 class="display-1 text-warning">403</h1>
+                <h2 class="mb-3">Απαγορευμένη πρόσβαση</h2>
+                <div class="error-details mb-4">
+                    <p class="lead">{{#if message}}{{message}}{{else}}Δεν έχετε τα απαραίτητα δικαιώματα για να αποκτήσετε πρόσβαση σε αυτή τη σελίδα.{{/if}}</p>
+                </div>
+                <div class="error-actions">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="history.back()">
+                        <i class="ti-arrow-left me-2"></i>
+                        Πίσω
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+.error-template {
+    padding: 2rem;
+}
+
+.display-1 {
+    font-size: 8rem;
+    font-weight: bold;
+}
+</style>

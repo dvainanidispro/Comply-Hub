@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ComplyHub">
+    <meta name="author" content="Computer Studio">
+    <title>{{or title 'ComplyHub' ''}}</title>
+
+
+    <link href="/favicon.ico" rel="shortcut icon">
+    <meta name="theme-color" content="#9cc14d">
+    <link rel="preload" href="/css/adminator.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" as="style">
+    <link rel="stylesheet" media="screen" href="/css/style.css" >
+
+
+    <script defer src="/js/dim.js"></script>
+    <script defer src="/js/adminator.js"></script>
+    <script defer src="/js/dimstrap.js"></script>
+    <script defer src="/js/script.js"></script>
+    <script defer crossorigin="anonymous" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script defer crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="/js/dimtables.js"></script>
+
+    {{!-- <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="/resources/alpine-fetch.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
+
+
+  </head>
+
+
+
+
+
+  <body class="app">
+
+
+
+        <div id="sidebar">
+
+            {{> sidebar }}
+
+        </div>
+
+        <div class="page-container">
+
+                <header id="app-header">
+
+                    {{> header }}
+
+                </header>
+
+                    <main class="main-content">
+
+                        {{{ body }}}
+
+                    </main>
+
+                <footer>
+
+                    {{> footer }}
+
+                </footer>
+
+        </div> <!-- .page-container -->
+
+        {{> modals}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

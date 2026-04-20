@@ -1,0 +1,86 @@
+    <div class="sidebar">
+        <div class="sidebar-inner">
+            <!-- ### $Sidebar Header with Logo ### -->
+            <div class="sidebar-logo">
+                <div class="peers ai-c fxw-nw">
+                    <div class="peer peer-greed">
+                        <a class="sidebar-link td-n" href="/">
+                            <div class="gap-2 logo-area justify-content-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="logo">
+                                        <img src="/resources/logo.png" alt="Logo ComplyHub" />
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="peer">
+                        <div class="mobile-toggle sidebar-toggle">
+                            <a href="" class="td-n">
+                                <i class="ti-arrow-circle-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ### $Sidebar Navigation ### -->
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <ul class="sidebar-menu scrollable pos-r">
+                    {{#if (can "view:content")}}
+                    <li class="nav-item mT-30 actived">
+                        <a class="sidebar-link" href="/dashboard">
+                            <span class="icon-holder">
+                            <i class="c-blue-500 ti-dashboard"></i>
+                            </span>
+                            <span class="title">Dashboard</span>
+                        </a>
+                    </li>
+                    {{/if}}
+                    
+                    {{#if (can "edit:users")}}
+                    <li class="nav-item dropdown open">
+                        <a class="dropdown-toggle" href="javascript:void(0);">
+                            <span class="icon-holder">
+                                <i class="c-blue-500 ti-settings"></i>
+                            </span>
+                                <span class="title">Διαχείριση</span>
+                            <span class="arrow">
+                                <i class="ti-angle-right"></i>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {{!-- <li>
+                                <a class="sidebar-link" href="/admin/users">
+                                    <span class="icon-holder">
+                                        <i class="c-blue-500 ti-user"></i>
+                                    </span>
+                                <span>Χρήστες</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="sidebar-link" href="/admin/roles">
+                                    <span class="icon-holder">
+                                        <i class="c-blue-500 ti-shield"></i>
+                                    </span>
+                                <span>Ρόλοι</span>
+                                </a>
+                            </li> --}}
+                        </ul>
+                    </li>
+
+                    <li role="separator" class="divider"></li>
+                    {{/if}}
+   
+
+                    <li role="separator" class="divider"></li>
+
+
+                    </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- ### $Sidebar Footer ### -->
+
+        </div>
+    </div>

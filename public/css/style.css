@@ -1,0 +1,716 @@
+/* Import των framework αρχείων στο framework layer - πρέπει να είναι πρώτα */
+@import url("/css/adminator.css") layer(framework);
+@import url("https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css") layer(framework);
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css") layer(framework);
+
+/* Δήλωση των CSS layers με τη σωστή σειρά προτεραιότητας */
+@layer framework, base, dim, layout, theme, components, utilities;
+
+
+
+
+/****************      BASE LAYER      ******************/
+@layer base {
+    :root{
+        --bs-body-bg: hsl(240, 67%, 97%);
+        --bs-heading-color: hsl(277, 100%, 15%);
+
+        --bs-nav-text-color: rgb(0, 0, 63%);
+        --nav-hover-color: purple;
+        --nav-active-color: hsl(277, 50%, 25%);
+        --nav-active-text-color: hsl(277, 100%, 94%);
+        --nav-icon-color: navy;
+        --divider-color: lavender;
+        --border-color: hsl(277, 50%, 30%);
+        --input-bg-color: hsl(240, 67%, 98%);
+
+        --bs-btn-bg: green;
+        --bs-orange: hsl(39, 100%, 46%);
+        --bs-warning-caution: hsl(28, 100%, 50%);
+        --bs-warning-rgb: 235, 152, 0;
+        /* --bs-btn-bg: hsl(39, 100%, 36%); */
+        --bs-pink: hsl(332, 100%, 60%);
+
+        --card-gradient: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+
+        /* Smooth transitions */
+        interpolate-size: allow-keywords; 
+
+    }
+
+
+    /* Prevent all non-defined custom elements from displaying: */
+    *:not(:defined) { display: none; }
+
+    /* Hide cloaked elements for Alpine.js */
+    [x-cloak] { display: none !important; }
+
+    /* View transition between pages */
+    @view-transition {
+        navigation: auto;
+    }
+
+    /* smooth scrolling by default */
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 3rem;
+    }
+
+
+    body{
+        /* color-scheme: dark; */
+        background-color: var(--bs-body-bg);
+    }
+
+    main{
+        margin-inline: 0.5rem;   /* for mobile */
+        container-type: inline-size;
+        container-name: main;
+        /* border: var(--bs-border-width) var(--bs-border-style) white;
+        border-radius: var(--bs-border-radius); */
+    }
+
+    .main-content {
+        min-height: calc(100vh - 45px);
+    }
+
+    div {
+        /* background-color: var(--bs-body-bg); */
+        /* background-color: revert; */
+        /* color: revert; */
+    }
+
+    a{
+        color: navy;
+    }
+
+    /* h3,h4,h5,p{margin-bottom: revert;} */
+
+    hr{
+        border-top: 1px solid var(--border-color);
+        opacity: 0.3;
+    }
+
+    .table td{min-width: 18ch}
+
+}
+
+/****************      DIM LAYER      ******************/
+@layer dim {
+
+    /*********   DIM TABLES *********/
+    /* Για να μην πηδάει στο φόρτωμα */
+    table.dim-table:not([data-dimtables-initialized="1"]) { margin-top: 3rem }
+    .dim-table-bar { height: 2rem }
+    /* Περιορισμός κελιών σε 50 χαρακτήρες με ellipsis (...) και κατακόρυφη στοίχηση στο κέντρο */
+    table.dim-table :is(th, td) {
+        max-width: 50ch;
+        overflow: hidden;
+        vertical-align: middle;
+        @media(width >= 992px) {
+            text-overflow: ellipsis;
+            /* white-space: nowrap; */
+        }
+    }
+    /* Να συρρικνώνονται τα κελιά αντί να εμφανίζεται η μπάρα κύλισης */
+    table.dim-table {
+        max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+    table.dim-table.auto-rows{
+        table-layout: auto;
+    }
+    /* Μόνο για την παρούσα εφαρμογή, επειδή δεν έχουν όλες οι γραμμές κουμπιά (πχ viewer periods) */
+    table.dim-table tr{ 
+        height: 3.5rem; 
+    }
+    table.dim-table i{
+        font-size: 1.2rem;
+    }
+
+    dialog {
+        /* Προτεινόμενα */
+        border: 1px solid darkgray;
+        padding: 1rem 1.3rem;
+        border-radius: 0.5rem;
+        min-width: min(40ch, 80vw);
+        max-width: min(90vw, 1000px);
+        background-color: var(--bs-body-bg);
+        margin-top: 10vh;   /* Πόσο ψηλά εμφανίζεται */
+        &::backdrop {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(1px);
+        }
+        &[open] {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.4s, transform 0.4s;
+            @starting-style {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+        }
+        button{
+            margin: 0.5rem;
+            min-width: 10ch;
+        }
+        div {
+            display: flex;
+            justify-content: flex-end;
+        }
+        p {
+            margin: 0 0 1rem 0;
+        }
+    }
+
+
+
+} 
+/* Τέλος dim layer */
+
+
+
+
+@layer framework {
+
+    .collapse:not(.show) {
+        display: grid;
+        grid-template-rows: 0fr;
+        overflow: hidden;
+        transition: grid-template-rows 0.4s ease;
+        & > * {
+            padding-block: 0 !important;
+        }
+    }
+    .collapse.show {
+        display: grid;
+        grid-template-rows: 1fr;
+        overflow: hidden;
+        transition: grid-template-rows 0.4s ease;
+    }
+    .collapse > * {
+        min-height: 0;
+        overflow: hidden;
+        transition: padding 0.4s ease;
+    }
+}
+
+
+
+
+/****************      LAYOUT LAYER      ******************/
+@layer layout {
+
+    .sidebar{
+        background-color: var(--bs-body-bg);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo a .logo{
+        align-content: center;  /* center vertically */
+        width: auto;
+    }
+    .sidebar-logo a .logo img {
+        height: 60px;
+        width: auto;
+    }
+
+    .sidebar i {
+        color: var(--nav-icon-color) !important;
+    }
+
+
+    .header, .sidebar-logo {        
+        height: 4.2rem;     /*These two should have the same height*/
+        background-color: var(--bs-body-bg);
+        border-bottom: 1px solid #ccc;
+    }
+
+
+    .sidebar-menu *, .dropdown-menu *,  .dropdown-menu li,  .dropdown-menu a, .dropdown-menu div, .dropdown-menu span {
+        transition: all 0.5s ease-in-out !important;
+    }
+    .sidebar-menu li a, .dropdown-menu li a {
+        color: var(--bs-nav-text-color) !important;
+        &:hover, &.active {
+            background-color: var(--nav-hover-color) !important;
+            color: var(--nav-active-text-color) !important;
+        }
+    }
+
+    .icon-holder{
+        margin-inline: 0.2rem;
+    }
+
+    /* .sidebar-menu a.dropdown-toggle:has(+.dropdown-menu a:hover) {
+        background-color: var(--nav-hover-color) !important;
+    } */
+
+    .divider{
+        background-color: var(--divider-color);
+        opacity: 0.2;
+        height: 2px;
+    }
+
+
+}
+/* Τέλος layout layer */
+
+
+
+
+/****************      THEME LAYER      ******************/
+@layer theme {
+
+
+    .bi {
+        line-height: 1;
+    }
+
+    .btn{
+        padding: 0.6rem 1.2rem !important;
+        min-width: 3rem;
+    }
+    :is(.btn, .btn:focus, .btn:active, .btn:hover):not([class*="btn-outline"]){
+        color: var(--bs-light) !important;
+    }
+    .btn:hover i {
+        color: var(--bs-light) !important;
+    }
+
+    .btn-icon, .badge-icon{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+
+        .bi {
+            font-size: 1.2rem;
+        }
+        div {
+            /* transform: translateY(-1px); */
+        }
+    }
+
+    input.form-control{
+        border-color: hsl(240, 93%, 90%);
+    }
+    input[readonly]:not([type="checkbox"]):not([type="radio"]), 
+    input:disabled:not([type="checkbox"]):not([type="radio"]),
+    textarea[readonly], textarea:disabled, select:disabled {
+        background-color: hsl(240, 50%, 93%) !important;
+    }
+    input::placeholder{
+        color: gray !important;
+        opacity: 1 !important; /* Firefox */
+    }
+    .form-select{
+        background-color: var(--input-bg-color);
+    }
+    .dropdown-search{
+        max-width: 30ch;
+    }
+
+    .bg-warning-caution{
+        background-color: var(--bs-warning-caution) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-orange{
+        background-color: var(--bs-orange) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-purple{
+        background-color: var(--bs-purple) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-pink{
+        background-color: hsl(322, 100%, 48%) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-pink-light{
+        background-color: hsl(330, 87%, 73%) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-gray{
+        background-color: hsl(0, 0%, 60%) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-indigo{
+        background-color: var(--bs-indigo) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-danger-light{
+        background-color: hsl(27, 100%, 84%) !important;
+    }
+    .bg-blue{
+        background-color: hsl(210, 100%, 45%) !important;
+        color: var(--bs-light) !important;
+    }
+    .bg-blue-light{
+        background-color: hsl(210, 100%, 86%) !important;
+    }
+
+    a.text-primary, .btn-outline-primary, .btn-outline-primary i{
+        color: #04c !important;
+        border-color: #04c !important;
+        &:focus{
+            background-color: var(--bs-btn-active-bg) !important;
+            border-color: var(--bs-btn-active-border-color) !important;
+        }
+    }
+    .btn-outline-dark, .btn-outline-dark i{
+        color: var(--bs-dark) !important;
+        border-color: var(--bs-dark) !important;
+        &:hover, &:focus, &:active{
+            color: var(--bs-light) !important;
+            background-color: var(--bs-dark) !important;
+        }
+    }
+
+    .btn-approve,  .bg-approve{
+        background-color: hsl(120, 100%, 35%);
+    }
+    .btn-approve:hover,  .bg-approve:hover{
+        background-color: hsl(120, 100%, 38%);
+    }
+    .btn-reject, .bg-reject{
+        background-color: hsl(199, 11%, 53%)  ;
+    }
+    .btn-reject:hover, .bg-reject:hover{
+        background-color: hsl(199, 11%, 58%)  ;
+    }
+
+    .btn-success{
+        background-color: hsl(123, 50%, 43%);
+        &:hover{
+            background-color: hsl(123, 50%, 46%);
+        }
+    }
+    .btn-warning{
+        background-color: var(--bs-orange) !important;
+        border-color: var(--bs-orange) !important;
+        color: var(--bs-light) !important;
+    }
+    .btn-warning-caution{
+        background-color: var(--bs-warning-caution) !important;
+        color: var(--bs-light) !important;
+    }
+
+    .text-red{
+        color: crimson;
+    }
+
+
+    /* Excel Icon - SVG ως CSS icon */
+    .btn-excel{
+        background-color: #177b45; 
+        color: var(--bs-light);
+        &:hover{
+            background-color: #146c3f;
+        }
+    }
+    .excel-icon {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-image: url("data:image/svg+xml,%3Csvg height='24px' width='24px' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 26 26' xml:space='preserve'%3E%3Cg%3E%3Cpath style='fill:white;' d='M25.162,3H16v2.984h3.031v2.031H16V10h3v2h-3v2h3v2h-3v2h3v2h-3v3h9.162C25.623,23,26,22.609,26,22.13V3.87C26,3.391,25.623,3,25.162,3z M24,20h-4v-2h4V20z M24,16h-4v-2h4V16z M24,12h-4v-2h4V12z M24,8h-4V6h4V8z'/%3E%3Cpath style='fill:white;' d='M0,2.889v20.223L15,26V0L0,2.889z M9.488,18.08l-1.745-3.299c-0.066-0.123-0.134-0.349-0.205-0.678H7.511C7.478,14.258,7.4,14.494,7.277,14.81l-1.751,3.27H2.807l3.228-5.064L3.082,7.951h2.776l1.448,3.037c0.113,0.24,0.214,0.525,0.304,0.854h0.028c0.057-0.198,0.163-0.492,0.318-0.883l1.61-3.009h2.542l-3.037,5.022l3.122,5.107L9.488,18.08L9.488,18.08z'/%3E%3C/g%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        vertical-align: middle;
+    }
+
+
+} 
+/* Τέλος theme layer */
+
+
+
+
+
+/****************      COMPONENTS LAYER      ******************/
+@layer components {
+
+    .modal {
+        background-color: rgba(0, 0, 0, 0.3);
+        transition-behavior: allow-discrete;
+    }
+
+    @keyframes modal-slide-in {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal.show .modal-dialog {
+        animation: modal-slide-in 0.25s ease-out forwards;
+    }
+    
+    /* Cards */
+    .card{
+        background-color: hsl(240, 67%, 96%);
+        & input:not([type="checkbox"]), input:not([type="checkbox"]):focus{
+            background-color: var(--input-bg-color);
+        }
+    }
+
+    .dashboard-card{
+        padding: 0.3rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 1px 3px 8px rgba(0, 0, 0, 0.5);
+        background-image: var(--card-gradient);
+        min-height: 16rem;
+        &:hover {
+            transform: translateY(-3px);
+        }
+        p, h2, h3, h6, i {
+            color: snow;
+        }
+        hr {
+            margin-inline: 0.7rem;
+            border-top: 1px solid var(--border-color);
+        }
+        i{
+            font-size: 3rem;
+        }
+        .dashboard-top{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            div:has(i){
+                margin-top: 0.5rem;
+            }
+        }
+    }
+
+    /* Employee Profile - Nested Schema Fields */
+    .schema-field-group {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        border-left: 3px solid #0d6efd;
+    }
+
+    .schema-field-group h6 {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+        color: #495057;
+    }
+
+    .schema-subfield {
+        padding-left: 1rem;
+        border-left: 2px solid #dee2e6;
+        margin-left: 0.5rem;
+    }
+
+    /* Status badges */
+    .profile-status-badge {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .employee-type-badge {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        text-transform: capitalize;
+    }
+
+    .big-checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+        cursor: pointer;
+    }
+
+    .accordion-card-button{
+        font-size: 1.1rem;
+        font-weight: 500;
+        background-color: rgba(var(--bs-body-color-rgb), 0.02);
+    }
+
+    /* Selected table row */
+    .selected-entry td {
+        background-color: hsl(210, 100%, 90%) !important;
+    }
+
+    /* Bulk action toast */
+    .bulk-action-toast {
+        box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.4);
+        border: none;
+    }
+
+    .toast-container-bulk {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 1030;
+        border: none;
+    }
+
+    .actions-row{
+        gap: 0.5rem;
+        width: 30ch;
+        @media (width < 1200px) {
+            width: 15ch;
+        }
+    }
+
+    /* *:has(>.password-toggle) {
+        position: relative;
+    }
+    .password-toggle{
+        position: absolute;
+        right: 0.8rem;
+        top: 0.45rem;
+        cursor: pointer;
+        color: gray;
+    } */
+    .password-toggle{
+        margin-inline: 0.3rem;
+        cursor: pointer;
+    }
+
+}
+/* Τέλος components layer */
+
+
+
+
+
+/****************      UTILITIES LAYER      ******************/
+@layer utilities {
+
+
+    .center-contents, .center-content{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .unseparated {
+        white-space: nowrap !important;
+    }
+    .larger{
+        font-size: larger;
+    }
+    .normal{
+        font-size: medium;
+    }
+    .bold{
+        font-weight: bold;
+    }
+
+    .hand{
+        cursor: pointer;
+    }
+
+    .tall-line{
+        line-height: 2;
+    } 
+
+    .big-shadow{
+        box-shadow: 1px 3px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+    .small-shadow{
+        box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    .lg{
+        margin-inline: auto;
+        max-width: 992px;
+    }
+
+    /* Για περιπτώσεις όπου τα gap-x δεν λειτουργούν σωστά */
+    .g-2{
+        gap: 0.5rem;
+    }
+    .g-3{
+        gap: 1rem;
+    }
+
+    .shake-it{
+        animation: shake 3s ease-in-out;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateY(0); }
+        /* 10% { transform: translateY(-4px); } */
+        50% { transform: translateY(0); }
+        55% { transform: translateY(-4px); }
+        60% { transform: translateY(0); }
+        65% { transform: translateY(-4px); }
+        70% { transform: translateY(0); }
+        75% { transform: translateY(-4px); }
+        80% { transform: translateY(0); }
+        85% { transform: translateY(-4px); }
+        90% { transform: translateY(0); }
+    }
+
+    .d-xs-none{ 
+        @media (width <= 576px) { display: none ; } 
+    }
+    .d-xs-show{
+        @media (width > 576px) { display: none ; }
+    }
+    .d-md-show{
+        @media (width <= 768px) { display: none ; }
+    }
+    .d-lg-show{
+        @media (width <= 992px) { display: none ; }
+    }
+    .d-xl-show{
+        @media (width <= 1200px) { display: none ; }
+    }
+    .d-xxl-show{
+        @media (width <= 1580px) { display: none ; }
+    }
+
+    .checkbox-cell{
+        width: 5ch;
+    }
+    .very-narrow-cell{
+        width: 10ch;
+    }
+    /* .cell-narrowest{
+        width: 1px;
+        white-space: nowrap;
+    } */
+
+
+    @media (width < 1580px) {
+        .narrow-cell-xs{
+            width: 12ch;
+        }
+        .narrow-cell-sm{
+            width: 15ch;
+        }
+        .narrow-cell-m, .narrow-cell{
+            width: 18ch;
+        }
+        .narrow-cell-l {
+            width: 20ch;
+        }
+    }
+        .wide-cell-sm{
+            width: 12vw;
+        }
+        .wide-cell-m{
+            width: 15vw;
+        }
+        .wide-cell, .wide-cell-l{
+            width: 20vw;
+        }
+        .wide-cell-xl{
+            width: 30vw;
+        }
+
+
+} 
+/* Τέλος utilities layer */

@@ -1,0 +1,64 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="ti-shield me-2"></i>
+                        Ρόλοι και Δικαιώματα
+                    </h1>
+                    <div class="card-subtitle text-muted">
+                        Ενημερωτική σελίδα για τους ρόλους και τα δικαιώματα της εφαρμογής.
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Πίνακας Ρόλων -->
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Ρόλος</th>
+                                    <th>Περιγραφή</th>
+                                    <th>Δικαιώματα</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each roles}}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-{{this.color}} fs-6">
+                                            {{this.name}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{this.description}}
+                                    </td>
+                                    <td>
+                                        <div class="">
+                                            {{#each this.permissions}}
+                                            <span class="">
+                                                {{lookup @root.permissions this}}<br>
+                                            </span>
+                                            {{/each}}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Πληροφορίες -->
+                    <div class="alert alert-info">
+                        <i class="ti-info-alt me-2"></i>
+                        <strong>Σημείωση:</strong> 
+                        Αυτή η σελίδα είναι μόνο για ενημέρωση. Για επεξεργασία ρόλων και δικαιωμάτων, 
+                        επικοινωνήστε με τον διαχειριστή του συστήματος.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ComplyHub">
+    <meta name="author" content="Computer Studio">
+    <title>{{or title 'ComplyHub' ''}}</title>
+
+
+    <link href="/favicon.ico" rel="shortcut icon">
+    <meta name="theme-color" content="#9cc14d">
+    <link rel="preload" href="/css/adminator.css" as="style">
+    <link href="/css/style.css" rel="stylesheet" media="screen">
+
+
+    <script defer src="/js/dim.js"></script>
+    <script defer src="/js/adminator.js"></script>
+    <script defer src="/js/script.js"></script>
+
+    {{!-- <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="/resources/alpine-fetch.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
+
+
+  </head>
+
+
+    <style>
+        body{
+            background-image: url("/resources/background.jpg");
+            background-color: black;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .page-container{
+            background-color: hsl(0, 5%, 10%, 66%);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            margin-left: 0vw;
+        }
+    </style>
+
+
+
+    <body class="app" >
+
+
+
+
+
+        {{!-- <div id="sidebar"></div> --}}
+
+        <div class="page-container ">
+
+                <header id="app-header">
+
+                    
+
+                </header>
+
+                    <main class="main-content  pt-4">
+
+                        {{{ body }}}
+
+                    </main>
+
+                <footer>
+
+                    {{> footer }}
+
+                </footer>
+
+        </div> <!-- .page-container -->
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

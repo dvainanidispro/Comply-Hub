@@ -1,0 +1,362 @@
+/** Reload the page if it was restored from the back/forward cache */
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+
+/**
+ * Ένδειξη στο sidebar για το link που αντιστοιχεί στην τρέχουσα σελίδα.
+ * Χρησιμοποιούμε every αντί για forEach γιατι το forEach δεν έχει break, 
+ * ενώ το every σταματάει όταν επιστραφεί false.
+ */
+(() => {
+    const nav = Q.url.get('nav');
+    const path = Q.url.path;
+    Q(".sidebar .sidebar-link").every(link => {
+        const href = link.getAttribute("href");
+        const baseHref = href.split('?')[0];    // χωρίς get parameters
+        if (!href || href.length < 3) {
+            return true; // συνεχίζουμε το every
+        }
+        
+        if ((nav && baseHref === nav) || (!nav && path.startsWith(baseHref))) {
+            link.classList.add("active");
+            return false; // σταματάμε το every
+        } 
+        return true; // συνεχίζουμε το every
+    });
+})();
+
+/**
+ * Προσθήκη validation classes (is-valid, is-invalid) σε input πεδία με pattern ή minlength
+ * καθώς ο χρήστης πληκτρολογεί
+ */
+document.addEventListener("DOMContentLoaded", () => {
+  const inputs = document.querySelectorAll("input[pattern], input[minlength]");
+
+  inputs.forEach(input => {
+    input.addEventListener("input", () => {
+      if (input.value === "") {
+        input.classList.remove("is-valid", "is-invalid");
+        return;
+      }
+
+      if (input.checkValidity()) {
+        input.classList.add("is-valid");
+        input.classList.remove("is-invalid");
+      } else {
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+      }
+    });
+  });
+});
+
+
+/**
+ * Όταν υπάρχει κάποιο get parameter που αντιστοιχεί σε πεδιο φόρμας (με το ίδιο name),
+ * τότε συμπληρώνει αυτόματα το πεδίο με την τιμή του parameter και το πεδίο γίνεται readonly.
+ * Χρήσιμο για φόρμες αναζήτησης/φιλτραρίσματος.
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const formFields = document.querySelectorAll("input[name], select[name], textarea[name]");
+
+   formFields.forEach(field => {
+       const paramValue = urlParams.get(field.name);
+       if (paramValue) {
+           field.value = paramValue;
+           field.readOnly = true;
+       }
+   });
+});
+
+
+
+
+/**
+ * Ελέγχει αν το JWT token είναι έγκυρο και αν δεν έχει λήξει
+ * @param {string} token - Το JWT token προς έλεγχο
+ * @returns {object} - {valid: boolean, reason: string}
+ */
+function isValidJWT(token) {
+    try {
+        // Διαχωρισμός του JWT σε header, payload, signature
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            return { valid: false, reason: 'invalid' };
+        }
+
+        // Αποκωδικοποίηση του payload (base64url)
+        let payload;
+        try {
+            const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+            payload = JSON.parse(atob(base64));
+        } catch (decodeError) {
+            return { valid: false, reason: 'invalid' };
+        }
+        
+        // Έλεγχος αν το token έχει λήξει
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < currentTime) {
+            return { valid: false, reason: 'expired' };
+        }
+
+        return { valid: true, reason: null };
+    } catch (error) {
+        console.error('Σφάλμα κατά τον έλεγχο του JWT token:', error);
+        return { valid: false, reason: 'invalid' };
+    }
+}
+
+
+function periodDescription(startDate, endDate) {
+    let getGreekMonthName = (monthIndex) => {
+        const months = [
+            'Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος',
+            'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'
+        ];
+        return months[monthIndex];
+    }; 
+
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+    if (isNaN(start) || isNaN(end)) {
+        return '';
+    }
+
+    let startMonth = getGreekMonthName(start.getMonth());
+    let endMonth = getGreekMonthName(end.getMonth());
+
+    return `${startMonth} - ${endMonth}`;
+}
+
+
+
+
+
+/**
+ * Ελέγχει τα ενεργά badges για ληγμένες μισθώσεις και μισθώσεις που λήγουν σύντομα
+ * @param {string} expiredText - Το κείμενο για ληγμένες μισθώσεις (προεπιλογή: "Έχει λήξει")
+ * @param {string} expiringSoonText - Το κείμενο για μισθώσεις που λήγουν σύντομα (προεπιλογή: "Λήγει σύντομα")
+ */
+function checkLeaseExpiry(expiredText = 'Έχει λήξει', expiringSoonText = 'Λήγει σύντομα') {
+    const statusBadges = document.querySelectorAll('.status-badge');
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Υπολογισμός ημερομηνίας 6 μηνών από σήμερα
+    const sixMonthsFromNow = new Date(today);
+    sixMonthsFromNow.setMonth(today.getMonth() + 6);
+    const sixMonthsFromNowStr = sixMonthsFromNow.toISOString().split('T')[0];
+    
+    statusBadges.forEach(badge => {
+        const leaseEndStr = badge.getAttribute('data-lease-end');
+        
+        if (leaseEndStr) {
+            if (leaseEndStr < todayStr) {
+                // Ληγμένη μίσθωση
+                badge.textContent = expiredText;
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-danger', 'text-light');
+            } else if (leaseEndStr <= sixMonthsFromNowStr) {
+                // Μίσθωση που λήγει σύντομα (σε λιγότερο από 6 μήνες)
+                badge.textContent = expiringSoonText;
+                badge.classList.remove('bg-success');
+                badge.classList.add('bg-warning');
+            }
+        }
+    });
+}
+
+/**
+ * Ελέγχει τα κελιά αναπροσαρμογής μισθώματος και τονίζει αυτά που αντιστοιχούν στον τρέχοντα μήνα
+ */
+function checkRentAdjustmentMonth() {
+    const currentMonth = new Date().getMonth() + 1; // getMonth() επιστρέφει 0-11
+    const currentYear = new Date().getFullYear();
+    const rentAdjustmentCells = document.querySelectorAll('.adjustment-month');
+    
+    rentAdjustmentCells.forEach(cell => {
+        const cellMonth = parseInt(cell.getAttribute('data-sort-value'), 10);
+        let cellYear = parseInt(cell.getAttribute('data-last-adjustment-year'), 10);
+        if (isNaN(cellYear)) {cellYear=0}
+        const span = cell.querySelector('span');
+        if (cellMonth == currentMonth && cellYear < currentYear) {
+            if (span) {
+                span.classList.add('badge', 'fs-6', 'bg-warning2', 'fw-bold');
+            }
+        } else if (cellMonth == currentMonth && cellYear == currentYear) {
+            span.insertAdjacentHTML('beforeend', ' ✔️');
+        }
+    });
+}
+
+
+
+
+/**
+ * Κατεβάζει έναν HTML πίνακα ως αρχείο Excel
+ * Απαιτεί το SheetJS (xlsx) library - https://docs.sheetjs.com/docs/getting-started/installation/standalone
+ * @param {string} tableID - Το ID του HTML table στοιχείου
+ * @param {string} filename - Το όνομα του αρχείου Excel που θα δημιουργηθεί (προαιρετικό)
+ */
+function downloadTableAsExcel(tableID, filename = 'table.xlsx', sheetname = 'Sheet1') {
+    const table = document.getElementById(tableID);
+    if (!table) { console.error('Table not found:', tableID); return; }
+    
+    // Αφαίρεση μη έγκυρων χαρακτήρων και περιορισμός μήκους
+    sheetname = sheetname.substring(0,31).replace(/[/\\?%*:|"<>]/g, '_');
+    filename = filename.replace(/[/\\?%*:|"<>]/g, '_'); 
+
+    // Clone για να μην πειραχτεί το DOM
+    const clone = table.cloneNode(true);
+
+    // Αν υπάρχει data-value ή data-sort-value, να χρησιμοποιείται αυτό, αλλιώς, να χρησιμοποιείται το textContent
+    clone.querySelectorAll('td, th').forEach(cell => {
+      const dataValue = cell.getAttribute('data-value') ?? cell.getAttribute('data-sort-value');
+      if (dataValue !== null && dataValue !== "") {
+        cell.textContent = dataValue;
+      } else {
+        cell.textContent = cell.textContent;
+      }
+    });
+
+    const wb = XLSX.utils.table_to_book(clone, { sheet: sheetname });
+    XLSX.writeFile(wb, filename);
+}
+
+
+
+
+// Μεταβλητή για αποθήκευση του onClose callback
+let currentOnCloseCallback = null;
+
+/**
+ * Εμφανίζει ένα success modal με μήνυμα
+ * @param {string} message - Το μήνυμα προς εμφάνιση
+ * @param {number} autoCloseDelay - Χρόνος σε ms για αυτόματο κλείσιμο (προαιρετικό)
+ * @param {function} onClose - Callback function όταν κλείσει το modal (προαιρετικό)
+ */
+function showSuccessModal(message, autoCloseDelay = null, onClose = null) {
+    const successModal = document.getElementById('successModal');
+    const messageElement = document.getElementById('successMessage');
+    
+    if (!successModal || !messageElement) {
+        console.error('Success modal elements not found');
+        return;
+    }
+    
+    // Αποθήκευση του onClose callback
+    currentOnCloseCallback = onClose;
+    
+    messageElement.textContent = message;
+    successModal.classList.add('show');
+    successModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    
+    if (autoCloseDelay && autoCloseDelay > 0) {
+        setTimeout(() => {
+            closeModal('successModal');
+        }, autoCloseDelay);
+    }
+}
+
+/**
+ * Εμφανίζει ένα error modal με μήνυμα
+ * @param {string} message - Το μήνυμα σφάλματος προς εμφάνιση
+ */
+function showErrorModal(message) {
+    const errorModal = document.getElementById('errorModal');
+    const messageElement = document.getElementById('errorMessage');
+    
+    if (!errorModal || !messageElement) {
+        console.error('Error modal elements not found');
+        return;
+    }
+    
+    messageElement.textContent = message;
+    errorModal.classList.add('show');
+    errorModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+}
+
+/**
+ * Κλείνει ένα modal
+ * @param {string} modalId - Το ID του modal προς κλείσιμο
+ */
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        
+        // Εκτέλεση του onClose callback αν υπάρχει και το modal είναι το success modal
+        if (modalId === 'successModal' && currentOnCloseCallback && typeof currentOnCloseCallback === 'function') {
+            currentOnCloseCallback();
+            currentOnCloseCallback = null; // Καθαρισμός του callback
+        }
+    }
+    
+    // Αφαίρεση του modal-open class από το body ανεξάρτητα από το αν βρέθηκε το modal
+    // για να εξασφαλίσουμε ότι η σελίδα δεν μένει blocked
+    document.body.classList.remove('modal-open');
+    
+    // Αφαίρεση οποιουδήποτε backdrop element που μπορεί να έχει μείνει
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+}
+
+/**
+ * Σε περίπτωση επιτυχίας, ανακατευθύνει το χρήστη σε μια προεπιλεγμένη διαδρομή.
+ * Αν τυχόν υπάρχει get request παράμετρος 'redirect', πχ ?redirect=/canteens/canteens/1
+ * τότε ανακατευθύνει εκεί (αγνοώντας την προεπιλεγμένη διαδρομή).
+ * Αν defaultPath = null, κάνει απλή ανανέωση της τρέχουσας σελίδας.
+ */
+function redirectOnSuccess(defaultPath = null) {
+    const redirectPath = Q.url.get('redirect');
+    
+    if (redirectPath) {
+        window.location.href = redirectPath;
+    } else if (defaultPath) {
+        window.location.href = defaultPath;
+    } else {
+        window.location.reload();
+    }
+}
+
+
+// Αρχικοποίηση event listeners για τα modals όταν φορτώσει η σελίδα
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners για κλείσιμο modals
+    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+    
+    // Κλείσιμο modal με κλικ στο backdrop - διόρθωση για drag behavior
+    document.querySelectorAll('.modal').forEach(modal => {
+        let mouseDownTarget = null;
+        
+        modal.addEventListener('mousedown', function(e) {
+            mouseDownTarget = e.target;
+        });
+        
+        modal.addEventListener('click', function(e) {
+            // Κλείσιμο μόνο αν το mousedown και το click έγιναν στο ίδιο element (το backdrop)
+            if (e.target === this && mouseDownTarget === this) {
+                closeModal(this.id);
+            }
+            mouseDownTarget = null;
+        });
+    });
+
+
+});
