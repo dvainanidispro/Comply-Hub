@@ -11,8 +11,9 @@ const User = db.define('user',
         email: DataTypes.STRING,
         name: DataTypes.STRING,
         password: DataTypes.STRING,
-        roles: DataTypes.JSONB,
+        role: DataTypes.STRING,
         organization: DataTypes.INTEGER,
+        permissions: DataTypes.ARRAY(DataTypes.STRING),
         active: {
             type: DataTypes.BOOLEAN,
             defaultValue: true

@@ -8,24 +8,25 @@
                         Χρήστες
                     </h1>
                     <div class="card-actions">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <a href="/admin/users/new" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-1"></i>
                             Νέος Χρήστης
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle">
+                        <table class="table dim-table auto-rows table-striped table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
-                                    <th class="narrow-cell-sm">ID</th>
-                                    <th class="wide-cell">Όνομα</th>
-                                    <th class="wide-cell">Email</th>
-                                    <th>Ρόλος</th>
-                                    <th class="narrow-cell-m">Ενεργός</th>
-                                    <th>Δημιουργία</th>
-                                    <th>Επεξεργασία</th>
+                                    <th class="">ID</th>
+                                    <th class="">Όνομα</th>
+                                    <th class="">Email</th>
+                                    <th class="">Ρόλος</th>
+                                    <th class="">Οργανισμός</th>
+                                    <th class="">Ενεργός</th>
+                                    {{!-- <th class="">Δημιουργία</th> --}}
+                                    <th class="">Επεξεργασία</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,6 +40,7 @@
                                             {{this.role}}
                                         </span>
                                     </td>
+                                    <td>{{this.organization}}</td>
                                     <td>
                                         {{#if this.active}}
                                             <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>
@@ -46,7 +48,7 @@
                                             <span title="Ανενεργός"><i class="bi bi-x-circle text-dark"></i></span>
                                         {{/if}}
                                     </td>
-                                    <td>{{date this.createdAt}}</td>
+                                    {{!-- <td>{{date this.createdAt}}</td> --}}
                                     <td>
                                         <a href="/admin/users/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">
                                             <i class="ti-pencil text-success" ></i>

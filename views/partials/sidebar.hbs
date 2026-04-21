@@ -38,7 +38,7 @@
                     </li>
                     {{/if}}
                     
-                    {{#if (can "edit:users")}}
+                    {{#if (can "manage:platform")}}
                     <li class="nav-item dropdown open">
                         <a class="dropdown-toggle" href="javascript:void(0);">
                             <span class="icon-holder">
@@ -50,7 +50,7 @@
                             </span>
                         </a>
                         <ul class="dropdown-menu">
-                            {{!-- <li>
+                            <li>
                                 <a class="sidebar-link" href="/admin/users">
                                     <span class="icon-holder">
                                         <i class="c-blue-500 ti-user"></i>
@@ -65,7 +65,7 @@
                                     </span>
                                 <span>Ρόλοι</span>
                                 </a>
-                            </li> --}}
+                            </li>
                         </ul>
                     </li>
 

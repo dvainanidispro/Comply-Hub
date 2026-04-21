@@ -98,7 +98,7 @@ const handlebarsConfig = {
                 return '';
             }
         },
-        /* example: {{#if (can 'edit:users')}} */
+        /* example: {{#if (can 'manage:platform')}} */
         can: function(permission) {
             // Το 'this' είναι το context (το αντικείμενο δεδομένων) που περνιέται στο handlebars
             const user = this.user;

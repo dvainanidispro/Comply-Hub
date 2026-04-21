@@ -1,5 +1,6 @@
 import express from 'express';
-// import Models from '../models/models.js';
+import Models from '../models/models.js';
+import Cache from '../models/cache.js';
 import { can, roles, permissions } from '../auth/roles.js';
 import { hashPassword } from '../auth/auth.js';
 import { Op } from 'sequelize';
@@ -15,7 +16,7 @@ const admin = express.Router();
 ////////////////////////////       ROUTES ΓΙΑ ΔΙΑΧΕΙΡΙΣΗ ΧΡΗΣΤΩΝ       /////////////////////////////
 
 // Middleware για έλεγχο admin δικαιωμάτων
-admin.use(can('edit:users'));
+admin.use(can('manage:platform'));
 
 
 
@@ -25,7 +26,7 @@ admin.use(can('edit:users'));
 admin.get('/users', async (req, res) => {
     try {
         const users = await Models.User.findAll({
-            attributes: ['id', 'email', 'name', 'role', 'createdAt','active'],
+            attributes: ['id', 'email', 'name', 'role', 'organization', 'permissions', 'createdAt','active'],
             // order: [['createdAt', 'DESC']],
             raw: true
         });
@@ -43,23 +44,48 @@ admin.get('/users', async (req, res) => {
 });
 
 /**
+ * GET /admin/users/new - Φόρμα δημιουργίας νέου χρήστη
+ */
+admin.get('/users/new', async (req, res) => {
+    try {
+        // const organizations = await Cache.table.Organization;
+        
+        res.render('admin/single-user', {
+            isNew: true,
+            userDetails: {},
+            roles: roles,
+            // organizations: organizations,
+            user: req.user,
+            title: 'Νέος Χρήστης'
+        });
+    } catch (error) {
+        log.error(`Σφάλμα: ${error}`);
+        res.status(500).render('errors/500', { message: 'Σφάλμα κατά την ανάκτηση φόρμας' });
+    }
+});
+
+/**
  * GET /admin/users/:id - Εμφάνιση στοιχείων συγκεκριμένου χρήστη
  */
 admin.get('/users/:id', async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const user = await Models.User.findByPk(userId, {
-            attributes: ['id', 'email', 'name', 'role', 'active', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'email', 'name', 'role', 'organization', 'permissions', 'active', 'createdAt', 'updatedAt'],
             raw: true       // JavaScript object χωρίς μεθόδους Sequelize
         });
         
         if (!user) {
             return res.status(404).render('errors/404', { message: 'Ο χρήστης δεν βρέθηκε' });
         }
+
+        // const organizations = await Cache.table.Organization;
         
         res.render('admin/edit-user', { 
+            isNew: false,
             userDetails: user,
             roles: roles,
+            // organizations: organizations,
             user: req.user,
             title: `Επεξεργασία Χρήστη: ${user.name || user.email}`
         });
@@ -74,7 +100,7 @@ admin.get('/users/:id', async (req, res) => {
  */
 admin.post('/users', async (req, res) => {
     try {
-        const { email, name, password, role, department } = req.body;
+        const { email, name, password, role, organization } = req.body;
         
         // Βασικός έλεγχος δεδομένων
         if (!email) {
@@ -101,7 +127,7 @@ admin.post('/users', async (req, res) => {
             name: name || email.split('@')[0],
             password: hashPassword(password),
             role: role || 'user',
-            department: department || null,
+            organization: organization || null,
         });
         
         log.info(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);

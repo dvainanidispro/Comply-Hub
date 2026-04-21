@@ -5,7 +5,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/admin/users">Χρήστες</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{userDetails.name}}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{#if isNew}}Νέος Χρήστης{{else}}{{userDetails.name}}{{/if}}</li>
                 </ol>
             </nav>
         </div>
@@ -14,44 +14,64 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">
+                        {{#if isNew}}
+                        <i class="ti-plus me-2"></i>
+                        Νέος Χρήστης
+                        {{else}}
                         <i class="ti-pencil me-2"></i>
                         Επεξεργασία Χρήστη
+                        {{/if}}
                     </h4>
                 </div>
                 <div class="card-body">
-                    <form id="editUserForm">
+                    <form id="form">
+                        {{#unless isNew}}
                         <input type="hidden" id="editUserId" name="id" value="{{userDetails.id}}">
+                        {{/unless}}
                         
                         <div class="row">
+                            {{#unless isNew}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">ID Χρήστη:</label>
                                 <p class="form-control-plaintext text-muted">{{userDetails.id}}</p>
                             </div>
                             <div class="col-md-6 mb-3"></div>
+                            {{/unless}}
                             <div class="col-md-6 mb-3">
                                 <label for="editUserEmail" class="form-label fw-bold">Email *</label>
-                                <input type="email" class="form-control" id="editUserEmail" name="email" value="{{userDetails.email}}" required>
-                                <div class="form-text text-muted">Χρησιμοποιείται για την είσοδο στην εφαρμογή</div>
+                                <input type="email" class="form-control" id="editUserEmail" name="email" value="{{userDetails.email}}" autocomplete="new-email" required>
+                                <div class="form-text">Χρησιμοποιείται για την είσοδο στην εφαρμογή</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserName" class="form-label fw-bold">Όνομα</label>
-                                <input type="text" class="form-control" id="editUserName" name="name" value="{{userDetails.name}}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="editUserPassword" class="form-label fw-bold">Νέο Password</label>
-                                <input type="password" class="form-control" id="editUserPassword" name="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$" title="Το password πρέπει να περιέχει τουλάχιστον 8 χαρακτήρες, ένα γράμμα, έναν αριθμό και ένα σύμβολο.">
-                                <div class="form-text text-muted">Να παραμείνει κενό αν δεν επιθυμείτε την αλλαγή του</div>
+                                <input type="text" class="form-control" id="editUserName" name="name" value="{{userDetails.name}}" autocomplete="off">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserRole" class="form-label fw-bold">Ρόλος *</label>
                                 <select class="form-select" id="editUserRole" name="role" required {{#if (eq userDetails.email @root.user.email)}}disabled{{/if}}>
                                     {{#each roles}}
-                                        <option value="{{this.name}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.name}}</option>
+                                        <option value="{{this.name}}" data-can-have-organization="{{this.canHaveOrganization}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.displayName}}</option>
                                     {{/each}}
                                 </select>
                                 {{#if (eq userDetails.email @root.user.email)}}
-                                <div class="form-text text-muted">Δεν μπορείτε να αλλάξετε τον δικό σας ρόλο</div>
+                                <div class="form-text">Δεν μπορείτε να αλλάξετε τον δικό σας ρόλο</div>
                                 {{/if}}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editUserDepartment" class="form-label fw-bold">Οργανισμός</label>
+                                <select class="form-select" id="editUserDepartment" name="departmentId" disabled>
+                                    <option value="">Όλα</option>
+                                    {{#each departments}}
+                                        <option value="{{this.id}}" {{#if (eq this.id ../userDetails.departmentId)}}selected{{/if}}>{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                                <div class="form-text">Ο Οργανισμός στον οποίο ανήκει ο χρήστης</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editUserPassword" class="form-label fw-bold">{{#if isNew}}Password *{{else}}Νέο Password{{/if}}</label>
+                                <span class="password-toggle"><i class="bi bi-eye"></i></span>
+                                <input type="password" class="form-control" id="editUserPassword" name="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$" title="Το password πρέπει να περιέχει τουλάχιστον 8 χαρακτήρες, ένα λατινικό γράμμα, έναν αριθμό και ένα σύμβολο." autocomplete="new-password" {{#if isNew}}required{{/if}}>
+                                <div class="form-text">{{#if isNew}}Ο κωδικός πρέπει να περιέχει τουλάχιστον 8 χαρακτήρες, ένα λατινικό γράμμα, έναν αριθμό και ένα σύμβολο{{else}}Να παραμείνει κενό αν δεν επιθυμείτε την αλλαγή του{{/if}}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserActive" class="form-label fw-bold">Κατάσταση *</label>
@@ -60,9 +80,9 @@
                                     <option value="false" {{#if (eq userDetails.active false)}}selected{{/if}}>Ανενεργός</option>
                                 </select>
                                 {{#if (eq userDetails.email @root.user.email)}}
-                                <div class="form-text text-muted">Δεν μπορείτε να αλλάξετε την κατάσταση του δικού σας λογαριασμού</div>
+                                <div class="form-text">Δεν μπορείτε να αλλάξετε την κατάσταση του δικού σας λογαριασμού</div>
                                 {{else}}
-                                <div class="form-text text-muted">Καθορίζει αν ο χρήστης μπορεί να πραγματοποιήσει είσοδο στην Εφαρμογή</div>
+                                <div class="form-text">Καθορίζει αν ο χρήστης μπορεί να πραγματοποιήσει είσοδο στην Εφαρμογή</div>
                                 {{/if}}
                             </div>
                         </div>
@@ -72,7 +92,7 @@
                                 <div class="d-flex g-2">
                                     <button type="submit" class="btn btn-success btn-icon">
                                         <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
-                                        <div>Αποθήκευση</div>
+                                        <div>{{#if isNew}}Δημιουργία{{else}}Αποθήκευση{{/if}}</div>
                                     </button>
                                     <a href="/admin/users" class="btn btn-secondary btn-icon">
                                         <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
@@ -97,6 +117,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid">
+                        {{#unless isNew}}
                         {{#unless (eq userDetails.email @root.user.email)}}
                         <button type="button" class="btn btn-danger delete-user-btn"
                                 data-user-id="{{userDetails.id}}" 
@@ -107,6 +128,7 @@
                         
                         <hr>
                         {{/unless}}
+                        {{/unless}}
                         
                         <a href="/admin/users" class="btn btn-secondary">
                             <i class="ti-arrow-left me-1"></i>
@@ -116,6 +138,7 @@
                 </div>
             </div>
             
+            {{#unless isNew}}
             <!-- Πληροφορίες δραστηριότητας -->
             <div class="card mt-3">
                 <div class="card-header">
@@ -135,74 +158,53 @@
                     </small>
                 </div>
             </div>
+            {{/unless}}
         </div>
     </div>
 </div>
 
-<script>
+<script type="module">
+const isNew = {{isNew}};
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Form για επεξεργασία χρήστη
-    document.getElementById('editUserForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+
+    // Λογική για enable/disable του department field με βάση τον επιλεγμένο ρόλο
+    function updateDepartmentField() {
+        const selectedOption = Q('#editUserRole').options[Q('#editUserRole').selectedIndex];
+        const canHaveOrganization = selectedOption.dataset.canHaveOrganization === 'true';
         
-        Q('bootstrap-spinner').show();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
-        const userId = data.id;
-        delete data.id;
-        
-        try {
-            const response = await fetch(`/admin/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            Q('bootstrap-spinner').show(false);
-            await Q.delay(0.1);    // Μικρή καθυστέρηση για να κρύψει το spinner
-            
-            if (result.success) {
-                alert('Ο χρήστης ενημερώθηκε επιτυχώς!');
-                location.reload();
-            } else {
-                alert('Σφάλμα κατά την ενημέρωση χρήστη. Προσπαθήστε ξανά.');
-            }
-        } catch (error) {
-            alert('Σφάλμα δικτύου: ' + error.message);
+        if (canHaveOrganization) {
+            Q('#editUserDepartment').disabled = false;
+        } else {
+            Q('#editUserDepartment').disabled = true;
+            Q('#editUserDepartment').value = '';
         }
+    }
+    
+    // Ενημέρωση κατά τη φόρτωση της σελίδας
+    updateDepartmentField();
+    // Ενημέρωση με κάθε αλλαγή του ρόλου
+    Q('#editUserRole').on('change', updateDepartmentField);
+    
+    // Form για επεξεργασία/δημιουργία χρήστη
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        await submitData(
+            this, 
+            '/admin/users', 
+            isNew ? 'POST' : 'PUT',
+            isNew ? '/admin/users' : null
+        );
     });
     
+    {{#unless isNew}}
     // Button για διαγραφή χρήστη
-    document.querySelectorAll('.delete-user-btn').forEach(button => {
-        button.addEventListener('click', async function() {
-            const userId = this.dataset.userId;
-            const userName = this.dataset.userName;
-            
-            if (confirm(`Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη "${userName}";`)) {
-
-                Q('bootstrap-spinner').show();
-                try {
-                    const response = await fetch(`/admin/users/${userId}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    const result = await response.json();
-                    Q('bootstrap-spinner').show(false);
-
-                    if (result.success) {
-                        alert('Ο χρήστης διαγράφηκε επιτυχώς!');
-                        window.location.href = '/admin/users';
-                    } else {
-                        alert(result.message);
-                    }
-                } catch (error) {
-                    alert('Σφάλμα δικτύου: ' + error.message);
-                }
-            }
-        });
+    Q('.delete-user-btn').on('click', async function() {
+        await deleteEntity(
+            `Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη "${this.dataset.userName}";`,
+            '/admin/users'
+        );
     });
+    {{/unless}}
 });
 </script>

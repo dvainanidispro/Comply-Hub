@@ -1,34 +1,41 @@
 
 
 const permissions = {
-    'edit:users': 'Προβολή και επεξεργασία χρηστών',
-    'view:content': 'Προβολή περιεχομένου',
-    'edit:content': 'Επεξεργασία περιεχομένου',
-    'post:content': 'Δημοσίευση περιεχομένου',
+    'manage:platform': 'Κεντρική διαχείριση πλατφόρμας',
+    'edit:any:content': 'Επεξεργασία περιεχομένου για οποιονδήποτε οργανισμό',
+    'view:any:content': 'Προβολή περιεχομένου για οποιονδήποτε οργανισμό',
+    'edit:org:content': 'Επεξεργασία περιεχομένου για τον οργανισμό του',
+    'view:org:content': 'Προβολή περιεχομένου για τον οργανισμό του',
 };
 
 const roles = {
     admin: {
         name: 'admin',
+        displayName: 'Διαχειριστής',
         user: true,
-        description: 'Διαχειριστής συστήματος με πλήρη δικαιώματα',
-        permissions: ['edit:users', 'view:content', 'edit:content', 'post:content'],
+        description: 'Διαχειριστής πλατφόρμας με πλήρη δικαιώματα',
+        permissions: ['manage:platform', 'view:any:content', 'edit:any:content'],
+        canHaveOrganization: false,
         color: 'danger'
     },
-    editor: {
-        name: 'editor',
+    manager: {
+        name: 'manager',
+        displayName: 'Υπεύθυνος Οργανισμού',
         user: true,
         description: 'Χρήστης με δικαιώματα επεξεργασίας και δημοσίευσης περιεχομένου',
-        permissions: ['view:content', 'edit:content', 'post:content'],
+        permissions: ['view:org:content', 'edit:org:content'],
+        canHaveOrganization: true,
         color: 'success'
     },
-    viewer: {
-        name: 'viewer',
-        user: true,
-        description: 'Χρήστης με δικαιώματα μόνο προβολής',
-        permissions: ['view:content'],
-        color: 'info'
-    },
+    // viewer: {
+    //     name: 'viewer',
+    //     displayName: 'Απλός Χρήστης',
+    //     user: true,
+    //     description: 'Χρήστης με δικαιώματα μόνο προβολής',
+    //     permissions: ['view:org:content'],
+    //     canHaveOrganization: true,
+    //     color: 'info'
+    // },
 
 };
 
