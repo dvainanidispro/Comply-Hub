@@ -48,13 +48,13 @@ admin.get('/users', async (req, res) => {
  */
 admin.get('/users/new', async (req, res) => {
     try {
-        // const organizations = await Cache.table.Organization;
+        const organizations = await Cache.table.Organization;
         
         res.render('admin/single-user', {
             isNew: true,
             userDetails: {},
             roles: roles,
-            // organizations: organizations,
+            organizations,
             user: req.user,
             title: 'Νέος Χρήστης'
         });
@@ -79,13 +79,13 @@ admin.get('/users/:id', async (req, res) => {
             return res.status(404).render('errors/404', { message: 'Ο χρήστης δεν βρέθηκε' });
         }
 
-        // const organizations = await Cache.table.Organization;
+        const organizations = await Cache.table.Organization;
         
         res.render('admin/edit-user', { 
             isNew: false,
             userDetails: user,
             roles: roles,
-            // organizations: organizations,
+            organizations: organizations,
             user: req.user,
             title: `Επεξεργασία Χρήστη: ${user.name || user.email}`
         });

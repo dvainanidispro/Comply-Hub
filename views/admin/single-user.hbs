@@ -58,11 +58,11 @@
                                 {{/if}}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="editUserDepartment" class="form-label fw-bold">Οργανισμός</label>
-                                <select class="form-select" id="editUserDepartment" name="departmentId" disabled>
+                                <label for="editUserOrganization" class="form-label fw-bold">Οργανισμός</label>
+                                <select class="form-select" id="editUserOrganization" name="organizationId" disabled>
                                     <option value="">Όλα</option>
-                                    {{#each departments}}
-                                        <option value="{{this.id}}" {{#if (eq this.id ../userDetails.departmentId)}}selected{{/if}}>{{this.name}}</option>
+                                    {{#each organizations}}
+                                        <option value="{{this.id}}" {{#if (eq this.id ../userDetails.organizationId)}}selected{{/if}}>{{this.name}}</option>
                                     {{/each}}
                                 </select>
                                 <div class="form-text">Ο Οργανισμός στον οποίο ανήκει ο χρήστης</div>
@@ -168,23 +168,23 @@ const isNew = {{isNew}};
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Λογική για enable/disable του department field με βάση τον επιλεγμένο ρόλο
-    function updateDepartmentField() {
+    // Λογική για enable/disable του organization field με βάση τον επιλεγμένο ρόλο
+    function updateOrganizationField() {
         const selectedOption = Q('#editUserRole').options[Q('#editUserRole').selectedIndex];
         const canHaveOrganization = selectedOption.dataset.canHaveOrganization === 'true';
         
         if (canHaveOrganization) {
-            Q('#editUserDepartment').disabled = false;
+            Q('#editUserOrganization').disabled = false;
         } else {
-            Q('#editUserDepartment').disabled = true;
-            Q('#editUserDepartment').value = '';
+            Q('#editUserOrganization').disabled = true;
+            Q('#editUserOrganization').value = '';
         }
     }
     
     // Ενημέρωση κατά τη φόρτωση της σελίδας
-    updateDepartmentField();
+    updateOrganizationField();
     // Ενημέρωση με κάθε αλλαγή του ρόλου
-    Q('#editUserRole').on('change', updateDepartmentField);
+    Q('#editUserRole').on('change', updateOrganizationField);
     
     // Form για επεξεργασία/δημιουργία χρήστη
     Q('#form').on('submit', async function(e) {

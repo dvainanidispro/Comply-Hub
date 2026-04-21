@@ -1,4 +1,5 @@
 import { User } from "./user.js";
+import { Organization } from "./organization.js";
 import { db } from '../config/database.js';
 import log from '../lib/logger.js';
 
@@ -30,4 +31,5 @@ async function syncModels() {
 export default {
     syncModels,
     User,
+    Organization,
 };
