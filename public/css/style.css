@@ -36,6 +36,10 @@
         /* Smooth transitions */
         interpolate-size: allow-keywords; 
 
+        /* Shoelace */
+        --sl-color-primary-600: hsl(210, 100%, 41%);
+        --sl-color-primary-500: hsl(210, 100%, 45%);
+
     }
 
 

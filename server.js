@@ -98,13 +98,13 @@ server.use((req, res) => {
 ///////////////////////////////////         THE SERVER         /////////////////////////////////////
 
 async function startServer(){
+    log.info('Node.js version: ' + process.version);
     await databaseConnectionTest(db);
     if (process.env.SYNCMODELS==='true') {await Models.syncModels()};
     let port = process.env.PORT??80;
     let listeningURL = process.env.LISTENINGURL??'http://localhost';
     server.listen(port, () => {
         log.system(`Express server started at ${presentTime()} | Listening at ${listeningURL}.`);
-        log.info('Node.js version: ' + process.version);
     });
 }
 startServer();
