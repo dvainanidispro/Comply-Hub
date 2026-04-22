@@ -1,0 +1,54 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="ti-briefcase me-2"></i>
+                        Οργανισμοί
+                    </h1>
+                    <div class="card-actions">
+                        <a href="/admin/organizations/new" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Νέος Οργανισμός
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table dim-table auto-rows table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Όνομα</th>
+                                    <th>Ενεργό</th>
+                                    <th>Επεξεργασία</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each organizations}}
+                                <tr>
+                                    <td>{{this.id}}</td>
+                                    <td class="fw-semibold">{{this.name}}</td>
+                                    <td>
+                                        {{#if this.active}}
+                                            <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>
+                                        {{else}}
+                                            <span title="Ανενεργός"><i class="bi bi-x-circle text-dark"></i></span>
+                                        {{/if}}
+                                    </td>
+                                    <td>
+                                        <a href="/admin/organizations/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">
+                                            <i class="ti-pencil text-success"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

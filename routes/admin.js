@@ -26,9 +26,9 @@ admin.use(can('manage:platform'));
 admin.get('/users', async (req, res) => {
     try {
         const users = await Models.User.findAll({
-            attributes: ['id', 'email', 'name', 'role', 'organization', 'permissions', 'createdAt','active'],
+            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'permissions', 'createdAt', 'active'],
+            include: [{ model: Models.Organization, as: 'organization', attributes: ['id', 'name'] }],
             // order: [['createdAt', 'DESC']],
-            raw: true
         });
         
         res.render('admin/users', { 
@@ -71,7 +71,7 @@ admin.get('/users/:id', async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const user = await Models.User.findByPk(userId, {
-            attributes: ['id', 'email', 'name', 'role', 'organization', 'permissions', 'active', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'permissions', 'active', 'createdAt', 'updatedAt'],
             raw: true       // JavaScript object χωρίς μεθόδους Sequelize
         });
         
@@ -81,7 +81,7 @@ admin.get('/users/:id', async (req, res) => {
 
         const organizations = await Cache.table.Organization;
         
-        res.render('admin/edit-user', { 
+        res.render('admin/single-user', { 
             isNew: false,
             userDetails: user,
             roles: roles,
@@ -100,7 +100,7 @@ admin.get('/users/:id', async (req, res) => {
  */
 admin.post('/users', async (req, res) => {
     try {
-        const { email, name, password, role, organization } = req.body;
+        const { email, name, password, role, organizationId, active } = req.body;
         
         // Βασικός έλεγχος δεδομένων
         if (!email) {
@@ -127,7 +127,8 @@ admin.post('/users', async (req, res) => {
             name: name || email.split('@')[0],
             password: hashPassword(password),
             role: role || 'user',
-            organization: organization || null,
+            organizationId: organizationId || null,
+            active: active !== 'false' && active !== false,
         });
         
         log.info(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);
@@ -157,7 +158,7 @@ admin.post('/users', async (req, res) => {
 admin.put('/users/:id', async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const { email, name, role, password, active } = req.body;
+        const { email, name, role, organizationId, password, active } = req.body;
         
         const user = await Models.User.findByPk(userId);
         if (!user) {
@@ -189,6 +190,7 @@ admin.put('/users/:id', async (req, res) => {
             email: email || user.email,
             name: name || user.name,
             role: role || user.role,
+            organizationId: organizationId || null,
             active: active === 'true' || active === true
         };
         
@@ -258,6 +260,161 @@ admin.delete('/users/:id', async (req, res) => {
             success: false, 
             message: 'Σφάλμα κατά τη διαγραφή χρήστη' 
         });
+    }
+});
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////    ROUTES ΓΙΑ ΔΙΑΧΕΙΡΙΣΗ ΟΡΓΑΝΙΣΜΩΝ       /////////////////////////////
+
+/**
+ * GET /admin/organizations - Εμφάνιση λίστας όλων των οργανισμών
+ */
+admin.get('/organizations', async (req, res) => {
+    try {
+        const organizations = await Models.Organization.findAll({
+            attributes: ['id', 'name', 'active'],
+        });
+
+        res.render('admin/organizations', {
+            organizations,
+            user: req.user,
+            title: 'Διαχείριση Οργανισμών'
+        });
+    } catch (error) {
+        log.error(`Σφάλμα κατά την ανάκτηση οργανισμών: ${error}`);
+        res.status(500).render('errors/500', { message: 'Σφάλμα κατά την ανάκτηση οργανισμών' });
+    }
+});
+
+/**
+ * GET /admin/organizations/new - Φόρμα δημιουργίας νέου οργανισμού
+ */
+admin.get('/organizations/new', (req, res) => {
+    res.render('admin/single-organization', {
+        isNew: true,
+        orgDetails: {},
+        user: req.user,
+        title: 'Νέος Οργανισμός'
+    });
+});
+
+/**
+ * GET /admin/organizations/:id - Εμφάνιση στοιχείων συγκεκριμένου οργανισμού
+ */
+admin.get('/organizations/:id', async (req, res) => {
+    try {
+        const orgId = parseInt(req.params.id);
+        const org = await Models.Organization.findByPk(orgId, {
+            attributes: ['id', 'name', 'active'],
+            raw: true
+        });
+
+        if (!org) {
+            return res.status(404).render('errors/404', { message: 'Ο οργανισμός δεν βρέθηκε' });
+        }
+
+        res.render('admin/single-organization', {
+            isNew: false,
+            orgDetails: org,
+            user: req.user,
+            title: `Επεξεργασία Οργανισμού: ${org.name}`
+        });
+    } catch (error) {
+        log.error(`Σφάλμα κατά την ανάκτηση οργανισμού: ${error}`);
+        res.status(500).render('errors/500', { message: 'Σφάλμα κατά την ανάκτηση οργανισμού' });
+    }
+});
+
+/**
+ * POST /admin/organizations - Δημιουργία νέου οργανισμού
+ */
+admin.post('/organizations', async (req, res) => {
+    try {
+        const { name, active } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'Το πεδίο Όνομα είναι υποχρεωτικό' });
+        }
+
+        const existing = await Models.Organization.findOne({ where: { name } });
+        if (existing) {
+            return res.status(400).json({ success: false, message: 'Υπάρχει ήδη οργανισμός με αυτό το όνομα' });
+        }
+
+        const newOrg = await Models.Organization.create({
+            name,
+            active: active !== 'false' && active !== false,
+        });
+
+        Cache.refresh('Organization');
+        log.info(`Νέος οργανισμός δημιουργήθηκε: ${newOrg.name} (ID: ${newOrg.id})`);
+
+        res.status(201).json({ success: true, message: 'Ο οργανισμός δημιουργήθηκε επιτυχώς' });
+    } catch (error) {
+        log.error(`Σφάλμα κατά τη δημιουργία οργανισμού: ${error}`);
+        res.status(500).json({ success: false, message: 'Σφάλμα κατά τη δημιουργία οργανισμού' });
+    }
+});
+
+/**
+ * PUT /admin/organizations/:id - Ενημέρωση στοιχείων οργανισμού
+ */
+admin.put('/organizations/:id', async (req, res) => {
+    try {
+        const orgId = parseInt(req.params.id);
+        const { name, active } = req.body;
+
+        const org = await Models.Organization.findByPk(orgId);
+        if (!org) {
+            return res.status(404).json({ success: false, message: 'Ο οργανισμός δεν βρέθηκε' });
+        }
+
+        if (name && name !== org.name) {
+            const existing = await Models.Organization.findOne({
+                where: { name, id: { [Op.ne]: orgId } }
+            });
+            if (existing) {
+                return res.status(400).json({ success: false, message: 'Υπάρχει ήδη άλλος οργανισμός με αυτό το όνομα' });
+            }
+        }
+
+        await org.update({
+            name: name || org.name,
+            active: active === 'true' || active === true,
+        });
+
+        Cache.refresh('Organization');
+        log.info(`Οργανισμός ενημερώθηκε: ${org.name} (ID: ${org.id})`);
+
+        res.json({ success: true, message: 'Ο οργανισμός ενημερώθηκε επιτυχώς' });
+    } catch (error) {
+        log.error(`Σφάλμα κατά την ενημέρωση οργανισμού: ${error}`);
+        res.status(500).json({ success: false, message: 'Σφάλμα κατά την ενημέρωση οργανισμού' });
+    }
+});
+
+/**
+ * DELETE /admin/organizations/:id - Διαγραφή οργανισμού
+ */
+admin.delete('/organizations/:id', async (req, res) => {
+    try {
+        const orgId = parseInt(req.params.id);
+
+        const org = await Models.Organization.findByPk(orgId);
+        if (!org) {
+            return res.status(404).json({ success: false, message: 'Ο οργανισμός δεν βρέθηκε' });
+        }
+
+        await org.destroy();
+
+        Cache.refresh('Organization');
+        log.info(`Οργανισμός διαγράφηκε: ${org.name} (ID: ${org.id})`);
+
+        res.json({ success: true, message: 'Ο οργανισμός διαγράφηκε επιτυχώς' });
+    } catch (error) {
+        log.error(`Σφάλμα κατά τη διαγραφή οργανισμού: ${error}`);
+        res.status(500).json({ success: false, message: 'Σφάλμα κατά τη διαγραφή οργανισμού' });
     }
 });
 

@@ -1,0 +1,128 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Breadcrumb -->
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/organizations">Οργανισμοί</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{#if isNew}}Νέος Οργανισμός{{else}}{{orgDetails.name}}{{/if}}</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        {{#if isNew}}
+                        <i class="ti-plus me-2"></i>
+                        Νέος Οργανισμός
+                        {{else}}
+                        <i class="ti-pencil me-2"></i>
+                        Επεξεργασία Οργανισμού
+                        {{/if}}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="form">
+                        {{#unless isNew}}
+                        <input type="hidden" id="editOrgId" name="id" value="{{orgDetails.id}}">
+                        {{/unless}}
+
+                        <div class="row">
+                            {{#unless isNew}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">ID Οργανισμού:</label>
+                                <p class="form-control-plaintext text-muted">{{orgDetails.id}}</p>
+                            </div>
+                            <div class="col-md-6 mb-3"></div>
+                            {{/unless}}
+                            <div class="col-md-6 mb-3">
+                                <label for="editOrgName" class="form-label fw-bold">Όνομα *</label>
+                                <input type="text" class="form-control" id="editOrgName" name="name" value="{{orgDetails.name}}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editOrgActive" class="form-label fw-bold">Κατάσταση *</label>
+                                <select class="form-select" id="editOrgActive" name="active">
+                                    <option value="true" {{#unless (eq orgDetails.active false)}}selected{{/unless}}>Ενεργός</option>
+                                    <option value="false" {{#if (eq orgDetails.active false)}}selected{{/if}}>Ανενεργός</option>
+                                </select>
+                                <div class="form-text">Καθορίζει αν ο οργανισμός εμφανίζεται στις επιλογές</div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>{{#if isNew}}Δημιουργία{{else}}Αποθήκευση{{/if}}</div>
+                                    </button>
+                                    <a href="/admin/organizations" class="btn btn-secondary btn-icon">
+                                        <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                        <div>Ακύρωση</div>
+                                    </a>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="ti-settings me-2"></i>
+                        Άλλες Ενέργειες
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid">
+                        {{#unless isNew}}
+                        <button type="button" class="btn btn-danger delete-org-btn"
+                                data-org-id="{{orgDetails.id}}"
+                                data-org-name="{{orgDetails.name}}">
+                            <i class="ti-trash me-1"></i>
+                            Διαγραφή Οργανισμού
+                        </button>
+                        <hr>
+                        {{/unless}}
+                        <a href="/admin/organizations" class="btn btn-secondary">
+                            <i class="ti-arrow-left me-1"></i>
+                            Επιστροφή στη Λίστα Οργανισμών
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+const isNew = {{isNew}};
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        await submitData(
+            this,
+            '/admin/organizations',
+            isNew ? 'POST' : 'PUT',
+            isNew ? '/admin/organizations' : null
+        );
+    });
+
+    {{#unless isNew}}
+    Q('.delete-org-btn').on('click', async function() {
+        await deleteEntity(
+            `Είστε σίγουροι ότι θέλετε να διαγράψετε τον οργανισμό "${this.dataset.orgName}";`,
+            '/admin/organizations'
+        );
+    });
+    {{/unless}}
+});
+</script>

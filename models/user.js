@@ -12,7 +12,7 @@ const User = db.define('user',
         name: DataTypes.STRING,
         password: DataTypes.STRING,
         role: DataTypes.STRING,
-        organization: DataTypes.INTEGER,
+        organizationId: DataTypes.INTEGER,
         permissions: DataTypes.ARRAY(DataTypes.STRING),
         active: {
             type: DataTypes.BOOLEAN,

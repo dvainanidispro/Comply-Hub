@@ -6,6 +6,9 @@ import log from '../lib/logger.js';
 
 ////////////////    MODELS ASSOCIATIONS    ////////////////
 
+User.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+Organization.hasMany(User, { foreignKey: 'organizationId', as: 'organization' });
+
 
 ////////////////    MODELS SYNC    ////////////////
 
