@@ -37,10 +37,10 @@
                                     <td>{{this.email}}</td>
                                     <td>
                                         <span class="badge bg-{{deepLookup @root.roles this.role 'color'}} fs-6">
-                                            {{this.role}}
+                                            {{deepLookup @root.roles this.role 'displayName'}}
                                         </span>
                                     </td>
-                                    <td>{{this.organization.name}}</td>
+                                    <td>{{or this.organization.name '-'}}</td>
                                     <td>
                                         {{#if this.active}}
                                             <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>

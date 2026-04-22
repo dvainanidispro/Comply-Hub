@@ -1,8 +1,9 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
+import { promisify } from 'util';
 import log from '../lib/logger.js';
-// import Models from '../models/models.js';
+import Models from '../models/models.js';
 // import { Op } from 'sequelize';
 
 
@@ -49,32 +50,38 @@ const cookieOptions = {
     maxAge: ms(tokenExpirationTime),
 };
 
+const scryptAsync = promisify(crypto.scrypt);
+const passwordKeyLength = 64;
+
 
 
 /////////////////////////////    HASHING AND VALIDATING PASSWORD    /////////////////////////////
 
 /**
- * Κρυπτογραφεί ένα password με SHA-256 hashing και τυχαίο salt
+ * Κρυπτογραφεί ένα password με scrypt και τυχαίο salt
  * @param {string} password - Το password προς κρυπτογράφηση
- * @returns {string} Το hashed password με salt (μορφή: salt:hash)
+ * @returns {Promise<string>} Το hashed password με salt (μορφή: scrypt:salt:hash)
  */
-const hashPassword = (password) => {
+const hashPassword = async (password) => {
     const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.createHash('sha256').update(salt + password).digest('hex');
-    return `${salt}:${hash}`;
+    const hash = (await scryptAsync(password, salt, passwordKeyLength)).toString('hex');
+    return `scrypt:${salt}:${hash}`;
 };
 
 /**
- * Ελέγχει αν το password ταιριάζει με το hashedPassword (μορφή: salt:hash). Επιστρέφει true ή false.
+ * Ελέγχει αν το password ταιριάζει με το hashedPassword (μορφή: scrypt:salt:hash). Επιστρέφει true ή false.
  * @param {string} password - Το password προς έλεγχο
  * @param {string} hashedPassword - Το αποθηκευμένο hash με salt
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
-let validatePassword = (password, hashedPassword) => {
-    const [salt, hash] = hashedPassword.split(':');
-    if (!salt || !hash) return false;
-    const hashToCompare = crypto.createHash('sha256').update(salt + password).digest('hex');
-    return hashToCompare === hash;
+let validatePassword = async (password, hashedPassword) => {
+    const [algorithm, salt, storedHash, ...rest] = hashedPassword.split(':');
+    if (algorithm !== 'scrypt' || !salt || !storedHash || rest.length) return false;
+
+    const storedBuffer = Buffer.from(storedHash, 'hex');
+    const hashToCompare = await scryptAsync(password, salt, passwordKeyLength);
+    if (storedBuffer.length !== hashToCompare.length) return false;
+    return crypto.timingSafeEqual(hashToCompare, storedBuffer);
 };
 
 
@@ -85,39 +92,23 @@ let validatePassword = (password, hashedPassword) => {
 /** Ελέγχει το email και το password του χρήστη σύμφωνα με αυτά που υπάρχουν στη Βάση και επιστρέφει το χρήστη */
 let getUserFromDatabaseByCredentials = async (email, password) => {
 
-    // Temporary login
-    log.warn(`Temporary login with email: ${email} and password: ${password}`);
-    log.info(`Να χρησιμοποιηθεί η φόρμα του adminitrator για προσθήκη χρήστη στη βάση δεδομένων.`)
-    if (email === process.env.USER && password === process.env.PASSWORD) {
-        let user = {
-            id: 0,
-            username: process.env.USER,
-            name: process.env.NAME,
-            email: process.env.EMAIL,
-            role: 'admin',
-        };
-        return user;
-    } else {
-        return false;
-    }
-    /*
     let user = await Models.User.findOne({
-        where: {email: email},
+        where: {email: email.toLowerCase()},
         // case sensitive! for case insensitive comparison use:
         // where { username: { [Op.iLike]: username } }
         // For PostgreSQL; for other DBs use:  username: { [Op.like]: username.toLowerCase() }
-        // include: {model: Models.Speaker, as: 'speaker'},
+        include: {model: Models.Organization, as: 'organization'},
         raw: true,          // Επιστρέφει τα αποτελέσματα ως JSON
-        nest : true,        // το Speaker να είναι αντικείμενο μέσα στο user 
+        nest : true,        // το organization να είναι αντικείμενο μέσα στο user 
     });
     if (!user) return false;
     // log.dev({user});
 
     // let passwordMatch = (password === user.password);
-    let passwordMatch = validatePassword(password, user.password);
+    let passwordMatch = await validatePassword(password, user.password);
     if (passwordMatch) {return user}
     else {return false}
-    */
+
 };
 
 /** Δημιουργεί το Access Token του χρήστη */

@@ -88,6 +88,10 @@ server.use(dashboard);
 import admin from './routes/admin.js';
 server.use('/admin', admin);
 
+// Own account routes
+import account from './routes/account.js';
+server.use('/account', account);
+
 
 // Catch-all route for 404 errors (must be last)
 server.use((req, res) => {

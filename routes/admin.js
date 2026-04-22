@@ -125,7 +125,7 @@ admin.post('/users', async (req, res) => {
         const newUser = await Models.User.create({
             email,
             name: name || email.split('@')[0],
-            password: hashPassword(password),
+            password: await hashPassword(password),
             role: role || 'user',
             organizationId: organizationId || null,
             active: active !== 'false' && active !== false,
@@ -191,12 +191,15 @@ admin.put('/users/:id', async (req, res) => {
             name: name || user.name,
             role: role || user.role,
             organizationId: organizationId || null,
-            active: active === 'true' || active === true
         };
+        
+        if (active !== undefined) {
+            updateData.active = active === 'true' || active === true;
+        }
         
         // Προσθήκη κωδικού μόνο αν έχει δοθεί νέος
         if (password && password.trim() !== '') {
-            updateData.password = hashPassword(password);
+            updateData.password = await hashPassword(password);
         }
         
         await user.update(updateData);
