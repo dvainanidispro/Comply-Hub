@@ -26,7 +26,7 @@ admin.use(can('manage:platform'));
 admin.get('/users', async (req, res) => {
     try {
         const users = await Models.User.findAll({
-            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'permissions', 'createdAt', 'active'],
+            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'scope', 'createdAt', 'active'],
             include: [{ model: Models.Organization, as: 'organization', attributes: ['id', 'name'] }],
             order: [['role', 'ASC'], ['createdAt', 'ASC']],
         });
@@ -71,7 +71,7 @@ admin.get('/users/:id', async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const user = await Models.User.findByPk(userId, {
-            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'permissions', 'active', 'createdAt', 'updatedAt'],
+            attributes: ['id', 'email', 'name', 'role', 'organizationId', 'scope', 'active', 'createdAt', 'updatedAt'],
             raw: true       // JavaScript object χωρίς μεθόδους Sequelize
         });
         
