@@ -105,7 +105,7 @@ const arrayOfDOMObjectsHandler = (selector) => {
  * @type {(selector: string) => HTMLElement | HTMLElement[]}
 */
 function Q (selector) {         // Χρήση function declaretion (όχι πχ expression / arrow function) για να παίζουν τα JsDoc των methods παρακάτω
-    if ( selector.charAt(0)=='#' ) {  
+    if ( selector.charAt(0)=='#' && !selector.includes(' ')) {  
         const element = document.querySelector(selector);
         if (!element) {return null}
         return new Proxy(element, singleDOMObjectHandler);

@@ -57,6 +57,7 @@
                                 <div class="form-text">Δεν μπορείτε να αλλάξετε τον δικό σας ρόλο</div>
                                 {{/if}}
                             </div>
+                            <div></div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserOrganization" class="form-label fw-bold">Οργανισμός</label>
                                 <select class="form-select" id="editUserOrganization" name="organizationId" disabled>
@@ -66,6 +67,15 @@
                                     {{/each}}
                                 </select>
                                 <div class="form-text">Ο Οργανισμός στον οποίο ανήκει ο χρήστης</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editUserScope" class="form-label fw-bold">Πρόσβαση σε λειτουργίες</label>
+                                <select class="form-select" id="editUserScope" name="scope" multiple size="3" disabled>
+                                    {{#each scopes}}
+                                        <option value="{{this.name}}" {{#if (includes ../userDetails.scope this.name)}}selected{{/if}}>{{this.displayName}}</option>
+                                    {{/each}}
+                                </select>
+                                <div class="form-text">Καθορίζει τις λειτουργίες στις οποίες έχει πρόσβαση ο χρήστης. Πατήστε Ctrl για πολλαπλή επιλογή.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserPassword" class="form-label fw-bold">{{#if isNew}}Password *{{else}}Νέο Password{{/if}}</label>
@@ -175,9 +185,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (canHaveOrganization) {
             Q('#editUserOrganization').disabled = false;
+            Q('#editUserScope').disabled = false;
         } else {
             Q('#editUserOrganization').disabled = true;
             Q('#editUserOrganization').value = '';
+            Q('#editUserScope').disabled = true;
+            Q('#editUserScope option').forEach(option => option.selected = false);
         }
     }
     
@@ -189,8 +202,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form για επεξεργασία/δημιουργία χρήστη
     Q('#form').on('submit', async function(e) {
         e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        data.scope = formData.getAll('scope');  // Αν είναι disabled, επιστρέφει []
         await submitData(
-            this, 
+            data, 
             '/admin/users', 
             isNew ? 'POST' : 'PUT',
             isNew ? '/admin/users' : null

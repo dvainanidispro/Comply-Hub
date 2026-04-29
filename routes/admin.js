@@ -5,6 +5,7 @@ import { can, roles, permissions } from '../auth/roles.js';
 import { hashPassword } from '../auth/auth.js';
 import { Op, ForeignKeyConstraintError } from 'sequelize';
 import log from '../lib/logger.js';
+import scopes from '../auth/scopes.js';
 
 const admin = express.Router();
 
@@ -54,6 +55,7 @@ admin.get('/users/new', async (req, res) => {
             isNew: true,
             userDetails: {},
             roles: roles,
+            scopes: scopes,
             organizations,
             user: req.user,
             title: 'Νέος Χρήστης'
@@ -85,6 +87,7 @@ admin.get('/users/:id', async (req, res) => {
             isNew: false,
             userDetails: user,
             roles: roles,
+            scopes: scopes,
             organizations: organizations,
             user: req.user,
             title: `Επεξεργασία Χρήστη: ${user.name || user.email}`
@@ -100,7 +103,7 @@ admin.get('/users/:id', async (req, res) => {
  */
 admin.post('/users', async (req, res) => {
     try {
-        const { email, name, password, role, organizationId, active } = req.body;
+        const { email, name, password, role, organizationId, active, scope } = req.body;
         
         // Βασικός έλεγχος δεδομένων
         if (!email) {
@@ -129,6 +132,7 @@ admin.post('/users', async (req, res) => {
             role: role || 'user',
             organizationId: organizationId || null,
             active: active !== 'false' && active !== false,
+            scope,
         });
         
         log.info(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);
@@ -158,7 +162,7 @@ admin.post('/users', async (req, res) => {
 admin.put('/users/:id', async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const { email, name, role, organizationId, password, active } = req.body;
+        const { email, name, role, organizationId, password, active, scope } = req.body;
         
         const user = await Models.User.findByPk(userId);
         if (!user) {
@@ -191,6 +195,7 @@ admin.put('/users/:id', async (req, res) => {
             name: name || user.name,
             role: role || user.role,
             organizationId: organizationId || null,
+            scope,
         };
         
         if (active !== undefined) {
