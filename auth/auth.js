@@ -121,7 +121,8 @@ let createAccessToken = (user, forMagicLink=false) => {
         email: user?.email??null,
         name: user.name,
         role: user?.role??null,
-        // scope: "read:messages write:messages",
+        org: user?.organizationId??'any',
+        scope: user?.scope??[],
         // customClaims: {  },  // name, email, username, roles, permissions
     }, jwtsecret, {expiresIn: forMagicLink ? linkExpirationTime : tokenExpirationTime});
 };

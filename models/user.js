@@ -13,7 +13,7 @@ const User = db.define('user',
         password: DataTypes.STRING,
         role: DataTypes.STRING,
         organizationId: DataTypes.INTEGER,
-        permissions: DataTypes.ARRAY(DataTypes.STRING),
+        scope: DataTypes.ARRAY(DataTypes.STRING),
         active: {
             type: DataTypes.BOOLEAN,
             defaultValue: true
