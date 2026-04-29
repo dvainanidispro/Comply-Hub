@@ -3,7 +3,7 @@ import Models from '../models/models.js';
 import Cache from '../models/cache.js';
 import { can, roles, permissions } from '../auth/roles.js';
 import { hashPassword } from '../auth/auth.js';
-import { Op } from 'sequelize';
+import { Op, ForeignKeyConstraintError } from 'sequelize';
 import log from '../lib/logger.js';
 
 const admin = express.Router();
@@ -28,7 +28,7 @@ admin.get('/users', async (req, res) => {
         const users = await Models.User.findAll({
             attributes: ['id', 'email', 'name', 'role', 'organizationId', 'permissions', 'createdAt', 'active'],
             include: [{ model: Models.Organization, as: 'organization', attributes: ['id', 'name'] }],
-            // order: [['createdAt', 'DESC']],
+            order: [['role', 'ASC'], ['createdAt', 'ASC']],
         });
         
         res.render('admin/users', { 
@@ -258,6 +258,12 @@ admin.delete('/users/:id', async (req, res) => {
             message: 'Ο χρήστης διαγράφηκε επιτυχώς' 
         });
     } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Είναι αδύνατη η διαγραφή του χρήστη διότι συνδέεται με άλλες εγγραφές. Παρακαλώ, απενεργοποιήστε τον χρήστη.' 
+            });
+        }
         log.error(`Σφάλμα κατά τη διαγραφή χρήστη: ${error}`);
         res.status(500).json({ 
             success: false, 

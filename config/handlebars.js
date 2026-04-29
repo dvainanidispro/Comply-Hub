@@ -98,15 +98,18 @@ const handlebarsConfig = {
                 return '';
             }
         },
-        /* example: {{#if (can 'manage:platform')}} */
-        can: function(permission) {
+        /* example: {{#if (can 'manage:platform')}} ή {{#if (can 'perm1' 'perm2')}} (OR logic) */
+        can: function(...args) {
             // Το 'this' είναι το context (το αντικείμενο δεδομένων) που περνιέται στο handlebars
             const user = this.user;
-            return userHasPermission(user, permission);
+            const permissions = args.slice(0, -1); // αφαιρούμε το Handlebars options object
+            return userHasPermission(user, ...permissions);
         },
-        /* example: {{#unless (can2 'edit:content' ../user)}}d-none{{/unless}} χρήσιμο μέσα σε {{#each}} όπου δεν λειουργεί το can */
-        can2: function(permission, user) {
-            return userHasPermission(user, permission);
+        /* example: {{#unless (can2 'edit:content' ../user)}}d-none{{/unless}} ή {{#unless (can2 'perm1' 'perm2' ../user)}} (OR logic) χρήσιμο μέσα σε {{#each}} όπου δεν λειουργεί το can */
+        can2: function(...args) {
+            const user = args.at(args.length - 2); // τελευταίο explicit arg πριν το options object
+            const permissions = args.slice(0, -2); // όλα εκτός user και options
+            return userHasPermission(user, ...permissions);
         },
     }
 };
