@@ -155,17 +155,36 @@ Q.fetch = async (URL,property=true) => {
  * @param {object} data The data to send
  * @returns {Promise<object>} Returns the result as JSON
  */
-Q.fetchPost = async (URL, data) => {
+Q.fetch.post = async (URL, data) => {
     return fetch(URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
     .then(response=>{
-        if (!response.ok) {throw new Error('Q.fetchPost failed')} 
+        if (!response.ok) {throw new Error('Q.fetch.post failed')} 
         else {return response.json()}
     })
     .catch(e=>{console.error(e)});     
+};
+
+/**
+ * Makes a DELETE request and returns the result as JSON
+ * @param {string} URL The URL to make a DELETE request
+ * @param {object} data The data to send
+ * @returns {Promise<object>} Returns the result as JSON
+ */
+Q.fetch.delete = async (URL, data) => {
+    return fetch(URL, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response=>{
+        if (!response.ok) {throw new Error('Q.fetch.delete failed')}
+        else {return response.json()}
+    })
+    .catch(e=>{console.error(e)});
 };
 
 

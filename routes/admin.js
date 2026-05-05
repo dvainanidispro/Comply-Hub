@@ -6,6 +6,7 @@ import { hashPassword } from '../auth/auth.js';
 import { Op, ForeignKeyConstraintError } from 'sequelize';
 import log from '../lib/logger.js';
 import scopes from '../auth/scopes.js';
+import storageRouter from './storage.js';
 
 const admin = express.Router();
 
@@ -18,6 +19,8 @@ const admin = express.Router();
 
 // Middleware για έλεγχο admin δικαιωμάτων
 admin.use(can('manage:platform'));
+
+admin.use('/storage', storageRouter);
 
 
 

@@ -34,7 +34,15 @@
                                 <tr>
                                     <td>{{this.id}}</td>
                                     <td class="fw-semibold">{{this.name}}</td>
-                                    <td>{{this.email}}</td>
+                                    <td>
+                                        <sl-copy-button
+                                            value="{{this.email}}"
+                                            copy-label="Αντιγραφή"
+                                            success-label="ΟΚ!"
+                                            error-label="Σφάλμα, ο περιηγητής σας δεν υποστηρίζει αυτή τη λειτουργία!"
+                                        ></sl-copy-button>
+                                        {{this.email}}
+                                    </td>
                                     <td>
                                         <span class="badge bg-{{deepLookup @root.roles this.role 'color'}} fs-6">
                                             {{deepLookup @root.roles this.role 'displayName'}}

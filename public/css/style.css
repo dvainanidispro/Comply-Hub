@@ -582,6 +582,18 @@
         cursor: pointer;
     }
 
+    /* Storage browser: εμφάνιση εικονιδίου διαγραφής μετά από 3s hover */
+    .storage-item .delete-icon {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .storage-item:hover .delete-icon {
+        animation: storage-show-delete 0s linear 3s forwards;
+    }
+    @keyframes storage-show-delete {
+        to { opacity: 1; pointer-events: auto; }
+    }
+
 }
 /* Τέλος components layer */
 
