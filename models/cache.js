@@ -7,7 +7,7 @@
  * Πχ τα Departments και Users που εμφανίζονται σε πολλές σελίδες ως dropdowns.
  * Παρόλα αυτά, στις σελίδες διαχείρισης τους (πχ /admin/departments, /admin/users/) 
  * θα γίνεται πάντα query για να εμφανίζονται και τα inactive records.
- * 
+ * pee
  * Exports:
  * - Cache.table:       Proxy — επιστρέφει array με τα records του model (raw)
  * - Cache.map:         Proxy — επιστρέφει Map<id, record> για γρήγορη αναζήτηση
@@ -119,9 +119,12 @@ async function getTableData(modelName) {
         throw new Error(`Model ${modelName} δεν βρέθηκε`);
     }
     
-    // Query στη βάση - φιλτράρισμα μόνο αν υπάρχει πεδίο active και ταξινόμηση αν υπάρχει πεδίο name
+    // Query στη βάση - φιλτράρισμα μόνο αν υπάρχει πεδίο active και ταξινόμηση κατά sequence ή name
     const where = Model.rawAttributes.active ? { active: true } : {};
-    const order = Model.rawAttributes.name ? [['name', 'ASC']] : [];
+    const order = 
+        Model.rawAttributes.sequence ? [['sequence', 'ASC']] : 
+        Model.rawAttributes.name ? [['name', 'ASC']] : 
+        [];
     const data = await Model.findAll({ where, order, raw: true });
 
     // log.dev(`Fetched ${data.length} records from database for model ${modelName}`);

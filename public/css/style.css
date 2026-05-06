@@ -1,7 +1,7 @@
 /* Import των framework αρχείων στο framework layer - πρέπει να είναι πρώτα */
 @import url("/css/adminator.css") layer(framework);
 @import url("https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css") layer(framework);
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css") layer(framework);
+/* @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css") layer(framework); */
 
 /* Δήλωση των CSS layers με τη σωστή σειρά προτεραιότητας */
 @layer framework, base, dim, layout, theme, components, utilities;

@@ -1,5 +1,7 @@
 import { User } from "./user.js";
 import { Organization } from "./organization.js";
+import { PolicyType } from "./policy_type.js";
+import { Policy } from "./policy.js";
 import { db } from '../config/database.js';
 import log from '../lib/logger.js';
 
@@ -8,6 +10,12 @@ import log from '../lib/logger.js';
 
 User.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
 Organization.hasMany(User, { foreignKey: 'organizationId', as: 'organization' });
+
+Policy.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+Organization.hasMany(Policy, { foreignKey: 'organizationId', as: 'policies' });
+
+Policy.belongsTo(PolicyType, { foreignKey: 'policyTypeId', as: 'policyType' });
+PolicyType.hasMany(Policy, { foreignKey: 'policyTypeId', as: 'policies' });
 
 
 ////////////////    MODELS SYNC    ////////////////
@@ -35,4 +43,6 @@ export default {
     syncModels,
     User,
     Organization,
+    PolicyType,
+    Policy,
 };
