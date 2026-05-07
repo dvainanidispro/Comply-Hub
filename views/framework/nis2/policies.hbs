@@ -20,13 +20,25 @@ const showID = true;
                         <table class="table table-striped dim-table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th x-show="showID" style="width:5ch">ID</th>
-                                    <th style="width:12ch">Κωδικός</th>
-                                    <th style="width:60ch">Όνομα</th>
+                                    <th class="sortable" x-show="showID" style="width:7ch">ID</th>
+                                    <th class="sortable" style="width:14ch" >
+                                        <sl-tooltip content="Προαιρετικό">
+                                            <span>Κωδικός</span>
+                                        </sl-tooltip>
+                                    </th>
+                                    <th class="sortable "style="width:60ch">Όνομα</th>
                                     <th>Περιγραφή</th>
-                                    <th class="text-center" style="width:15ch">Προεπιλογή</th>
-                                    <th class="text-center" style="width:70px">Σειρά</th>
-                                    <th class="text-center" style="width:10ch">Ενεργή</th>
+                                    <th class="text-center sortable" style="width:18ch">
+                                        <sl-tooltip content="Καθορίζει αν η πολιτική θα συμπεριλαμβάνεται στη μαζική απόδοση πολιτικών σε Οργανισμό.">
+                                            <span>Προεπιλογή</span>
+                                        </sl-tooltip>
+                                    </th>
+                                    <th class="text-center sortable" data-sort-type="number" style="width:12ch">
+                                        <sl-tooltip content="Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης των πολιτικών. Δεν έχει λειτουργική σημασία.">
+                                            <span>Σειρά</span>
+                                        </sl-tooltip>
+                                        </th>
+                                    <th class="text-center sortable" style="width:12ch">Ενεργή</th>
                                     <th class="text-center" style="width:15ch">Αποθήκευση</th>
                                 </tr>
                             </thead>
@@ -86,7 +98,7 @@ const showID = true;
                 <div class="card-header">
                     <h2 class="card-title h5 mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
-                        Νέος Τύπος Πολιτικής
+                        Προσθήκη Νέου Τύπου Πολιτικής
                     </h2>
                 </div>
                 <div class="card-body">
@@ -97,7 +109,8 @@ const showID = true;
                         </div>
                         <div class="col" style="min-width:180px">
                             <label class="form-label small">Όνομα</label>
-                            <input type="text" class="form-control form-control-sm" x-model="newRow.name">
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.name"
+                                @input.debounce="if (!newRow.code) newRow.code = createCodeFromName(newRow.name)">
                         </div>
                         <div class="col" style="min-width:200px">
                             <label class="form-label small">Περιγραφή</label>
@@ -127,69 +140,74 @@ const showID = true;
 </div>
 
 <script>
-function nis2PoliciesApp() {
-    return {
-        rows: window.policies.map(p => ({ ...p, _saving: false })),
-        newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '' },
 
-        async saveRow(row) {
-            row._saving = true;
-            try {
-                const res = await fetch(`/admin/framework/nis2/policies/${row.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        code: row.code,
-                        name: row.name,
-                        description: row.description,
-                        sequence: row.sequence !== '' ? row.sequence : null,
-                        default: row.default,
-                        active: row.active,
-                    }),
-                });
-                const data = await res.json();
-                if (data.ok) {
-                    window.location.reload();
-                } else {
-                    row._saving = false;
-                    alert(data.message || 'Σφάλμα κατά την αποθήκευση.');
-                }
-            } catch (e) {
-                row._saving = false;
-                alert('Σφάλμα δικτύου.');
-            }
-        },
-
-        async createRow() {
-            this.newRow._saving = true;
-            this.newRow._error = '';
-            try {
-                const res = await fetch('/admin/framework/nis2/policies', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        code: this.newRow.code,
-                        name: this.newRow.name,
-                        description: this.newRow.description,
-                        sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
-                        default: this.newRow.default,
-                        active: true,
-                    }),
-                });
-                const data = await res.json();
-                if (data.ok) {
-                    window.location.reload();
-                } else {
-                    this.newRow._saving = false;
-                    this.newRow._error = data.message || 'Σφάλμα κατά την προσθήκη.';
-                }
-            } catch (e) {
-                this.newRow._saving = false;
-                this.newRow._error = 'Σφάλμα δικτύου.';
-            }
-        },
+    window.dimtablesOptions = {
+        showTopBar: false,
     };
-}
+
+    function nis2PoliciesApp() {
+        return {
+            rows: window.policies.map(p => ({ ...p, _saving: false })),
+            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '' },
+
+            async saveRow(row) {
+                row._saving = true;
+                try {
+                    const res = await fetch(`/admin/framework/nis2/policies/${row.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            code: row.code,
+                            name: row.name,
+                            description: row.description,
+                            sequence: row.sequence !== '' ? row.sequence : null,
+                            default: row.default,
+                            active: row.active,
+                        }),
+                    });
+                    const data = await res.json();
+                    if (data.ok) {
+                        window.location.reload();
+                    } else {
+                        row._saving = false;
+                        alert(data.message || 'Σφάλμα κατά την αποθήκευση.');
+                    }
+                } catch (e) {
+                    row._saving = false;
+                    alert('Σφάλμα δικτύου.');
+                }
+            },
+
+            async createRow() {
+                this.newRow._saving = true;
+                this.newRow._error = '';
+                try {
+                    const res = await fetch('/admin/framework/nis2/policies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            code: this.newRow.code,
+                            name: this.newRow.name,
+                            description: this.newRow.description,
+                            sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
+                            default: this.newRow.default,
+                            active: true,
+                        }),
+                    });
+                    const data = await res.json();
+                    if (data.ok) {
+                        window.location.reload();
+                    } else {
+                        this.newRow._saving = false;
+                        this.newRow._error = data.message || 'Σφάλμα κατά την προσθήκη.';
+                    }
+                } catch (e) {
+                    this.newRow._saving = false;
+                    this.newRow._error = 'Σφάλμα δικτύου.';
+                }
+            },
+        };
+    }
 </script>
 
 <script type="module">
@@ -203,3 +221,9 @@ function nis2PoliciesApp() {
         if (count > 1) Q.alert(`Υπάρχουν ${count} πολιτικές με τον ίδιο κωδικό: ${code}`, 'OK');
     }
 </script>
+
+<style>
+    :root {
+        --sl-tooltip-background-color: hsl(242, 36%, 42%);
+    }
+</style>
