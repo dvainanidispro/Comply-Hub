@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Op } from 'sequelize';
 import { db } from "../config/database.js";
 
 const Policy = db.define('policy',
@@ -19,9 +19,14 @@ const Policy = db.define('policy',
         description: DataTypes.TEXT,
         effectiveDate: DataTypes.DATE,
         reviewDate: DataTypes.DATE,
+        framework: {
+            type: DataTypes.STRING,
+            comment: 'Χρησιμοποιείται για filtering των custom policies (όταν policyTypeId=null).',
+        },
         files: {
             type: DataTypes.ARRAY(DataTypes.STRING),
             defaultValue: [],
+            comment: 'Array από αντικείμενα { path, filename, mimetype }'
         },
     },
     {
@@ -35,6 +40,12 @@ const Policy = db.define('policy',
             {
                 name: 'policies_policy_type_id',
                 fields: ['policyTypeId'],
+            },
+            {
+                name: 'policies_org_policy_type_unique',
+                fields: ['organizationId', 'policyTypeId'],
+                unique: true,
+                where: { policyTypeId: { [Op.ne]: null } },
             },
         ],
     }

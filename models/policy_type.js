@@ -21,6 +21,10 @@ const PolicyType = db.define('policy_type',
             type: DataTypes.SMALLINT,
             comment: 'Χρησιμοποιείται για την οπτική ταξινόμηση, δεν έχει λειτουργική σημασία.',
         },
+        active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+        },
     },
     {
         tableName: 'policy_types',
