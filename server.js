@@ -98,6 +98,10 @@ server.use(dashboard);
 import admin from './routes/admin.js';
 server.use('/admin', admin);
 
+// Frameworks routes
+import frameworks from './routes/frameworks/frameworks.js';
+server.use('/admin/framework', frameworks);
+
 // Own account routes
 import account from './routes/account.js';
 server.use('/account', account);

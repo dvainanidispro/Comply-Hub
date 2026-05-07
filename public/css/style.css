@@ -305,6 +305,9 @@
     textarea[readonly], textarea:disabled, select:disabled {
         background-color: hsl(240, 50%, 93%) !important;
     }
+    input.form-check-input, input.form-check-input + *:is(span, label){
+        cursor: pointer;
+    }
     input::placeholder{
         color: gray !important;
         opacity: 1 !important; /* Firefox */
@@ -606,9 +609,8 @@
 
 
     .center-contents, .center-content{
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        place-items: center;
     }
 
     .unseparated {

@@ -1,0 +1,205 @@
+<script>
+window.policies = {{{objectify policies}}};
+const showID = true;
+</script>
+
+<div class="container-fluid" x-data="nis2PoliciesApp()">
+
+    <!-- Πίνακας πολιτικών -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        NIS2 &mdash; Πολιτικές
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped dim-table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th x-show="showID" style="width:5ch">ID</th>
+                                    <th style="width:12ch">Κωδικός</th>
+                                    <th style="width:60ch">Όνομα</th>
+                                    <th>Περιγραφή</th>
+                                    <th class="text-center" style="width:15ch">Προεπιλογή</th>
+                                    <th class="text-center" style="width:70px">Σειρά</th>
+                                    <th class="text-center" style="width:10ch">Ενεργή</th>
+                                    <th class="text-center" style="width:15ch">Αποθήκευση</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="row in rows" :key="row.id">
+                                    <tr :class="!row.active ? 'table-secondary text-muted' : ''">
+                                        <td x-show="showID" x-text="row.id"></td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                x-model="row.code">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                x-model="row.name"
+                                                @input.debounce="if (!row.code) row.code = createCodeFromName(row.name)">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm"
+                                                x-model="row.description">
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input"
+                                                :checked="row.default"
+                                                @change="row.default = $event.target.checked">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm"
+                                                x-model="row.sequence" style="width:60px">
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input"
+                                                :checked="row.active"
+                                                @change="row.active = $event.target.checked">
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-success me-1" title="Αποθήκευση"
+                                                @click="saveRow(row)"
+                                                :disabled="row._saving">
+                                                <span x-show="!row._saving"><i class="bi bi-floppy"></i></span>
+                                                <span x-show="row._saving"><i class="bi bi-hourglass-split"></i></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Προσθήκη νέου policy type -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h5 mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Νέος Τύπος Πολιτικής
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-auto" style="width:120px">
+                            <label class="form-label small">Κωδικός</label>
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.code">
+                        </div>
+                        <div class="col" style="min-width:180px">
+                            <label class="form-label small">Όνομα</label>
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.name">
+                        </div>
+                        <div class="col" style="min-width:200px">
+                            <label class="form-label small">Περιγραφή</label>
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.description">
+                        </div>
+                        <div class="col-auto text-center" style="padding-bottom:8px">
+                            <label class="form-label small d-block">Προεπιλογή</label>
+                            <input type="checkbox" class="form-check-input" x-model="newRow.default">
+                        </div>
+                        <div class="col-auto" style="width:80px">
+                            <label class="form-label small">Σειρά</label>
+                            <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" @click="createRow()" :disabled="newRow._saving">
+                                <span x-show="!newRow._saving"><i class="bi bi-plus-lg me-1"></i>Προσθήκη</span>
+                                <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-danger small" x-show="newRow._error" x-text="newRow._error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function nis2PoliciesApp() {
+    return {
+        rows: window.policies.map(p => ({ ...p, _saving: false })),
+        newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '' },
+
+        async saveRow(row) {
+            row._saving = true;
+            try {
+                const res = await fetch(`/admin/framework/nis2/policies/${row.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: row.code,
+                        name: row.name,
+                        description: row.description,
+                        sequence: row.sequence !== '' ? row.sequence : null,
+                        default: row.default,
+                        active: row.active,
+                    }),
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    window.location.reload();
+                } else {
+                    row._saving = false;
+                    alert(data.message || 'Σφάλμα κατά την αποθήκευση.');
+                }
+            } catch (e) {
+                row._saving = false;
+                alert('Σφάλμα δικτύου.');
+            }
+        },
+
+        async createRow() {
+            this.newRow._saving = true;
+            this.newRow._error = '';
+            try {
+                const res = await fetch('/admin/framework/nis2/policies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: this.newRow.code,
+                        name: this.newRow.name,
+                        description: this.newRow.description,
+                        sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
+                        default: this.newRow.default,
+                        active: true,
+                    }),
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    window.location.reload();
+                } else {
+                    this.newRow._saving = false;
+                    this.newRow._error = data.message || 'Σφάλμα κατά την προσθήκη.';
+                }
+            } catch (e) {
+                this.newRow._saving = false;
+                this.newRow._error = 'Σφάλμα δικτύου.';
+            }
+        },
+    };
+}
+</script>
+
+<script type="module">
+    /* Έλεγχος για διπλότυπους κωδικούς */
+    const codeCount = new Map();
+    for (const p of window.policies) {
+        if (!p.code) continue;
+        codeCount.set(p.code, (codeCount.get(p.code) ?? 0) + 1);
+    }
+    for (const [code, count] of codeCount) {
+        if (count > 1) Q.alert(`Υπάρχουν ${count} πολιτικές με τον ίδιο κωδικό: ${code}`, 'OK');
+    }
+</script>

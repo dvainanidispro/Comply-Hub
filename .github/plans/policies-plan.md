@@ -54,7 +54,6 @@
 Προτεινόμενες προσθήκες:
 
 - `active: boolean` με default `true`
-- χρήση deactivate αντί για hard delete όπου γίνεται
 
 Στόχος:
 
@@ -75,7 +74,7 @@
 - σωστό filtering των custom policies βάσει scope/framework,
 - καθαρό query model χωρίς πολύπλοκα joins μόνο και μόνο για framework filtering.
 
-### 2. Access Model και Organization Context
+### 2. Access Model και Organization Context  - Done
 
 Το feature είναι org-centric, αλλά προς το παρόν η ορατότητα των frameworks μένει user-based:
 
@@ -92,7 +91,7 @@
 
 Ο admin δεν θα έχει ξεχωριστό interface για org policies. Θα λειτουργεί ως manager για τον επιλεγμένο οργανισμό.
 
-### 3. Admin Master Data
+### 3. Admin Master Data - Done
 
 Νέο admin CRUD για `policy_types` με fields:
 
@@ -104,7 +103,7 @@
 - `sequence`
 - `active`
 
-Μετά από create/update/delete/deactivate:
+Μετά από create/update/delete:
 
 - `Cache.refresh('PolicyType')`
 
