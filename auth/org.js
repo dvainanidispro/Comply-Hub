@@ -7,8 +7,9 @@ const org = (req, res, next) => {
         const cookieOrg = parseInt(req.cookies?.org);
         req.org = isNaN(cookieOrg) ? null : cookieOrg;
     }
-    //TODO: Αν τελικά είναι null, τότε να οδηγεί σε σελίδα επιλογής οργανισμού αν είναι υπεύθυνος 
-    // (ή σελίδα login αν είναι admin). 
+    if (req.org === null) {
+        return res.redirect(`/account/settings?redirect=${encodeURIComponent(req.originalUrl)}`);
+    }
     next();
 };
 

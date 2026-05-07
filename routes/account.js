@@ -1,6 +1,7 @@
 import express from 'express';
 import { hashPassword } from '../auth/auth.js';
 import Models from '../models/models.js';
+import Cache from '../models/cache.js';
 import { roles, can } from '../auth/roles.js';
 import log from '../lib/logger.js';
 
@@ -108,10 +109,14 @@ account.post('/profile', async (req, res) => {
 });
 
 /**
- * GET /account/settings - Εμφάνιση ρυθμίσεων χρήστη (δεν εφαρμόζεται)
+ * GET /account/settings - Εμφάνιση ρυθμίσεων (μόνο για admins)
  */
-account.get('/settings', async (req, res) => {
-    res.render('account/settings');
+account.get('/settings', can('manage:platform'), async (req, res) => {
+    const organizations = await Cache.table.Organization;
+    res.render('account/settings', {
+        title: 'Ρυθμίσεις',
+        organizations,
+    });
 });
 
 

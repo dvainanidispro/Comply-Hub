@@ -459,7 +459,7 @@
     /* Cards */
     .card{
         background-color: hsl(240, 67%, 96%);
-        & input:not([type="checkbox"]), input:not([type="checkbox"]):focus{
+        & input:not(:is([type="checkbox"], [type="radio"])), & input:not(:is([type="checkbox"], [type="radio"])):focus {
             background-color: var(--input-bg-color);
         }
     }
