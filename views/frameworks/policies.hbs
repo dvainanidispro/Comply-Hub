@@ -1,9 +1,10 @@
 <script>
 window.policies = {{{objectify policies}}};
-const showID = true;
+window.framework = '{{framework}}';
+const showID = false;
 </script>
 
-<div class="container-fluid" x-data="nis2PoliciesApp()">
+<div class="container-fluid" x-data="policiesApp()">
 
     <!-- Πίνακας πολιτικών -->
     <div class="row mb-4">
@@ -12,7 +13,7 @@ const showID = true;
                 <div class="card-header">
                     <h1 class="card-title h3">
                         <i class="bi bi-file-earmark-text me-2"></i>
-                        NIS2 &mdash; Πολιτικές
+                        {{title}}
                     </h1>
                 </div>
                 <div class="card-body">
@@ -21,12 +22,12 @@ const showID = true;
                             <thead class="table-dark">
                                 <tr>
                                     <th class="sortable" x-show="showID" style="width:7ch">ID</th>
-                                    <th class="sortable" style="width:14ch" >
+                                    <th class="sortable" style="width:14ch">
                                         <sl-tooltip content="Προαιρετικό">
                                             <span>Κωδικός</span>
                                         </sl-tooltip>
                                     </th>
-                                    <th class="sortable "style="width:60ch">Όνομα</th>
+                                    <th class="sortable" style="width:60ch">Όνομα</th>
                                     <th>Περιγραφή</th>
                                     <th class="text-center sortable" style="width:18ch">
                                         <sl-tooltip content="Καθορίζει αν η πολιτική θα συμπεριλαμβάνεται στη μαζική απόδοση πολιτικών σε Οργανισμό.">
@@ -37,7 +38,7 @@ const showID = true;
                                         <sl-tooltip content="Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης των πολιτικών. Δεν έχει λειτουργική σημασία.">
                                             <span>Σειρά</span>
                                         </sl-tooltip>
-                                        </th>
+                                    </th>
                                     <th class="text-center sortable" style="width:12ch">Ενεργή</th>
                                     <th class="text-center" style="width:15ch">Αποθήκευση</th>
                                 </tr>
@@ -125,8 +126,8 @@ const showID = true;
                             <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
                         </div>
                         <div class="col-auto">
-                            <button class="btn btn-primary btn-sm" @click="createRow()" :disabled="newRow._saving">
-                                <span x-show="!newRow._saving"><i class="bi bi-plus-lg me-1"></i>Προσθήκη</span>
+                            <button class="btn btn-primary btn-sm fs-5" @click="createRow()" :disabled="newRow._saving">
+                                <span x-show="!newRow._saving"><i class="bi bi-plus-circle"></i></span>
                                 <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
                             </button>
                         </div>
@@ -145,7 +146,10 @@ const showID = true;
         showTopBar: false,
     };
 
-    function nis2PoliciesApp() {
+    function policiesApp() {
+        const fw = window.framework.toLowerCase();
+        const baseUrl = `/admin/frameworks/${fw}/policies`;
+
         return {
             rows: window.policies.map(p => ({ ...p, _saving: false })),
             newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '' },
@@ -153,7 +157,7 @@ const showID = true;
             async saveRow(row) {
                 row._saving = true;
                 try {
-                    const res = await fetch(`/admin/framework/nis2/policies/${row.id}`, {
+                    const res = await fetch(`${baseUrl}/${row.id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -182,7 +186,7 @@ const showID = true;
                 this.newRow._saving = true;
                 this.newRow._error = '';
                 try {
-                    const res = await fetch('/admin/framework/nis2/policies', {
+                    const res = await fetch(baseUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
