@@ -231,6 +231,14 @@
         border-bottom: 1px solid #ccc;
     }
 
+    .header .header-container {
+        height: 100%;
+        display: block flex;
+        align-items: center;
+        justify-content: space-between;
+        &::after {display: none}
+    }
+
 
     .sidebar-menu *, .dropdown-menu *,  .dropdown-menu li,  .dropdown-menu a, .dropdown-menu div, .dropdown-menu span {
         transition: all 0.5s ease-in-out !important;

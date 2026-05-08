@@ -24,7 +24,7 @@ let scope = (requiredScope) => {
         if (!roles?.[userRole]?.canHaveScope) { 
             return next();
         }   
-        const userScopes = req.user?.scopes || [];
+        const userScopes = req.user?.scope || [];
         const requiredArr = Array.isArray(requiredScope) ? requiredScope : [requiredScope];
         if (requiredArr.some(s => userScopes.includes(s))) {
             return next();
@@ -37,7 +37,7 @@ let scope = (requiredScope) => {
 let userHasScope = (user, ...requiredScopes) => {
     const userRole = user?.role;
     if (!roles?.[userRole]?.canHaveScope) return true;
-    const userScopes = user?.scopes || [];
+    const userScopes = user?.scope || [];
     return requiredScopes.some(s => userScopes.includes(s));
 };
 

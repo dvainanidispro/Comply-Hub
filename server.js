@@ -98,9 +98,13 @@ server.use(dashboard);
 import admin from './routes/admin.js';
 server.use('/admin', admin);
 
-// Frameworks routes
+// Admin Frameworks routes
 import frameworks from './routes/frameworks/frameworks.js';
 server.use('/admin/frameworks', frameworks);
+
+// Organization-scoped Frameworks routes
+import organization from './routes/organizations/organization.js';
+server.use('/organization', organization);
 
 // Own account routes
 import account from './routes/account.js';

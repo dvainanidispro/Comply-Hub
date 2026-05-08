@@ -147,6 +147,55 @@
                     {{/if}}
    
 
+                    {{#if (scope "nis2")}}
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-toggle" href="javascript:void(0);">
+                                <span class="icon-holder">
+                                    <i class="bi bi-shield-shaded c-blue-500"></i>
+                                </span>
+                                <span class="title">NIS2</span>
+                                <span class="arrow">
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="sidebar-link" href="/organization/frameworks/nis2/policies">
+                                        <span class="icon-holder">
+                                            <i class="bi bi-file-earmark-text c-blue-500"></i>
+                                        </span>
+                                        <span>Πολιτικές</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {{/if}}
+                    {{#if (scope "gdpr")}}
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-toggle" href="javascript:void(0);">
+                                <span class="icon-holder">
+                                    <i class="bi bi-person-square c-blue-500"></i>
+                                </span>
+                                <span class="title">GDPR</span>
+                                <span class="arrow">
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="sidebar-link" href="/organization/frameworks/gdpr/policies">
+                                        <span class="icon-holder">
+                                            <i class="bi bi-file-earmark-text c-blue-500"></i>
+                                        </span>
+                                        <span>Πολιτικές</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {{/if}}
+
+   
+
                     <li role="separator" class="divider"></li>
 
 
