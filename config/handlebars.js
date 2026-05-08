@@ -1,5 +1,6 @@
 import { create as HandlebarsCreator } from 'express-handlebars';
 import { userHasPermission } from '../auth/roles.js';
+import { userHasScope } from '../auth/scopes.js';
 
 const handlebarsConfig = {
     extname: '.hbs',    // extension for layouts (not views)
@@ -110,6 +111,18 @@ const handlebarsConfig = {
             const user = args.at(args.length - 2); // τελευταίο explicit arg πριν το options object
             const permissions = args.slice(0, -2); // όλα εκτός user και options
             return userHasPermission(user, ...permissions);
+        },
+        /* example: {{#if (scope 'nis2')}} ή {{#if (scope 'nis2' 'gdpr')}} (OR logic) */
+        scope: function(...args) {
+            const user = this.user;
+            const requiredScopes = args.slice(0, -1);
+            return userHasScope(user, ...requiredScopes);
+        },
+        /* example: {{#if (scope2 'nis2' ../user)}} χρήσιμο μέσα σε {{#each}} */
+        scope2: function(...args) {
+            const user = args.at(args.length - 2);
+            const requiredScopes = args.slice(0, -2);
+            return userHasScope(user, ...requiredScopes);
         },
     }
 };

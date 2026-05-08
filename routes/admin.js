@@ -5,7 +5,7 @@ import { can, roles, permissions } from '../auth/roles.js';
 import { hashPassword } from '../auth/auth.js';
 import { Op, ForeignKeyConstraintError } from 'sequelize';
 import log from '../lib/logger.js';
-import scopes from '../auth/scopes.js';
+import { scopes } from '../auth/scopes.js';
 import storageRouter from './storage.js';
 
 const admin = express.Router();

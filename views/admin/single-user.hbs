@@ -50,7 +50,7 @@
                                 <label for="editUserRole" class="form-label fw-bold">Ρόλος *</label>
                                 <select class="form-select" id="editUserRole" name="role" required {{#if (eq userDetails.email @root.user.email)}}disabled{{/if}}>
                                     {{#each roles}}
-                                        <option value="{{this.name}}" data-can-have-organization="{{this.canHaveOrganization}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.displayName}}</option>
+                                        <option value="{{this.name}}" data-can-have-organization="{{this.canHaveOrganization}}" data-can-have-scope="{{this.canHaveScope}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.displayName}}</option>
                                     {{/each}}
                                 </select>
                                 {{#if (eq userDetails.email @root.user.email)}}
@@ -178,26 +178,24 @@ const isNew = {{isNew}};
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Λογική για enable/disable του organization field με βάση τον επιλεγμένο ρόλο
-    function updateOrganizationField() {
+    // Λογική για enable/disable του organization/scope field με βάση τον επιλεγμένο ρόλο
+    function updateRoleFields() {
         const selectedOption = Q('#editUserRole').options[Q('#editUserRole').selectedIndex];
         const canHaveOrganization = selectedOption.dataset.canHaveOrganization === 'true';
-        
-        if (canHaveOrganization) {
-            Q('#editUserOrganization').disabled = false;
-            Q('#editUserScope').disabled = false;
-        } else {
-            Q('#editUserOrganization').disabled = true;
-            Q('#editUserOrganization').value = '';
-            Q('#editUserScope').disabled = true;
-            Q('#editUserScope option').forEach(option => option.selected = false);
-        }
+        const canHaveScope = selectedOption.dataset.canHaveScope === 'true';
+
+        Q('#editUserOrganization').disabled = !canHaveOrganization;
+        Q('#editUserOrganization').required = canHaveOrganization;
+        if (!canHaveOrganization) Q('#editUserOrganization').value = '';
+
+        Q('#editUserScope').disabled = !canHaveScope;
+        if (!canHaveScope) Q('#editUserScope option').forEach(option => option.selected = false);
     }
     
     // Ενημέρωση κατά τη φόρτωση της σελίδας
-    updateOrganizationField();
+    updateRoleFields();
     // Ενημέρωση με κάθε αλλαγή του ρόλου
-    Q('#editUserRole').on('change', updateOrganizationField);
+    Q('#editUserRole').on('change', updateRoleFields);
     
     // Form για επεξεργασία/δημιουργία χρήστη
     Q('#form').on('submit', async function(e) {
