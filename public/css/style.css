@@ -20,7 +20,7 @@
         --nav-active-color: hsl(277, 50%, 25%);
         --nav-active-text-color: hsl(277, 100%, 94%);
         --nav-icon-color: navy;
-        --divider-color: lavender;
+        --divider-color: hsl(240, 67%, 80%);
         --border-color: hsl(277, 50%, 30%);
         --input-bg-color: hsl(240, 67%, 98%);
 
@@ -426,6 +426,10 @@
         background-position: center;
         background-size: contain;
         vertical-align: middle;
+    }
+
+    .sidebar-nav li.bg-admin{
+        background-color: hsl(240, 67%, 94%);
     }
 
 

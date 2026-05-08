@@ -8,9 +8,15 @@ const PolicyType = db.define('policy_type',
             primaryKey: true,
             autoIncrement: true,
         },
-        framework: DataTypes.STRING,
+        framework: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         code: DataTypes.STRING,
-        name: DataTypes.STRING,
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         description: DataTypes.TEXT,
         default: {
             type: DataTypes.BOOLEAN,

@@ -74,7 +74,7 @@
 - σωστό filtering των custom policies βάσει scope/framework,
 - καθαρό query model χωρίς πολύπλοκα joins μόνο και μόνο για framework filtering.
 
-### 2. Access Model και Organization Context  - Done
+### 2. Access Model και Organization Context - Done
 
 Το feature είναι org-centric, αλλά προς το παρόν η ορατότητα των frameworks μένει user-based:
 

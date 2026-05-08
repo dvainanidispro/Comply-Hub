@@ -111,7 +111,8 @@ const showID = false;
                         <div class="col" style="min-width:180px">
                             <label class="form-label small">Όνομα</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.name"
-                                @input.debounce="if (!newRow.code) newRow.code = createCodeFromName(newRow.name)">
+                                :class="{ 'is-invalid': newRow._nameInvalid }"
+                                @input.debounce="newRow._nameInvalid = false; if (!newRow.code) newRow.code = createCodeFromName(newRow.name)">
                         </div>
                         <div class="col" style="min-width:200px">
                             <label class="form-label small">Περιγραφή</label>
@@ -152,7 +153,7 @@ const showID = false;
 
         return {
             rows: window.policies.map(p => ({ ...p, _saving: false })),
-            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '' },
+            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false },
 
             async saveRow(row) {
                 row._saving = true;
@@ -183,6 +184,10 @@ const showID = false;
             },
 
             async createRow() {
+                if (!this.newRow.name.trim()) {
+                    this.newRow._nameInvalid = true;
+                    return;
+                }
                 this.newRow._saving = true;
                 this.newRow._error = '';
                 try {
