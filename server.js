@@ -100,7 +100,7 @@ server.use('/admin', admin);
 
 // Frameworks routes
 import frameworks from './routes/frameworks/frameworks.js';
-server.use('/admin/framework', frameworks);
+server.use('/admin/frameworks', frameworks);
 
 // Own account routes
 import account from './routes/account.js';

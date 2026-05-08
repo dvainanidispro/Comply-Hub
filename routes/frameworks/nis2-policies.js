@@ -9,7 +9,7 @@ const nis2Policies = express.Router();
 const FRAMEWORK = 'NIS2';
 
 /**
- * GET /admin/framework/nis2/policies - Λίστα policy types για NIS2
+ * GET /admin/frameworks/nis2/policies - Λίστα policy types για NIS2
  */
 nis2Policies.get('/policies', async (req, res) => {
     try {
@@ -22,7 +22,7 @@ nis2Policies.get('/policies', async (req, res) => {
             raw: true,
         });
 
-        res.render('framework/nis2/policies', {
+        res.render('frameworks/nis2/policies', {
             policies,
             user: req.user,
             title: 'NIS2 - Πολιτικές',
@@ -34,7 +34,7 @@ nis2Policies.get('/policies', async (req, res) => {
 });
 
 /**
- * POST /admin/framework/nis2/policies - Δημιουργία νέου NIS2 policy type
+ * POST /admin/frameworks/nis2/policies - Δημιουργία νέου NIS2 policy type
  */
 nis2Policies.post('/policies', async (req, res) => {
     try {
@@ -61,7 +61,7 @@ nis2Policies.post('/policies', async (req, res) => {
 });
 
 /**
- * PUT /admin/framework/nis2/policies/:id - Ενημέρωση NIS2 policy type
+ * PUT /admin/frameworks/nis2/policies/:id - Ενημέρωση NIS2 policy type
  */
 nis2Policies.put('/policies/:id', async (req, res) => {
     try {
@@ -93,7 +93,7 @@ nis2Policies.put('/policies/:id', async (req, res) => {
 });
 
 /**
- * DELETE /admin/framework/nis2/policies/:id - Απενεργοποίηση NIS2 policy type
+ * DELETE /admin/frameworks/nis2/policies/:id - Απενεργοποίηση NIS2 policy type
  */
 nis2Policies.delete('/policies/:id', async (req, res) => {
     try {
