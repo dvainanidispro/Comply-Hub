@@ -1,15 +1,23 @@
 /** Middleware που βάζει στο req.org το organizationId του χρήστη, είτε από το token είτε από το cookie */
 const org = (req, res, next) => {
+    
     const userOrg = parseInt(req.user?.org);
+
+
+    // Αν το org είναι ακέραιος, το βρήκαμε.
     if (!isNaN(userOrg)) {
         req.org = userOrg;
-    } else {
+
+    // Αν org=="any" (πρόσβαση σε πολλούς οργανισμούς), πάρε το επιλεγμένο org από το cookie του
+    } else if (req.user?.org === 'any') {
         const cookieOrg = parseInt(req.cookies?.org);
-        req.org = isNaN(cookieOrg) ? null : cookieOrg;
+        if (isNaN(cookieOrg)) {
+            // Δεν έχει επιλέξει οργανισμό ακόμα, στείλε τον στις ρυθμίσεις
+            return res.redirect(`/account/settings?redirect=${encodeURIComponent(req.originalUrl)}`);
+        }
+        req.org = cookieOrg;
     }
-    if (req.org === null) {
-        return res.redirect(`/account/settings?redirect=${encodeURIComponent(req.originalUrl)}`);
-    }
+
     next();
 };
 

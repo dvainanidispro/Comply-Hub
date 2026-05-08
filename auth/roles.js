@@ -14,20 +14,26 @@ const roles = {
     admin: {
         name: 'admin',
         displayName: 'Διαχειριστής',
-        user: true,
         description: 'Διαχειριστής πλατφόρμας με πλήρη δικαιώματα',
         permissions: ['manage:platform', 'manage:any:content'],
         canHaveOrganization: false,
         color: 'danger'
     },
+    central: {
+        name: 'central',
+        displayName: 'Κεντρικός Υπεύθυνος',
+        description: 'Χρήστης με δικαιώματα διαχείρισης περιεχομένου για όλους τους οργανισμούς',
+        permissions: ['manage:any:content'],
+        canHaveOrganization: false,
+        color: 'success'
+    },
     manager: {
         name: 'manager',
         displayName: 'Υπεύθυνος Οργανισμού',
-        user: true,
-        description: 'Χρήστης με δικαιώματα επεξεργασίας και δημοσίευσης περιεχομένου',
+        description: 'Χρήστης με δικαιώματα δημοσίευσης και επεξεργασίας περιεχομένου',
         permissions: ['manage:org:content'],
         canHaveOrganization: true,
-        color: 'success'
+        color: 'info'
     },
     // viewer: {
     //     name: 'viewer',
