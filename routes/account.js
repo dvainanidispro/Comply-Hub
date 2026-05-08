@@ -111,7 +111,7 @@ account.post('/profile', async (req, res) => {
 /**
  * GET /account/settings - Εμφάνιση ρυθμίσεων (μόνο για admins)
  */
-account.get('/settings', can('manage:platform'), async (req, res) => {
+account.get('/settings', can('manage:any:content'), async (req, res) => {
     const organizations = await Cache.table.Organization;
     res.render('account/settings', {
         title: 'Ρυθμίσεις',

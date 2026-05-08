@@ -27,7 +27,6 @@
             <!-- ### $Sidebar Navigation ### -->
             <nav class="sidebar-nav" aria-label="Main navigation">
                 <ul class="sidebar-menu scrollable pos-r">
-                    {{#if (can "view:content")}}
                         <li class="nav-item mT-30 actived">
                             <a class="sidebar-link" href="/dashboard">
                                 <span class="icon-holder">
@@ -36,10 +35,9 @@
                                 <span class="title">Dashboard</span>
                             </a>
                         </li>
-                    {{/if}}
                     
                     {{#if (can "manage:platform")}}
-                        <li class="nav-item dropdown open bg-admin">
+                        <li class="nav-item dropdown bg-admin">
                             <a class="dropdown-toggle" href="javascript:void(0);">
                                 <span class="icon-holder">
                                     <i class="bi bi-gear-fill c-blue-500"></i>
@@ -99,7 +97,7 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item dropdown open">
+                                <li class="nav-item dropdown">
                                     <a class="dropdown-toggle" href="javascript:void(0);">
                                         <span class="icon-holder">
                                             <i class="bi bi-shield-shaded c-blue-500"></i>
@@ -120,7 +118,7 @@
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="nav-item dropdown open">
+                                <li class="nav-item dropdown">
                                     <a class="dropdown-toggle" href="javascript:void(0);">
                                         <span class="icon-holder">
                                             <i class="bi bi-person-square c-blue-500"></i>

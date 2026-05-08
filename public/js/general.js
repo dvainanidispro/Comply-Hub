@@ -8,29 +8,6 @@ window.addEventListener('pageshow', function (event) {
 });
 
 /**
- * Ένδειξη στο sidebar για το link που αντιστοιχεί στην τρέχουσα σελίδα.
- * Χρησιμοποιούμε every αντί για forEach γιατι το forEach δεν έχει break, 
- * ενώ το every σταματάει όταν επιστραφεί false.
- */
-(() => {
-    const nav = Q.url.get('nav');
-    const path = Q.url.path;
-    Q(".sidebar .sidebar-link").every(link => {
-        const href = link.getAttribute("href");
-        const baseHref = href.split('?')[0];    // χωρίς get parameters
-        if (!href || href.length < 3) {
-            return true; // συνεχίζουμε το every
-        }
-        
-        if ((nav && baseHref === nav) || (!nav && path.startsWith(baseHref))) {
-            link.classList.add("active");
-            return false; // σταματάμε το every
-        } 
-        return true; // συνεχίζουμε το every
-    });
-})();
-
-/**
  * Προσθήκη validation classes (is-valid, is-invalid) σε input πεδία με pattern ή minlength
  * καθώς ο χρήστης πληκτρολογεί
  */
