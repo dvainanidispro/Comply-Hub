@@ -111,24 +111,15 @@
 
 Νέο org-scoped policy index page για το active org.
 
-Η σελίδα θα εμφανίζει:
+Το route είναι το `routes\organizations\modules\policies.js`, το οποίο θα χρησιμοποιείται τόσο από τον manager όσο και από τον admin-as-manager. Αυτό θα είναι ένα Factory Pattern για τη διαχείριση πολιτικών (ώστε να χρησιμοποιείται και από gdpr και από nis2 κλπ). Έχει ήδη δημιουργηθεί η βασική υποδομή σε αυτό το αρχείο. 
 
-- όλα τα ορατά `policy_types`, φιλτραρισμένα από το current user scope,
-- τα ήδη υπάρχοντα `Policy` records του οργανισμού,
-- τις custom policies του οργανισμού.
+Θα υπάρχουν 3 views: `policies`, `single-policy`, `mass-creation`. 
+Η σελίδα `policies` θα εμφανίζει:
 
-Η λίστα θα είναι ουσιαστικά ένα left-join view:
+- τα ήδη υπάρχοντα `Policy` records του οργανισμού σε πίνακα μέσα σε card component, είτε αυτά ανήκουν σε `policy_types` είτε είναι custom policies (δεν χρειάζεται η ένδειξη στον πίνακα, ίσως το policy_type να μπει σε κρυφή στήλη). To query σίγουρα θα είναι left join των `policies` με τα `policy_types`. 
+- Κουμπί πάνω δεξιά για δημιουργία νέας πολιτικής, το οποίο ανοίγει το `single-policy` view σε create mode (mode: create).
+- Κουμπί πάνω δεξιά "Mαζική δημιουργία" για δημιουργία πολλών πολιτικών στον οργανισμό. Θα ανοίγει το `mass-creation` view, το οποίο θα εμφανίζει form με checkboxes για τα `policy_types`. Όσα τα έχει ήδη ο οργανισμός θα είναι disableds. Όσαν `policy_types` έχουν το πεδίο default true, θα είναι επιλεγμένα, και όσα έχουν default false, δεν θα είναι επιλεγμένα. Τέλος, κουμπί "Δημιουργία επιλεγμένων" (mode: mass-create). 
 
-- κάθε ορατό `PolicyType` εμφανίζεται ακόμη και αν δεν υπάρχει `Policy`,
-- όταν υπάρχει `Policy`, το record αυτό ορίζει `status`, `version`, `files` και actions.
-
-Προτεινόμενα row actions:
-
-- assign / create policy
-- mark as `non_applicable`
-- edit metadata
-- open files
-- add custom policy
 
 ### 5. Policy Detail και File Management
 

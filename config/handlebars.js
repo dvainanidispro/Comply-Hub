@@ -1,6 +1,7 @@
 import { create as HandlebarsCreator } from 'express-handlebars';
 import { userHasPermission } from '../auth/roles.js';
 import { userHasScope } from '../auth/scopes.js';
+import { labels } from '../lib/labels.js';
 
 const handlebarsConfig = {
     extname: '.hbs',    // extension for layouts (not views)
@@ -123,6 +124,20 @@ const handlebarsConfig = {
             const user = args.at(args.length - 2);
             const requiredScopes = args.slice(0, -2);
             return userHasScope(user, ...requiredScopes);
+        },
+        /** example: {{label 'status' 'pending'}} => Σε εκκρεμότητα */
+        label: function(category, value) {
+            if (typeof labels[category] === 'function') {
+                return labels[category](value) ?? '';
+            }
+            return labels[category]?.[value] ?? '';
+        },
+        /** Επιστρέφει array [{value, name}] για οποιαδήποτε κατηγορία labels (εκτός από functions), χρήσιμο για {{#each}} στα views.
+         * example: {{#each (labelEntries 'leaveType')}} */
+        labelEntries: (category) => {
+            const map = labels[category];
+            if (!map || typeof map === 'function') return [];
+            return Object.entries(map).map(([value, name]) => ({ value, name }));
         },
     }
 };

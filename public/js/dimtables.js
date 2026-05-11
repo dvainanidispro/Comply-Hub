@@ -60,7 +60,7 @@ window.dimtables.defaultOptions = {
     hiddenRowClass: "d-none", // μία κλάση απόκρυψης για φίλτρο & σελιδοποίηση (ο έλεγχος γίνεται με flags)
     pagerButtonClass: "btn btn-secondary", // κλάση για τα κουμπιά προηγ/επόμ
     searchInputClass: "form-control m-4", // κλάση για το input αναζήτησης
-    searchInputWidth: 260, // πλάτος σε px για το input αναζήτησης
+    searchInputWidth: 200, // πλάτος σε px για το input αναζήτησης
     sortIcon: '<svg viewBox="0 0 16 16" width="1.2em" height="1.2em" class="ms-1 dimtables-sort-icon"><path d="M8 2 L4 6 H12 L8 2 Z" fill="currentColor"></path><path d="M8 14 L4 10 H12 L8 14 Z" fill="currentColor"></path></svg>'
 };
 
@@ -156,7 +156,7 @@ window.dimtables.defaultOptions = {
     pagerContainer.appendChild(btnNext);
 
     const info = document.createElement("div");
-    info.className = "small text-muted";
+    info.className = "small text-muted d-none d-md-block"; 
 
     // Προσθήκη pagerContainer πριν το info
     left.appendChild(pagerContainer);

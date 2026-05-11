@@ -37,7 +37,7 @@
                     <div class="d-flex g-2">
                         <button id="btnSave" class="btn btn-success btn-icon">
                             <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
-                            <div>Αποθήκευση</div>
+                            <div id="save">Αποθήκευση</div>
                         </button>
                     </div>
                 </div>
@@ -51,6 +51,10 @@
     const currentOrg = Q.cookies.get('org') || '';
     const currentRadio = document.querySelector(`input[name="orgSelection"][value="${currentOrg}"]`);
     if (currentRadio) currentRadio.checked = true;
+
+    if (Q.url.get('redirect')) {
+        Q('#save').textContent = 'Αποθήκευση και Συνέχεια';
+    }
 
     Q('#btnSave').on('click', function () {
         const selected = document.querySelector('input[name="orgSelection"]:checked');

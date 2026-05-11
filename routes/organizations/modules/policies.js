@@ -21,7 +21,7 @@ export function managePoliciesRouter(framework, label) {
     /* GET /policies - Λίστα πολιτικών οργανισμού για το framework */
     policies.get('/', async (req, res) => {
         try {
-            res.render('organizations/policies', {
+            res.render('organizations/policies/policies', {
                 framework,
                 user: req.user,
                 org: req.org,
