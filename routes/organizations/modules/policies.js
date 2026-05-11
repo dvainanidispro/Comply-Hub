@@ -89,6 +89,7 @@ export function managePoliciesRouter(framework, label) {
                 return {
                     organizationId: req.org,
                     policyTypeId: id,
+                    code: pt.code,
                     name: pt.name,
                     description: pt.description,
                     status: 'to_be_created',
@@ -139,10 +140,11 @@ export function managePoliciesRouter(framework, label) {
     /* POST / - Δημιουργία νέας πολιτικής */
     policies.post('/', async (req, res) => {
         try {
-            const { policyTypeId, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            const { policyTypeId, code, name, description, version, effectiveDate, reviewDate, status } = req.body;
             await Models.Policy.create({
                 organizationId: req.org,
                 policyTypeId: policyTypeId || null,
+                code,
                 name,
                 description,
                 version,
@@ -190,8 +192,8 @@ export function managePoliciesRouter(framework, label) {
             });
             if (!policy) return res.status(404).json({ success: false, message: 'Η πολιτική δεν βρέθηκε.' });
 
-            const { name, description, version, effectiveDate, reviewDate, status } = req.body;
-            await policy.update({ name, description, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
+            const { code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            await policy.update({ code, name, description, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
 
             res.json({ success: true, message: 'Η πολιτική αποθηκεύτηκε επιτυχώς.' });
         } catch (error) {

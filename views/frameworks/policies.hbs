@@ -49,12 +49,15 @@ const showID = false;
                                         <td x-show="showID" x-text="row.id"></td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
-                                                x-model="row.code">
+                                                x-model="row.code"
+                                                :class="{ 'is-invalid': row._codeInvalid }"
+                                                @input="row._codeInvalid = false">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.name"
-                                                @input.debounce="if (!row.code) row.code = createCodeFromName(row.name)">
+                                                :class="{ 'is-invalid': row._nameInvalid }"
+                                                @input.debounce="row._nameInvalid = false; if (!row.code) row.code = createCodeFromName(row.name)">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
@@ -106,7 +109,9 @@ const showID = false;
                     <div class="row g-2 align-items-end">
                         <div class="col-auto" style="width:120px">
                             <label class="form-label small">Κωδικός</label>
-                            <input type="text" class="form-control form-control-sm" x-model="newRow.code">
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.code"
+                                :class="{ 'is-invalid': newRow._codeInvalid }"
+                                @input="newRow._codeInvalid = false">
                         </div>
                         <div class="col" style="min-width:180px">
                             <label class="form-label small">Όνομα</label>
@@ -152,10 +157,13 @@ const showID = false;
         const baseUrl = `/admin/frameworks/${fw}/policies`;
 
         return {
-            rows: window.policies.map(p => ({ ...p, _saving: false })),
-            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false },
+            rows: window.policies.map(p => ({ ...p, _saving: false, _codeInvalid: false, _nameInvalid: false })),
+            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false, _codeInvalid: false },
 
             async saveRow(row) {
+                if (!row.code?.trim()) row._codeInvalid = true;
+                if (!row.name?.trim()) row._nameInvalid = true;
+                if (row._codeInvalid || row._nameInvalid) return;
                 row._saving = true;
                 try {
                     const res = await fetch(`${baseUrl}/${row.id}`, {
@@ -184,10 +192,9 @@ const showID = false;
             },
 
             async createRow() {
-                if (!this.newRow.name.trim()) {
-                    this.newRow._nameInvalid = true;
-                    return;
-                }
+                if (!this.newRow.code?.trim()) this.newRow._codeInvalid = true;
+                if (!this.newRow.name.trim()) this.newRow._nameInvalid = true;
+                if (this.newRow._codeInvalid || this.newRow._nameInvalid) return;
                 this.newRow._saving = true;
                 this.newRow._error = '';
                 try {

@@ -12,7 +12,10 @@ const PolicyType = db.define('policy_type',
             type: DataTypes.STRING,
             allowNull: false,
         },
-        code: DataTypes.STRING,
+        code: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         name: {
             type: DataTypes.STRING,
             allowNull: false,

@@ -288,7 +288,7 @@ window.Q = Q;
 class requiredField extends HTMLElement {
     constructor(){
         super(); 
-        this.classList.add("text-danger");
+        this.classList.add("text-red");
         this.innerHTML = "*";
     }
 }

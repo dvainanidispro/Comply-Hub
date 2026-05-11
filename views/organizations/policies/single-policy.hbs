@@ -31,7 +31,7 @@
                         {{#if (eq mode 'create')}}
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <label for="policyTypeId" class="form-label fw-bold">Πρότυπο Πολιτικής</label>
+                                <label for="policyTypeId" class="form-label fw-bold">Πρότυπο Πολιτικής <req-star></req-star></label>
                                 <select class="form-select" id="policyTypeId" name="policyTypeId">
                                     <option value="">— Προσαρμοσμένη Πολιτική —</option>
                                     {{#each availablePolicyTypes}}
@@ -45,8 +45,12 @@
 
                         <div class="row">
                             <div class="col-md-8 mb-3">
-                                <label for="name" class="form-label fw-bold">Όνομα *</label>
+                                <label for="name" class="form-label fw-bold">Όνομα <req-star></req-star></label>
                                 <input type="text" class="form-control" id="name" name="name" value="{{policy.name}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="code" class="form-label fw-bold">Κωδικός <req-star></req-star></label>
+                                <input type="text" class="form-control" id="code" name="code" value="{{policy.code}}" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="version" class="form-label fw-bold">Έκδοση</label>
@@ -57,7 +61,7 @@
                                 <textarea class="form-control" id="description" name="description" rows="3">{{policy.description}}</textarea>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="status" class="form-label fw-bold">Κατάσταση *</label>
+                                <label for="status" class="form-label fw-bold">Κατάσταση <req-star></req-star></label>
                                 <select class="form-select" id="status" name="status" required>
                                     {{#each (labelEntries 'policyStatus')}}
                                     <option value="{{this.value}}" {{#if (eq this.value ../policy.status)}}selected{{/if}}>{{this.name}}</option>
@@ -148,14 +152,23 @@ document.addEventListener('DOMContentLoaded', function() {
     Q('#policyTypeId').on('change', function() {
         const pt = policyTypeMap.get(this.value);
         if (pt) {
+            Q('#code').value = pt.code ?? '';
             Q('#name').value = pt.name;
             Q('#description').value = pt.description ?? '';
         } else {
+            Q('#code').value = '';
             Q('#name').value = '';
             Q('#description').value = '';
         }
     });
     {{/if}}
+
+    /* Αυτόματη συμπλήρωση κωδικού από το όνομα, αν το code είναι κενό */
+    Q('#name').on('change', function() {
+        if (!Q('#code').value) {
+            Q('#code').value = createCodeFromName(this.value);
+        }
+    });
 
     Q('#form').on('submit', async function(e) {
         e.preventDefault();
