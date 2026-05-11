@@ -7,6 +7,7 @@
  */
 
 import express from 'express';
+import { Op } from 'sequelize';
 import Models from '../../../models/models.js';
 import Cache from '../../../models/cache.js';
 import log from '../../../lib/logger.js';
@@ -141,6 +142,22 @@ export function managePoliciesRouter(framework, label) {
     policies.post('/', async (req, res) => {
         try {
             const { policyTypeId, code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+
+            /* Έλεγχος για duplicate code ή policyTypeId στο ίδιο framework */
+            const duplicateConditions = [{ code }];
+            if (policyTypeId) duplicateConditions.push({ policyTypeId: Number(policyTypeId) });
+
+            const existing = await Models.Policy.findOne({
+                where: { organizationId: req.org, framework, [Op.or]: duplicateConditions },
+                attributes: ['code', 'policyTypeId'],
+            });
+
+            if (existing) {
+                if (existing.code === code)
+                    return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική με τον ίδιο κωδικό.' });
+                return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική για τον ίδιο τύπο πολιτικής.' });
+            }
+
             await Models.Policy.create({
                 organizationId: req.org,
                 policyTypeId: policyTypeId || null,
@@ -187,12 +204,24 @@ export function managePoliciesRouter(framework, label) {
     /* PUT /:id - Ενημέρωση πολιτικής */
     policies.put('/:id', async (req, res) => {
         try {
-            const policy = await Models.Policy.findOne({
-                where: { id: req.params.id, organizationId: req.org },
+            const { code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            const policyId = parseInt(req.params.id);
+
+            /* Query για fetch της πολιτικής προς επεξεργασίας και ενδεχομένως και άλλης με duplicate code */
+            const candidates = await Models.Policy.findAll({
+                where: {
+                    organizationId: req.org,
+                    framework,
+                    [Op.or]: [{ id: policyId }, { code }],
+                },
             });
+
+            const policy = candidates.find(p => p.id === policyId);
             if (!policy) return res.status(404).json({ success: false, message: 'Η πολιτική δεν βρέθηκε.' });
 
-            const { code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            const duplicate = candidates.find(p => p.code === code && p.id !== policyId);
+            if (duplicate) return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική με τον ίδιο κωδικό.' });
+
             await policy.update({ code, name, description, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
 
             res.json({ success: true, message: 'Η πολιτική αποθηκεύτηκε επιτυχώς.' });
