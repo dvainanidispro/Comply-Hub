@@ -7,7 +7,7 @@
  *
  * Χρήση:
  *   import { managePoliciesRouter } from './policies.js';
- *   router.use('/policies', managePoliciesRouter('NIS2', 'NIS2 — Πολιτικές'));
+ *   router.use('/policies', managePoliciesRouter('NIS2', 'NIS2 - Πολιτικές'));
  */
 
 import express from 'express';
@@ -19,7 +19,7 @@ import log from '../../lib/logger.js';
 /**
  * Δημιουργεί router για διαχείριση policy types ενός συγκεκριμένου framework.
  * @param {string} framework - Το αναγνωριστικό του framework (π.χ. 'NIS2', 'GDPR').
- * @param {string} label - Τίτλος για το view (π.χ. 'NIS2 — Πολιτικές').
+ * @param {string} label - Τίτλος για το view (π.χ. 'NIS2 - Πολιτικές').
  * @returns {express.Router}
  */
 export function managePoliciesRouter(framework, label) {

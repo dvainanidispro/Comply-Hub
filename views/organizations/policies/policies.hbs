@@ -7,9 +7,54 @@
                         <i class="bi bi-file-earmark-text me-2"></i>
                         {{title}}
                     </h1>
+                    <div class="card-actions d-flex g-3 my-3">
+                        <a href="{{baseUrl}}/mass-creation" class="btn btn-outline-secondary btn-icon">
+                            <i class="bi bi-files"></i>
+                            <div>Μαζική Δημιουργία</div>
+                        </a>
+                        <a href="{{baseUrl}}/new" class="btn btn-primary btn-icon">
+                            <i class="bi bi-plus-circle"></i>
+                            <div>Νέα Πολιτική</div>
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">Σύντομα διαθέσιμο.</p>
+                    <div class="table-responsive">
+                        <table class="table dim-table auto-rows table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="sortable">Κωδικός</th>
+                                    <th class="sortable">Όνομα</th>
+                                    <th class="sortable">Έκδοση</th>
+                                    <th class="sortable">Κατάσταση</th>
+                                    <th class="sortable">Ημ. Επισκόπησης</th>
+                                    <th class="">Επεξεργασία</th>
+                                    <th class="d-none">Τύπος Πολιτικής</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each policies}}
+                                <tr>
+                                    <td>{{or this.policyType.code '-'}}</td>
+                                    <td class="fw-semibold">{{this.name}}</td>
+                                    <td>{{or this.version '-'}}</td>
+                                    <td>
+                                        <span class="badge bg-{{label 'statusColor' this.status}}">
+                                            {{label 'policyStatus' this.status}}
+                                        </span>
+                                    </td>
+                                    <td>{{date this.reviewDate}}</td>
+                                    <td>
+                                        <a href="{{@root.baseUrl}}/{{this.id}}" class="btn btn-primary" title="Επεξεργασία">
+                                            <i class="ti-eye text-white"></i>
+                                        </a>
+                                    </td>
+                                    <td class="d-none">{{or this.policyType.name ''}}</td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,172 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{title}}</a></li>
+                    <li class="breadcrumb-item active">{{#if (eq mode 'create')}}Νέα Πολιτική{{else}}{{policy.name}}{{/if}}</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        {{#if (eq mode 'create')}}
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span>{{framework}} - Νέα Πολιτική</span>
+                        {{else}}
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <span>{{framework}} - {{policy.name}}</span>
+                        {{/if}}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="form">
+                        {{#unless (eq mode 'create')}}
+                        <input type="hidden" name="id" value="{{policy.id}}">
+                        {{/unless}}
+
+                        {{#if (eq mode 'create')}}
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="policyTypeId" class="form-label fw-bold">Πρότυπο Πολιτικής</label>
+                                <select class="form-select" id="policyTypeId" name="policyTypeId">
+                                    <option value="">— Προσαρμοσμένη Πολιτική —</option>
+                                    {{#each availablePolicyTypes}}
+                                    <option value="{{this.id}}">{{#if this.code}}[{{this.code}}] {{/if}}{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                                <div class="form-text">Αν επιλέξετε τύπο πολιτικής, τα πεδία συμπληρώνονται αυτόματα. Αφήστε κενό για προσαρμοσμένη πολιτική.</div>
+                            </div>
+                        </div>
+                        {{/if}}
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="name" class="form-label fw-bold">Όνομα *</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{policy.name}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="version" class="form-label fw-bold">Έκδοση</label>
+                                <input type="text" class="form-control" id="version" name="version" value="{{policy.version}}">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label fw-bold">Περιγραφή</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{policy.description}}</textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="status" class="form-label fw-bold">Κατάσταση *</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    {{#each (labelEntries 'policyStatus')}}
+                                    <option value="{{this.value}}" {{#if (eq this.value ../policy.status)}}selected{{/if}}>{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="effectiveDate" class="form-label fw-bold">Ημ. Έναρξης Ισχύος</label>
+                                <input type="date" class="form-control" id="effectiveDate" name="effectiveDate" value="{{dateInput policy.effectiveDate}}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="reviewDate" class="form-label fw-bold">Ημ. Επισκόπησης</label>
+                                <input type="date" class="form-control" id="reviewDate" name="reviewDate" value="{{dateInput policy.reviewDate}}">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>{{#if (eq mode 'create')}}Δημιουργία{{else}}Αποθήκευση{{/if}}</div>
+                                    </button>
+                                    <a href="{{baseUrl}}" class="btn btn-secondary btn-icon">
+                                        <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                        <div>Ακύρωση</div>
+                                    </a>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="bi bi-paperclip me-2"></i>
+                        Αρχεία
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Σύντομα διαθέσιμο.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="ti-info me-2"></i>
+                        Πληροφορίες
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{#unless (eq mode 'create')}}
+                    <small class="text-muted">
+                        <p><strong>Δημιουργία:</strong><br>{{date policy.createdAt}}</p>
+                        <p><strong>Τελευταία ενημέρωση:</strong><br>{{date policy.updatedAt}}</p>
+                        {{#if policy.policyType}}
+                        <p><strong>Τύπος Πολιτικής:</strong><br>{{policy.policyType.name}}</p>
+                        {{/if}}
+                    </small>
+                    {{/unless}}
+                    <a href="{{baseUrl}}" class="btn btn-secondary w-100 mt-2">
+                        <i class="ti-arrow-left me-1"></i>
+                        Επιστροφή στη Λίστα
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+const isCreate = {{#if (eq mode 'create')}}true{{else}}false{{/if}};
+const baseUrl = '{{baseUrl}}';
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    {{#if (eq mode 'create')}}
+    /* Auto-fill πεδίων βάσει επιλεγμένου policy type */
+    const policyTypes = {{{objectify availablePolicyTypes}}};
+    const policyTypeMap = new Map(policyTypes.map(pt => [String(pt.id), pt]));
+
+    Q('#policyTypeId').on('change', function() {
+        const pt = policyTypeMap.get(this.value);
+        if (pt) {
+            Q('#name').value = pt.name;
+            Q('#description').value = pt.description ?? '';
+        } else {
+            Q('#name').value = '';
+            Q('#description').value = '';
+        }
+    });
+    {{/if}}
+
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        await submitData(
+            data,
+            baseUrl,
+            isCreate ? 'POST' : 'PUT',
+            isCreate ? baseUrl : null,
+        );
+    });
+});
+</script>

@@ -3,6 +3,6 @@ import { managePoliciesRouter } from './policies.js';
 
 const gdpr = express.Router();
 
-gdpr.use('/policies', managePoliciesRouter('GDPR', 'GDPR — Πολιτικές'));
+gdpr.use('/policies', managePoliciesRouter('GDPR', 'GDPR - Πολιτικές'));
 
 export default gdpr;

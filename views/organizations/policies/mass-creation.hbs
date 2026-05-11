@@ -1,0 +1,57 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{title}}</a></li>
+                    <li class="breadcrumb-item active">Μαζική Δημιουργία</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="bi bi-files me-2"></i>
+                        Μαζική Δημιουργία Πολιτικών
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Επιλέξτε τις πολιτικές που θέλετε να δημιουργήσετε για τον οργανισμό. Οι πολιτικές που έχουν ήδη δημιουργηθεί εμφανίζονται ως ανενεργές.</p>
+                    <form method="POST" action="{{baseUrl}}/mass-creation">
+                        {{#each policyTypes}}
+                        <div class="form-check mb-2">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                name="policyTypeIds"
+                                value="{{this.id}}"
+                                id="pt_{{this.id}}"
+                                {{#if this.default}}checked{{/if}}
+                                {{#if this.assigned}}disabled checked{{/if}}
+                            >
+                            <label class="form-check-label {{#if this.assigned}}text-muted{{/if}}" for="pt_{{this.id}}">
+                                {{#if this.code}}<span class="badge bg-secondary me-1">{{this.code}}</span>{{/if}}
+                                {{this.name}}
+                                {{#if this.assigned}}<span class="badge bg-success ms-1">Υπάρχει ήδη</span>{{/if}}
+                            </label>
+                        </div>
+                        {{/each}}
+
+                        <div class="d-flex g-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-icon">
+                                <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                <div>Δημιουργία Επιλεγμένων</div>
+                            </button>
+                            <a href="{{baseUrl}}" class="btn btn-secondary btn-icon">
+                                <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                <div>Ακύρωση</div>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

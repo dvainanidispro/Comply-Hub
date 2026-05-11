@@ -11,7 +11,7 @@
 - `PolicyType`: ο κεντρικός κατάλογος standard policy templates.
 - `Policy`: η org-owned εγγραφή που αντιπροσωπεύει την πολιτική ενός συγκεκριμένου οργανισμού.
 - `non_applicable`: αποθηκευμένο status, όχι απουσία εγγραφής.
-- `custom policy`: `Policy` με `policyTypeId = null` και υποχρεωτικό `customName`.
+- `custom policy`: `Policy` με `policyTypeId = null` και υποχρεωτικό `name`.
 - Στο MVP δεν υπάρχει admin review ή approval workflow.
 - Κάθε policy του οργανισμού έχει **ένα μόνιμο record** που ενημερώνεται στον χρόνο και δεν δημιουργεί ξεχωριστές version rows.
 
@@ -111,27 +111,26 @@
 
 Νέο org-scoped policy index page για το active org.
 
-Το route είναι το `routes\organizations\modules\policies.js`, το οποίο θα χρησιμοποιείται τόσο από τον manager όσο και από τον admin-as-manager. Αυτό θα είναι ένα Factory Pattern για τη διαχείριση πολιτικών (ώστε να χρησιμοποιείται και από gdpr και από nis2 κλπ). Έχει ήδη δημιουργηθεί η βασική υποδομή σε αυτό το αρχείο. 
+Το route είναι το `routes\organizations\modules\policies.js`, το οποίο θα χρησιμοποιείται τόσο από τον manager όσο και από τον admin-as-manager. Αυτό θα είναι ένα Factory Pattern για τη διαχείριση πολιτικών (ώστε να χρησιμοποιείται και από gdpr και από nis2 κλπ). Έχει ήδη δημιουργηθεί η βασική υποδομή σε αυτό το αρχείο. Σε όλα τα paths, θα χρησιμοποιείται το `Cache.table('PolicyType')` ή `Cache.map('PolicyType')` (ανάλογα σε τι μορφή βολεύει τον κώδικα) φίλτραριμένο με βάση το framework (nis2, gdpr κλπ).
 
 Θα υπάρχουν 3 views: `policies`, `single-policy`, `mass-creation`. 
+
 Η σελίδα `policies` θα εμφανίζει:
 
 - τα ήδη υπάρχοντα `Policy` records του οργανισμού σε πίνακα μέσα σε card component, είτε αυτά ανήκουν σε `policy_types` είτε είναι custom policies (δεν χρειάζεται η ένδειξη στον πίνακα, ίσως το policy_type να μπει σε κρυφή στήλη). To query σίγουρα θα είναι left join των `policies` με τα `policy_types`. 
-- Κουμπί πάνω δεξιά για δημιουργία νέας πολιτικής, το οποίο ανοίγει το `single-policy` view σε create mode (mode: create).
-- Κουμπί πάνω δεξιά "Mαζική δημιουργία" για δημιουργία πολλών πολιτικών στον οργανισμό. Θα ανοίγει το `mass-creation` view, το οποίο θα εμφανίζει form με checkboxes για τα `policy_types`. Όσα τα έχει ήδη ο οργανισμός θα είναι disableds. Όσαν `policy_types` έχουν το πεδίο default true, θα είναι επιλεγμένα, και όσα έχουν default false, δεν θα είναι επιλεγμένα. Τέλος, κουμπί "Δημιουργία επιλεγμένων" (mode: mass-create). 
+- Κουμπί πάνω δεξιά για δημιουργία νέας πολιτικής, το οποίο ανοίγει το `single-policy` view σε create mode (mode: "create" κατά το res.render).
+- Κουμπί πάνω δεξιά "Mαζική δημιουργία" για δημιουργία πολλών πολιτικών στον οργανισμό. Θα ανοίγει το `mass-creation` view, το οποίο θα εμφανίζει form με checkboxes για τα `policy_types`. Όσα τα έχει ήδη ο οργανισμός θα είναι disabled. Όσαν `policy_types` έχουν το πεδίο default true, θα είναι επιλεγμένα, και όσα έχουν default false, δεν θα είναι επιλεγμένα. Τέλος, κουμπί "Δημιουργία επιλεγμένων". Κατά την υποβολή, θα δημιουργούνται `Policy` records για κάθε επιλεγμένο `policyTypeId` με `organizationId` το `req.org` που έχει δημιουργηθεί από το προηγούμενο middleware, `policyTypeId` το id του policy_type, `name` το name του policy_type, `description` το description του policy_type, `status`: `to_be_created`, `framework` το framework του policy_type. Τα υπόλοιπα πεδία κενά. Μετά τη δημιουργία, ο χρήστης θα ανακατευθύνεται πίσω στο `policies` view.
+
+Όσο για το `single-policy` view, θα χρησιμοποιείται τόσο για create όσο και για edit. Θα περιλαμβάνει form με τα πεδία `name`, `description`, `version`, `effectiveDate`, `reviewDate`, `status` και επιλογή αρχείων. Το form θα υποβάλλεται σε route που θα δημιουργεί ή θα ενημερώνει την εγγραφή `Policy` του οργανισμού. Κατά το create, θα εμφανίζεται ένα πρώτο πεδίο επιλογής `policyTypeId` με dropdown που θα δείχνει μόνο τα `policy_types` που δεν έχει ήδη ο οργανισμός (θα έρχεται από το route με query για να βρεθούν τα διαθέσιμα policy_types). Αν επιλεγεί κάποιο `policyType`, τότε τα πεδία `name`, `description`, `framework` θα συμπληρώνονται αυτόματα με βάση το επιλεγμένο `policyType`. Αν δεν επιλεγεί κάποιο `policyType` (δηλαδή παραμείνει κενό), τότε θεωρείται custom policy. Αν το mode είναι "edit", τότε το πεδίο επιλογής `policyTypeId` θα είναι κρυφό, αλλά τα υπόλοιπα πεδία συμπληρώνονται με βάση την υπάρχουσα εγγραφή `Policy`.
+
+Προς το παρόν, μην ασχοληθείς με file management. Βάλε ένα άδειο card με τίτλο "Αρχεία" κάτω από το main card των πεδίων. 
+
+Να ξέρεις όμως ότι το πάνω card και το κάτω card θα έχουν το δικό τους ανεξάρτητο save button. Το πάνω card θα αποθηκεύει τα πεδία της πολιτικής, ενώ το κάτω card θα είναι για upload και διαχείριση αρχείων (θα υλοποιηθεί στο επόμενο βήμα).
+
+Όσον αφορά την εμφάνιση των views, πάρε για παράδειγμα το `views\admin\users.hbs` και το `views\admin\single-user.hbs`. Όσον αφορά τα <select> τα badges τον πίνακα, κυρίως για το status, υπάρχουν τα handlebar helpers `label` (κυρίως για badges) και `labelEntries` κυρίως για χρήση σε #each σε select options. 
 
 
-### 5. Policy Detail και File Management
-
-Κάθε policy θα έχει create/edit page με:
-
-- `name`
-- `description`
-- `version`
-- `effectiveDate`
-- `reviewDate`
-- `status`
-- `files`
+### 5. File Management
 
 Τα αρχεία θα αποθηκεύονται με ασφαλή δομή:
 
@@ -150,42 +149,6 @@
 - κανένας χρήστης να μην μπορεί να αποκτήσει πρόσβαση σε αρχεία άλλου οργανισμού,
 - τα αρχεία να μη γίνουν public.
 
-## Προτεινόμενη Σειρά Υλοποίησης
-
-### Phase 1
-
-- Κλείδωμα domain rules
-- Οριστικοποίηση statuses
-- Απόφαση για custom policy semantics
-
-### Phase 2
-
-- Επέκταση `PolicyType`
-- Επέκταση `Policy`
-- Ευθυγράμμιση associations και indexes
-
-### Phase 3
-
-- Org context switch για admin
-- Κοινό org-scoped router για manager και admin
-
-### Phase 4
-
-- Admin CRUD για `policy_types`
-
-### Phase 5
-
-- Read-only org policy list
-- Assign/edit/non-applicable/custom policy behavior
-
-### Phase 6
-
-- Secure upload/download/delete αρχείων πολιτικών
-
-### Phase 7
-
-- Προαιρετικό automation από defaults ή org creation hooks
-- Αυτό προτείνεται να έρθει μετά το manual flow, όχι πριν
 
 ## Included στο MVP
 
@@ -229,6 +192,3 @@
 - `auth/org.js`
 - `routes/admin.js`
 - `lib/storage.js`
-- `views/admin/organizations.hbs`
-- `views/admin/single-organization.hbs`
-- `views/partials/sidebar.hbs`
