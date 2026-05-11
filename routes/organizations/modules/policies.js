@@ -100,7 +100,7 @@ export function managePoliciesRouter(framework, label) {
                 await Models.Policy.bulkCreate(records, { ignoreDuplicates: true });
             }
 
-            res.redirect(req.baseUrl);
+            res.json({ success: true, message: 'Οι επιλεγμένες πολιτικές δημιουργήθηκαν επιτυχώς.' });
         } catch (error) {
             log.error(`${framework} mass-creation POST error: ${error}`);
             res.status(500).render('errors/500');

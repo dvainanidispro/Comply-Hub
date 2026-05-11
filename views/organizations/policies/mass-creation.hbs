@@ -19,7 +19,7 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted mb-4">Επιλέξτε τις πολιτικές που θέλετε να δημιουργήσετε για τον οργανισμό. Οι πολιτικές που έχουν ήδη δημιουργηθεί εμφανίζονται ως ανενεργές.</p>
-                    <form method="POST" action="{{baseUrl}}/mass-creation">
+                    <form id="massCreationForm">
                         {{#each policyTypes}}
                         <div class="form-check mb-2">
                             <input
@@ -48,6 +48,7 @@
                                 <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
                                 <div>Ακύρωση</div>
                             </a>
+                            <bootstrap-spinner class="d-none"></bootstrap-spinner>
                         </div>
                     </form>
                 </div>
@@ -55,3 +56,14 @@
         </div>
     </div>
 </div>
+
+<script type="module">
+const baseUrl = '{{baseUrl}}';
+
+Q('#massCreationForm').on('submit', async function(e) {
+    Q("#modalSuccessTitle").set("Μαζική Δημιουργία Πολιτικών");
+    e.preventDefault();
+    const checked = [...Q('input[name="policyTypeIds"]:checked')].map(el => el.value);
+    await submitData({ policyTypeIds: checked }, `${baseUrl}/mass-creation`, 'POST', baseUrl);
+});
+</script>
