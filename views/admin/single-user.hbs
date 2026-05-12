@@ -50,7 +50,7 @@
                                 <label for="editUserRole" class="form-label fw-bold">Ρόλος *</label>
                                 <select class="form-select" id="editUserRole" name="role" required {{#if (eq userDetails.email @root.user.email)}}disabled{{/if}}>
                                     {{#each roles}}
-                                        <option value="{{this.name}}" data-can-have-organization="{{this.canHaveOrganization}}" data-can-have-scope="{{this.canHaveScope}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.displayName}}</option>
+                                        <option value="{{this.name}}" data-has-organization="{{this.hasOrganization}}" data-can-have-scope="{{this.canHaveScope}}" {{#if (eq this.name ../userDetails.role)}}selected{{/if}}>{{this.displayName}}</option>
                                     {{/each}}
                                 </select>
                                 {{#if (eq userDetails.email @root.user.email)}}
@@ -181,14 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Λογική για enable/disable του organization/scope field με βάση τον επιλεγμένο ρόλο
     function updateRoleFields() {
         const selectedOption = Q('#editUserRole').options[Q('#editUserRole').selectedIndex];
-        const canHaveOrganization = selectedOption.dataset.canHaveOrganization === 'true';
+        const hasOrganization = selectedOption.dataset.hasOrganization === 'true';
         const canHaveScope = selectedOption.dataset.canHaveScope === 'true';
 
-        Q('#editUserOrganization').disabled = !canHaveOrganization;
-        Q('#editUserOrganization').required = canHaveOrganization;
-        if (!canHaveOrganization) Q('#editUserOrganization').value = '';
+        Q('#editUserOrganization').disabled = !hasOrganization;
+        Q('#editUserOrganization').required = hasOrganization;
+        if (!hasOrganization) Q('#editUserOrganization').value = '';
 
         Q('#editUserScope').disabled = !canHaveScope;
+        Q('#editUserScope').required = canHaveScope;
         if (!canHaveScope) Q('#editUserScope option').forEach(option => option.selected = false);
     }
     

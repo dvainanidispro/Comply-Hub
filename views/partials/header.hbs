@@ -10,7 +10,11 @@
             </ul>
 
             <ul class="nav-center">
-            {{!-- Here is the center of the header --}}
+                {{#if (can "manage:any:content")}}
+                <a href="/account/settings{{#if currentPath}}?redirect={{currentPath}}{{/if}}" class="h3 text-secondary">{{org.name}}</a>
+                {{else}}
+                <div class="h3 text-secondary">{{org.name}}</div>
+                {{/if}}
             </ul>
 
             <ul class="nav-right">
@@ -21,7 +25,10 @@
                             <div class="peer">
                                 <span class="fsz-sm" data-variable="name">{{user.name}}</span>
                             </div>
-                            <sl-avatar class="mx-2" label="User avatar" name="{{user.name}}"></sl-avatar>
+                            <div class="avatar">
+                            <sl-avatar label="User avatar" name="{{user.name}}"></sl-avatar>
+
+                            </div>
                         </div>
                     </a>
 

@@ -1,5 +1,7 @@
+import Cache from "../models/cache.js";
+
 /** Middleware που βάζει στο req.org το organizationId του χρήστη, είτε από το token είτε από το cookie */
-const org = (req, res, next) => {
+const org = async (req, res, next) => {
     
     const userOrg = parseInt(req.user?.org);
 
@@ -17,7 +19,9 @@ const org = (req, res, next) => {
         }
         req.org = cookieOrg;
     }
-
+    
+    res.locals.org = {id: req.org, name: (await Cache.map.Organization).get(req.org)?.name || 'Οργανισμός'};
+    res.locals.currentPath = req.originalUrl;
     next();
 };
 

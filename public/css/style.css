@@ -609,6 +609,11 @@
         to { opacity: 1; pointer-events: auto; }
     }
 
+    .avatar{
+        width: 3rem;
+        margin-left: 0.5rem;
+    }
+
 }
 /* Τέλος components layer */
 

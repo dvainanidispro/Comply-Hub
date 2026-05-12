@@ -16,7 +16,7 @@ const roles = {
         displayName: 'Διαχειριστής',
         description: 'Διαχειριστής πλατφόρμας με πλήρη δικαιώματα',
         permissions: ['manage:platform', 'manage:any:content'],
-        canHaveOrganization: false,
+        hasOrganization: false,
         canHaveScope: false,
         color: 'danger'
     },
@@ -25,7 +25,7 @@ const roles = {
         displayName: 'Κεντρικός Υπεύθυνος',
         description: 'Χρήστης με δικαιώματα διαχείρισης περιεχομένου για όλους τους οργανισμούς',
         permissions: ['manage:any:content'],
-        canHaveOrganization: false,
+        hasOrganization: false,
         canHaveScope: true,
         color: 'success'
     },
@@ -34,7 +34,7 @@ const roles = {
         displayName: 'Υπεύθυνος Οργανισμού',
         description: 'Χρήστης με δικαιώματα δημοσίευσης και επεξεργασίας περιεχομένου',
         permissions: ['manage:org:content'],
-        canHaveOrganization: true,
+        hasOrganization: true,
         canHaveScope: true,
         color: 'info'
     },
@@ -44,7 +44,7 @@ const roles = {
     //     user: true,
     //     description: 'Χρήστης με δικαιώματα μόνο προβολής',
     //     permissions: ['view:org:content'],
-    //     canHaveOrganization: true,
+    //     hasOrganization: true,
     //     canHaveScope: true,
     //     color: 'info'
     // },
