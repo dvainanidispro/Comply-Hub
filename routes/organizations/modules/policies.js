@@ -7,9 +7,10 @@
  */
 
 import express from 'express';
-import { Op } from 'sequelize';
+import { can } from '../../../auth/roles.js';
 import Models from '../../../models/models.js';
 import Cache from '../../../models/cache.js';
+import { Op } from 'sequelize';
 import log from '../../../lib/logger.js';
 
 /**
@@ -47,7 +48,7 @@ export function managePoliciesRouter(framework, label) {
     });
 
     /* GET /mass-creation - Φόρμα μαζικής δημιουργίας πολιτικών */
-    policies.get('/mass-creation', async (req, res) => {
+    policies.get('/mass-creation', can('manage:any:content'), async (req, res) => {
         try {
             const allPolicyTypes = await Cache.table.PolicyType;
             const frameworkTypes = allPolicyTypes.filter(pt => pt.framework === framework);
@@ -75,7 +76,7 @@ export function managePoliciesRouter(framework, label) {
     });
 
     /* POST /mass-creation - Μαζική δημιουργία πολιτικών */
-    policies.post('/mass-creation', async (req, res) => {
+    policies.post('/mass-creation', can('manage:any:content'), async (req, res) => {
 
         try {
             const policyTypeMap = await Cache.map.PolicyType;
@@ -224,6 +225,22 @@ export function managePoliciesRouter(framework, label) {
         } catch (error) {
             log.error(`${framework} update policy PUT error: ${error}`);
             res.json({ success: false, message: 'Σφάλμα κατά την αποθήκευση της πολιτικής.' });
+        }
+    });
+
+    /* DELETE /:id - Διαγραφή πολιτικής */
+    policies.delete('/:id', can('manage:any:content'), async (req, res) => {
+        try {
+            const policy = await Models.Policy.findOne({
+                where: { id: req.params.id, organizationId: req.org },
+            });
+            if (!policy) return res.status(404).json({ success: false, message: 'Η πολιτική δεν βρέθηκε.' });
+
+            await policy.destroy();
+            res.json({ success: true, message: 'Η πολιτική διαγράφηκε επιτυχώς.' });
+        } catch (error) {
+            log.error(`${framework} delete policy DELETE error: ${error}`);
+            res.json({ success: false, message: 'Σφάλμα κατά τη διαγραφή της πολιτικής.' });
         }
     });
 

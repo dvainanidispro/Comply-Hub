@@ -134,6 +134,31 @@
                     </a>
                 </div>
             </div>
+
+
+
+            {{#if (can 'manage:any:content')}}
+            <div class="accordion mt-3 d-none d-xl-block" id="actionsAccordion">
+                <div class="accordion-item card">
+                    <h2 class="accordion-header card-header p-0" id="actionsHeading">
+                        <button class="accordion-button accordion-card-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#actionsCollapse" aria-expanded="false" aria-controls="actionsCollapse">
+                            Πρόσθετες ενέργειες
+                        </button>
+                    </h2>
+                    <div id="actionsCollapse" class="accordion-collapse collapse" aria-labelledby="actionsHeading" data-bs-parent="#actionsAccordion">
+                        <div class="accordion-body card-body">
+                            <div class="d-grid g-2">
+                                <button type="button" class="btn btn-danger btn-icon" id="btnDeletePolicy">
+                                    <i class="bi bi-trash"></i>
+                                    <span>Διαγραφή πολιτικής</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+
         </div>
     </div>
 </div>
@@ -181,5 +206,13 @@ document.addEventListener('DOMContentLoaded', function() {
             isCreate ? baseUrl : null,
         );
     });
+
+    async function deletePolicy() {
+        const confirmationMessage = "Θέλετε σίγουρα να διαγράψετε αυτή την πολιτική;";
+        const redirectPath = window.location.origin + baseUrl;
+        await deleteEntity(confirmationMessage, redirectPath);
+    }
+    Q('#btnDeletePolicy').on('click', deletePolicy);
+
 });
 </script>

@@ -11,9 +11,9 @@
 
             <ul class="nav-center">
                 {{#if (can "manage:any:content")}}
-                <a href="/account/settings{{#if currentPath}}?redirect={{currentPath}}{{/if}}" class="h3 text-secondary">{{org.name}}</a>
+                <a href="/account/settings{{#if currentPath}}?redirect={{currentPath}}{{/if}}" class="h3 text-secondary m-0">{{org.name}}</a>
                 {{else}}
-                <div class="h3 text-secondary">{{org.name}}</div>
+                <div class="h3 text-secondary m-0">{{org.name}}</div>
                 {{/if}}
             </ul>
 

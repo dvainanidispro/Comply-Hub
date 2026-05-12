@@ -131,35 +131,40 @@ async function submitData(formElementOrData, path, method, redirectPath = null) 
 /**
  * Διαγράφει ένα entity με επιβεβαίωση του χρήστη
  * @param {string} confirmationMessage - Το μήνυμα επιβεβαίωσης πριν τη διαγραφή
- * @param {string} redirectPath - Το path για redirect μετά την επιτυχία
+ * @param {string} redirectPath - Το path για redirect μετά την επιτυχία (προαιρετικό). Αν δεν δοθεί, χρησιμοποιείται το τρέχον path χωρίς το τελευταίο segment.        
  * @param {string} submitPath - Το path για το DELETE request (προαιρετικό). Αν δεν δοθεί, χρησιμοποιείται το τρέχον path.
  */
-async function deleteEntity(confirmationMessage, redirectPath, submitPath = window.location.pathname) {
-    let confimation = await Q.confirm(confirmationMessage, "Ναι, διαγραφή!", "Ακύρωση");
-    if (!confimation) {
-        return;
-    }
-    
-    Q('bootstrap-spinner').show();
-    
-    try {
-        const response = await fetch(submitPath, {
-            method: 'DELETE'
-        });
-        
-        const result = await response.json();
-        Q('bootstrap-spinner').show(false);
-        
-        if (result.success) {
-            showSuccessModal(result.message, 2000, () => window.location.href = redirectPath);
-        } else {
-            showErrorModal(result.message);
+async function deleteEntity(
+        confirmationMessage, 
+        redirectPath = window.location.pathname.split('/').slice(0, -1).join('/'), 
+        submitPath = window.location.pathname
+    ) 
+    {
+        let confimation = await Q.confirm(confirmationMessage, "Ναι, διαγραφή!", "Ακύρωση");
+        if (!confimation) {
+            return;
         }
-    } catch (error) {
-        Q('bootstrap-spinner').show(false);
-        showErrorModal("Σφάλμα δικτύου: " + error.message);
+        
+        Q('bootstrap-spinner').show();
+        
+        try {
+            const response = await fetch(submitPath, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            Q('bootstrap-spinner').show(false);
+            
+            if (result.success) {
+                showSuccessModal(result.message, 2000, () => window.location.href = redirectPath);
+            } else {
+                showErrorModal(result.message);
+            }
+        } catch (error) {
+            Q('bootstrap-spinner').show(false);
+            showErrorModal("Σφάλμα δικτύου: " + error.message);
+        }
     }
-}
 
 /**
  * Σε περίπτωση επιτυχίας, ανακατευθύνει το χρήστη σε μια προεπιλεγμένη διαδρομή.
