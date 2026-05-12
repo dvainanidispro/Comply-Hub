@@ -73,7 +73,7 @@
 - Avoid inline CSS. Use external CSS files in `public/css/`. Prefer element classes from Adminator and Bootstrap, if possible.
 - Prefer reusing the same custom CSS classes for similar elements. Do not create multiple similar classes for different elements; If needed (different margin for example), modify them with additional utility classes.
 - Use `Alpine.js` only when interactivity is needed. Do not use heavy JS frameworks like React.
-- You can use inline JavaScript in `<script type="module">` tags within Handlebars views, at the end of the view file, if the logic is applied only to a specific view. Use <script> without `type="module"` for Alpine.js logic, so it is available when alpine initalizes. 
+- You can use inline JavaScript in `<script defer>` tags within Handlebars views, at the end of the view file, if the logic is applied only to a specific view. Use <script> without `type="module"` for Alpine.js logic, so it is available when alpine initalizes. 
 - Keep frontend logic simple and enhance progressively only when necessary.
 
 ## Frontend Design

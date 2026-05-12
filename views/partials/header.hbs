@@ -17,16 +17,16 @@
 
                 <li class="dropdown if-user">
                     <a href="" class="dropdown-toggle no-after peers fxw-nw ai-c lh-1" data-bs-toggle="dropdown">
-                        {{!-- <div class="peer mR-10">
-                            <img id="profile-picture" class="w-2r bdrs-50p" src="https://randomuser.me/api/portraits/men/10.jpg" alt="">
-                        </div> --}}
-                        <div class="peer">
-                            <span class="fsz-sm" data-variable="name">{{user.name}}</span>
+                        <div class="d-flex align-items-center justify-content-between p-2">
+                            <div class="peer">
+                                <span class="fsz-sm" data-variable="name">{{user.name}}</span>
+                            </div>
+                            <sl-avatar class="mx-2" label="User avatar" name="{{user.name}}"></sl-avatar>
                         </div>
                     </a>
 
                     <nav class="user-nav" aria-label="User menu">
-                        <ul class="dropdown-menu fsz-sm">
+                        <ul class="dropdown-menu fsz-sm me-3">
                             <li>
                                 <a href="/account/profile" class="d-b td-n pY-5 bgcH-grey-100 c-grey-700">
                                     <i class="ti-user mR-10"></i>

@@ -10,3 +10,8 @@ function createCodeFromName(name) {
         .map(word => word[0].toUpperCase())
         .join('');
 }
+
+// Ορίζουμε τα αρχικά για όλα τα sl-avatar στοιχεία στη σελίδα από το name τους.
+Q("sl-avatar").forEach(el => {
+    el.setAttribute('initials', createCodeFromName(el.getAttribute('name') || ''));
+});
