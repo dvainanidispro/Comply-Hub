@@ -3,7 +3,7 @@
         <div class="col-12 mb-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{title}}</a></li>
+                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{section}}</a></li>
                     <li class="breadcrumb-item active">{{#if (eq mode 'create')}}Νέα Πολιτική{{else}}{{policy.name}}{{/if}}</li>
                 </ol>
             </nav>
@@ -31,14 +31,14 @@
                         {{#if (eq mode 'create')}}
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <label for="policyTypeId" class="form-label fw-bold">Πρότυπο Πολιτικής <req-star></req-star></label>
+                                <label for="policyTypeId" class="form-label fw-bold">Πρότυπο <req-star></req-star></label>
                                 <select class="form-select" id="policyTypeId" name="policyTypeId">
                                     <option value="">— Προσαρμοσμένη Πολιτική —</option>
                                     {{#each availablePolicyTypes}}
                                     <option value="{{this.id}}">{{#if this.code}}[{{this.code}}] {{/if}}{{this.name}}</option>
                                     {{/each}}
                                 </select>
-                                <div class="form-text">Αν επιλέξετε τύπο πολιτικής, τα πεδία συμπληρώνονται αυτόματα. Αφήστε κενό για προσαρμοσμένη πολιτική.</div>
+                                <div class="form-text">Αν επιλέξετε πρότυπο, τα πεδία συμπληρώνονται αυτόματα. Αφήστε κενό για προσαρμοσμένη πολιτική.</div>
                             </div>
                         </div>
                         {{/if}}
@@ -124,7 +124,7 @@
                         <p><strong>Δημιουργία:</strong><br>{{date policy.createdAt}}</p>
                         <p><strong>Τελευταία ενημέρωση:</strong><br>{{date policy.updatedAt}}</p>
                         {{#if policy.policyType}}
-                        <p><strong>Τύπος Πολιτικής:</strong><br>{{policy.policyType.name}}</p>
+                        <p><strong>Πρότυπο:</strong><br>{{policy.policyType.name}}</p>
                         {{/if}}
                     </small>
                     {{/unless}}
@@ -137,7 +137,7 @@
 
 
 
-            {{#if (can 'manage:any:content')}}
+            {{#if (and (eq mode 'edit') (can 'manage:any:content'))}}
             <div class="accordion mt-3 d-none d-xl-block" id="actionsAccordion">
                 <div class="accordion-item card">
                     <h2 class="accordion-header card-header p-0" id="actionsHeading">

@@ -3,7 +3,7 @@
         <div class="col-12 mb-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{title}}</a></li>
+                    <li class="breadcrumb-item"><a href="{{baseUrl}}">{{section}}</a></li>
                     <li class="breadcrumb-item active">Μαζική Δημιουργία</li>
                 </ol>
             </nav>
@@ -14,7 +14,7 @@
                 <div class="card-header">
                     <h4 class="card-title">
                         <i class="bi bi-files me-2"></i>
-                        Μαζική Δημιουργία Πολιτικών
+                        <span>{{section}} - Μαζική Δημιουργία</span>
                     </h4>
                 </div>
                 <div class="card-body">
@@ -61,7 +61,7 @@
 const baseUrl = '{{baseUrl}}';
 
 Q('#massCreationForm').on('submit', async function(e) {
-    Q("#modalSuccessTitle").set("Μαζική Δημιουργία Πολιτικών");
+    Q("#modalSuccessTitle").set("Μαζική Δημιουργία");
     e.preventDefault();
     const checked = [...Q('input[name="policyTypeIds"]:checked')].map(el => el.value);
     await submitData({ policyTypeIds: checked }, `${baseUrl}/mass-creation`, 'POST', baseUrl);

@@ -65,6 +65,7 @@ export function managePoliciesRouter(framework, label) {
             res.render('organizations/policies/mass-creation', {
                 framework,
                 user: req.user,
+                section: label,
                 title: `${label} - Μαζική Δημιουργία`,
                 policyTypes,
                 baseUrl: req.baseUrl,
@@ -187,6 +188,7 @@ export function managePoliciesRouter(framework, label) {
             res.render('organizations/policies/single-policy', {
                 framework,
                 user: req.user,
+                section: label,
                 title: `${label} - ${policy.name}`,
                 mode: 'edit',
                 policy,
