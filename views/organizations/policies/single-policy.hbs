@@ -4,7 +4,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{baseUrl}}">{{section}}</a></li>
-                    <li class="breadcrumb-item active">{{#if (eq mode 'create')}}Νέα Πολιτική{{else}}{{policy.name}}{{/if}}</li>
+                    <li class="breadcrumb-item active">{{#if (eq mode 'create')}}Νέα {{displayType.singular}}{{else}}{{policy.name}}{{/if}}</li>
                 </ol>
             </nav>
         </div>
@@ -15,7 +15,7 @@
                     <h4 class="card-title">
                         {{#if (eq mode 'create')}}
                         <i class="bi bi-plus-circle me-2"></i>
-                        <span>{{framework}} - Νέα Πολιτική</span>
+                        <span>{{framework}} - Νέα {{displayType.singular}}</span>
                         {{else}}
                         <i class="bi bi-file-earmark-text me-2"></i>
                         <span>{{framework}} - {{policy.name}}</span>
@@ -33,12 +33,12 @@
                             <div class="col-md-12">
                                 <label for="policyTypeId" class="form-label fw-bold">Πρότυπο <req-star></req-star></label>
                                 <select class="form-select" id="policyTypeId" name="policyTypeId">
-                                    <option value="">— Προσαρμοσμένη Πολιτική —</option>
+                                    <option value="">— Προσαρμοσμένη {{displayType.singular}} —</option>
                                     {{#each availablePolicyTypes}}
                                     <option value="{{this.id}}">{{#if this.code}}[{{this.code}}] {{/if}}{{this.name}}</option>
                                     {{/each}}
                                 </select>
-                                <div class="form-text">Αν επιλέξετε πρότυπο, τα πεδία συμπληρώνονται αυτόματα. Αφήστε κενό για προσαρμοσμένη πολιτική.</div>
+                                <div class="form-text">Αν επιλέξετε πρότυπο, τα πεδία συμπληρώνονται αυτόματα. Αφήστε κενό για προσαρμοσμένη {{displayType.singularLower}}.</div>
                             </div>
                         </div>
                         {{/if}}
@@ -150,7 +150,7 @@
                             <div class="d-grid g-2">
                                 <button type="button" class="btn btn-danger btn-icon" id="btnDeletePolicy">
                                     <i class="bi bi-trash"></i>
-                                    <span>Διαγραφή πολιτικής</span>
+                                    <span>Διαγραφή {{displayType.singularLower}}</span>
                                 </button>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function deletePolicy() {
-        const confirmationMessage = "Θέλετε σίγουρα να διαγράψετε αυτή την πολιτική;";
+        const confirmationMessage = 'Θέλετε σίγουρα να διαγράψετε αυτή τη {{displayType.singularLower}};';
         const redirectPath = window.location.origin + baseUrl;
         await deleteEntity(confirmationMessage, redirectPath);
     }

@@ -7,29 +7,57 @@
  *
  * Χρήση:
  *   import { managePoliciesRouter } from './policies.js';
- *   router.use('/policies', managePoliciesRouter('NIS2', 'NIS2 - Πολιτικές'));
+ *   router.use('/policies', managePoliciesRouter('NIS2', 'policy', 'NIS2 - Πολιτικές'));
  */
 
 import express from 'express';
 import Models from '../../models/models.js';
 import Cache from '../../models/cache.js';
-import { ForeignKeyConstraintError } from 'sequelize';
+import { ForeignKeyConstraintError, UniqueConstraintError } from 'sequelize';
 import log from '../../lib/logger.js';
+
+const typeLabels = {
+    policy: {
+        singular: 'Πολιτική',
+        singularLower: 'πολιτική',
+        plural: 'Πολιτικές',
+        pluralLower: 'πολιτικές',
+    },
+    procedure: {
+        singular: 'Διαδικασία',
+        singularLower: 'διαδικασία',
+        plural: 'Διαδικασίες',
+        pluralLower: 'διαδικασίες',
+    },
+    default: {
+        singular: 'Έγγραφο',
+        singularLower: 'έγγραφο',
+        plural: 'Έγγραφα',
+        pluralLower: 'έγγραφα',
+    },
+};
+
+function getUniqueConstraintMessage(displayType) {
+    return `Υπάρχει ήδη ${displayType.singularLower} με τον ίδιο κωδικό.`;
+}
 
 /**
  * Δημιουργεί router για διαχείριση policy types ενός συγκεκριμένου framework.
  * @param {string} framework - Το αναγνωριστικό του framework (π.χ. 'NIS2', 'GDPR').
+ * @param {string} type - Ο τύπος εγγράφου (π.χ. 'policy', 'procedure').
  * @param {string} label - Τίτλος για το view (π.χ. 'NIS2 - Πολιτικές').
  * @returns {express.Router}
  */
-export function managePoliciesRouter(framework, label) {
+export function managePoliciesRouter(framework, type, label) {
     const policies = express.Router();
+    const displayType = typeLabels[type||'default'];
 
+    
     /* GET /policies - Λίστα policy types για το framework */
     policies.get('/', async (req, res) => {
         try {
             const policies = await Models.PolicyType.findAll({
-                where: { framework },
+                where: { framework, type },
                 order: [
                     ['sequence', 'ASC'],
                     ['id', 'ASC'],
@@ -42,6 +70,8 @@ export function managePoliciesRouter(framework, label) {
                 framework,
                 user: req.user,
                 title: label,
+                displayType,
+                baseUrl: req.baseUrl,
             });
         } catch (error) {
             log.error(`${framework} policies GET error: ${error}`);
@@ -58,6 +88,7 @@ export function managePoliciesRouter(framework, label) {
 
             await Models.PolicyType.create({
                 framework,
+                type,
                 code: code || null,
                 name: name || null,
                 description: description || null,
@@ -69,6 +100,9 @@ export function managePoliciesRouter(framework, label) {
             Cache.refresh('PolicyType');
             res.json({ ok: true });
         } catch (error) {
+            if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
+                return res.status(400).json({ ok: false, message: getUniqueConstraintMessage(displayType) });
+            }
             log.error(`${framework} policies POST error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });
         }
@@ -80,7 +114,7 @@ export function managePoliciesRouter(framework, label) {
             const id = parseInt(req.params.id);
             const { code, name, description, sequence, default: isDefault, active } = req.body;
 
-            const policy = await Models.PolicyType.findOne({ where: { id, framework } });
+            const policy = await Models.PolicyType.findOne({ where: { id, framework, type } });
             if (!policy) {
                 return res.status(404).json({ ok: false, message: 'Δεν βρέθηκε.' });
             }
@@ -99,6 +133,9 @@ export function managePoliciesRouter(framework, label) {
             Cache.refresh('PolicyType');
             res.json({ ok: true });
         } catch (error) {
+            if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
+                return res.status(400).json({ ok: false, message: getUniqueConstraintMessage(displayType) });
+            }
             log.error(`${framework} policies PUT ${req.params.id} error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });
         }
@@ -109,7 +146,7 @@ export function managePoliciesRouter(framework, label) {
         try {
             const id = parseInt(req.params.id);
 
-            const policy = await Models.PolicyType.findOne({ where: { id, framework } });
+            const policy = await Models.PolicyType.findOne({ where: { id, framework, type } });
             if (!policy) {
                 return res.status(404).json({ ok: false, message: 'Δεν βρέθηκε.' });
             }

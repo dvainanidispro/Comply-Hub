@@ -195,6 +195,7 @@ Q.url = {
     domain: window.location.hostname,
     path: window.location.pathname,
     referrer: document.referrer,
+    base: window.location.pathname.split('/').slice(0,-1).join('/'),     // path without the last segment (e.g. /frameworks/gdpr/policies/123 -> /frameworks/gdpr/policies)
 };
 
 Q.refresh = () => window.location.reload();

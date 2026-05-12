@@ -10,7 +10,7 @@
                     <div class="card-actions d-flex g-3 my-3">
                         <a href="{{baseUrl}}/new" class="btn btn-primary btn-icon">
                             <i class="bi bi-plus-circle"></i>
-                            <div>Νέα Πολιτική</div>
+                            <div>Νέα {{displayType.singular}}</div>
                         </a>
                         {{#if (can 'manage:any:content')}}
                         <a href="{{baseUrl}}/mass-creation" class="btn btn-outline-secondary btn-icon">

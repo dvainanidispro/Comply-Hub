@@ -136,7 +136,7 @@ async function submitData(formElementOrData, path, method, redirectPath = null) 
  */
 async function deleteEntity(
         confirmationMessage, 
-        redirectPath = window.location.pathname.split('/').slice(0, -1).join('/'), 
+        redirectPath = Q.url.base, 
         submitPath = window.location.pathname
     ) 
     {

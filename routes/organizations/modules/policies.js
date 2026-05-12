@@ -3,7 +3,7 @@
  *
  * Χρήση:
  *   import { managePoliciesRouter } from './modules/policies.js';
- *   router.use('/policies', managePoliciesRouter('NIS2', 'NIS2 - Πολιτικές'));
+ *   router.use('/policies', managePoliciesRouter('NIS2', 'policy', 'NIS2 - Πολιτικές'));
  */
 
 import express from 'express';
@@ -13,32 +13,57 @@ import Cache from '../../../models/cache.js';
 import { Op } from 'sequelize';
 import log from '../../../lib/logger.js';
 
+const typeLabels = {
+    policy: {
+        singular: 'Πολιτική',
+        singularLower: 'πολιτική',
+        plural: 'Πολιτικές',
+        pluralLower: 'πολιτικές',
+    },
+    procedure: {
+        singular: 'Διαδικασία',
+        singularLower: 'διαδικασία',
+        plural: 'Διαδικασίες',
+        pluralLower: 'διαδικασίες',
+    },
+    default: {
+        singular: 'Έγγραφο',
+        singularLower: 'έγγραφο',
+        plural: 'Έγγραφα',
+        pluralLower: 'έγγραφα',
+    },
+};
+
 /**
  * Δημιουργεί router για διαχείριση πολιτικών οργανισμού για ένα συγκεκριμένο framework.
  * @param {string} framework - Το αναγνωριστικό του framework (π.χ. 'NIS2', 'GDPR').
+ * @param {string} type - Ο τύπος εγγράφου (π.χ. 'policy', 'procedure').
  * @param {string} label - Τίτλος για το view (π.χ. 'NIS2 - Πολιτικές').
  * @returns {express.Router}
  */
-export function managePoliciesRouter(framework, label) {
+export function managePoliciesRouter(framework, type, label) {
     const policies = express.Router();
+    const displayType = typeLabels[type||'default'];
 
     /* GET / - Λίστα πολιτικών οργανισμού για το framework */
     policies.get('/', async (req, res) => {
         try {
-            const orgPolicies = await Models.Policy.findAll({
-                where: { organizationId: req.org },
+            const policiesList = await Models.Policy.findAll({
+                where: {
+                    organizationId: req.org,
+                    framework,
+                    type,
+                },
                 include: [{ model: Models.PolicyType, as: 'policyType' }],
                 order: [['createdAt', 'ASC']],
             });
-
-            /* Φιλτράρισμα βάσει framework (πεδίο policy.framework) */
-            const frameworkPolicies = orgPolicies.filter(p => p.framework === framework);
 
             res.render('organizations/policies/policies', {
                 framework,
                 user: req.user,
                 title: label,
-                policies: frameworkPolicies,
+                displayType,
+                policies: policiesList,
                 baseUrl: req.baseUrl,
             });
         } catch (error) {
@@ -51,22 +76,27 @@ export function managePoliciesRouter(framework, label) {
     policies.get('/mass-creation', can('manage:any:content'), async (req, res) => {
         try {
             const allPolicyTypes = await Cache.table.PolicyType;
-            const frameworkTypes = allPolicyTypes.filter(pt => pt.framework === framework);
+            const availableTemplates = allPolicyTypes.filter(pt => pt.framework === framework && pt.type === type);
 
             const existing = await Models.Policy.findAll({
-                where: { organizationId: req.org },
+                where: {
+                    organizationId: req.org,
+                    framework,
+                    type,
+                },
                 attributes: ['policyTypeId'],
                 raw: true,
             });
             const existingIds = new Set(existing.map(p => p.policyTypeId).filter(Boolean));
 
-            const policyTypes = frameworkTypes.map(pt => ({ ...pt, assigned: existingIds.has(pt.id) }));
+            const policyTypes = availableTemplates.map(pt => ({ ...pt, assigned: existingIds.has(pt.id) }));
 
             res.render('organizations/policies/mass-creation', {
                 framework,
                 user: req.user,
                 section: label,
                 title: `${label} - Μαζική Δημιουργία`,
+                displayType,
                 policyTypes,
                 baseUrl: req.baseUrl,
             });
@@ -86,10 +116,11 @@ export function managePoliciesRouter(framework, label) {
 
             const records = selectedIds.map(id => {
                 const pt = policyTypeMap.get(id);
-                if (!pt) return null;
+                if (!pt || pt.framework !== framework || pt.type !== type) return null;
                 return {
                     organizationId: req.org,
                     policyTypeId: id,
+                    type,
                     code: pt.code,
                     name: pt.name,
                     description: pt.description,
@@ -102,7 +133,7 @@ export function managePoliciesRouter(framework, label) {
                 await Models.Policy.bulkCreate(records, { ignoreDuplicates: true });
             }
 
-            res.json({ success: true, message: 'Οι επιλεγμένες πολιτικές δημιουργήθηκαν επιτυχώς.' });
+            res.json({ success: true, message: `Οι επιλεγμένες ${displayType.pluralLower} δημιουργήθηκαν επιτυχώς.` });
         } catch (error) {
             log.error(`${framework} mass-creation POST error: ${error}`);
             res.status(500).render('errors/500');
@@ -113,21 +144,27 @@ export function managePoliciesRouter(framework, label) {
     policies.get('/new', async (req, res) => {
         try {
             const allPolicyTypes = await Cache.table.PolicyType;
-            const frameworkTypes = allPolicyTypes.filter(pt => pt.framework === framework);
+            const availableTemplates = allPolicyTypes.filter(pt => pt.framework === framework && pt.type === type);
 
             const existing = await Models.Policy.findAll({
-                where: { organizationId: req.org },
+                where: {
+                    organizationId: req.org,
+                    framework,
+                    type,
+                },
                 attributes: ['policyTypeId'],
                 raw: true,
             });
             const existingIds = new Set(existing.map(p => p.policyTypeId).filter(Boolean));
-            const availablePolicyTypes = frameworkTypes.filter(pt => !existingIds.has(pt.id));
+            const availablePolicyTypes = availableTemplates.filter(pt => !existingIds.has(pt.id));
 
             res.render('organizations/policies/single-policy', {
                 framework,
                 user: req.user,
-                title: `${label} - Νέα Πολιτική`,
+                section: label,
+                title: `${label} - Νέα ${displayType.singular}`,
                 mode: 'create',
+                displayType,
                 availablePolicyTypes,
                 baseUrl: req.baseUrl,
             });
@@ -147,19 +184,20 @@ export function managePoliciesRouter(framework, label) {
             if (policyTypeId) duplicateConditions.push({ policyTypeId: Number(policyTypeId) });
 
             const existing = await Models.Policy.findOne({
-                where: { organizationId: req.org, framework, [Op.or]: duplicateConditions },
+                where: { organizationId: req.org, framework, type, [Op.or]: duplicateConditions },
                 attributes: ['code', 'policyTypeId'],
             });
 
             if (existing) {
                 if (existing.code === code)
-                    return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική με τον ίδιο κωδικό.' });
-                return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική για τον ίδιο τύπο πολιτικής.' });
+                    return res.json({ success: false, message: `Υπάρχει ήδη ${displayType.singularLower} με τον ίδιο κωδικό.` });
+                return res.json({ success: false, message: `Υπάρχει ήδη ${displayType.singularLower} για τον ίδιο τύπο εγγράφου.` });
             }
 
             await Models.Policy.create({
                 organizationId: req.org,
                 policyTypeId: policyTypeId || null,
+                type,
                 code,
                 name,
                 description,
@@ -169,10 +207,10 @@ export function managePoliciesRouter(framework, label) {
                 status,
                 framework,
             });
-            res.json({ success: true, message: 'Η πολιτική δημιουργήθηκε επιτυχώς.' });
+            res.json({ success: true, message: `Η ${displayType.singularLower} δημιουργήθηκε επιτυχώς.` });
         } catch (error) {
             log.error(`${framework} create policy POST error: ${error}`);
-            res.json({ success: false, message: 'Σφάλμα κατά τη δημιουργία της πολιτικής.' });
+            res.json({ success: false, message: `Σφάλμα κατά τη δημιουργία της ${displayType.singularLower}.` });
         }
     });
 
@@ -180,7 +218,12 @@ export function managePoliciesRouter(framework, label) {
     policies.get('/:id', async (req, res) => {
         try {
             const policy = await Models.Policy.findOne({
-                where: { id: req.params.id, organizationId: req.org },
+                where: {
+                    id: req.params.id,
+                    organizationId: req.org,
+                    framework,
+                    type,
+                },
                 include: [{ model: Models.PolicyType, as: 'policyType' }],
             });
             if (!policy) return res.status(404).render('errors/404');
@@ -191,6 +234,7 @@ export function managePoliciesRouter(framework, label) {
                 section: label,
                 title: `${label} - ${policy.name}`,
                 mode: 'edit',
+                displayType,
                 policy,
                 baseUrl: req.baseUrl,
             });
@@ -211,22 +255,23 @@ export function managePoliciesRouter(framework, label) {
                 where: {
                     organizationId: req.org,
                     framework,
+                    type,
                     [Op.or]: [{ id: policyId }, { code }],
                 },
             });
 
             const policy = candidates.find(p => p.id === policyId);
-            if (!policy) return res.status(404).json({ success: false, message: 'Η πολιτική δεν βρέθηκε.' });
+            if (!policy) return res.status(404).json({ success: false, message: `Η ${displayType.singularLower} δεν βρέθηκε.` });
 
             const duplicate = candidates.find(p => p.code === code && p.id !== policyId);
-            if (duplicate) return res.json({ success: false, message: 'Υπάρχει ήδη πολιτική με τον ίδιο κωδικό.' });
+            if (duplicate) return res.json({ success: false, message: `Υπάρχει ήδη ${displayType.singularLower} με τον ίδιο κωδικό.` });
 
             await policy.update({ code, name, description, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
 
-            res.json({ success: true, message: 'Η πολιτική αποθηκεύτηκε επιτυχώς.' });
+            res.json({ success: true, message: `Η ${displayType.singularLower} αποθηκεύτηκε επιτυχώς.` });
         } catch (error) {
             log.error(`${framework} update policy PUT error: ${error}`);
-            res.json({ success: false, message: 'Σφάλμα κατά την αποθήκευση της πολιτικής.' });
+            res.json({ success: false, message: `Σφάλμα κατά την αποθήκευση της ${displayType.singularLower}.` });
         }
     });
 
@@ -234,15 +279,20 @@ export function managePoliciesRouter(framework, label) {
     policies.delete('/:id', can('manage:any:content'), async (req, res) => {
         try {
             const policy = await Models.Policy.findOne({
-                where: { id: req.params.id, organizationId: req.org },
+                where: {
+                    id: req.params.id,
+                    organizationId: req.org,
+                    framework,
+                    type,
+                },
             });
-            if (!policy) return res.status(404).json({ success: false, message: 'Η πολιτική δεν βρέθηκε.' });
+            if (!policy) return res.status(404).json({ success: false, message: `Η ${displayType.singularLower} δεν βρέθηκε.` });
 
             await policy.destroy();
-            res.json({ success: true, message: 'Η πολιτική διαγράφηκε επιτυχώς.' });
+            res.json({ success: true, message: `Η ${displayType.singularLower} διαγράφηκε επιτυχώς.` });
         } catch (error) {
             log.error(`${framework} delete policy DELETE error: ${error}`);
-            res.json({ success: false, message: 'Σφάλμα κατά τη διαγραφή της πολιτικής.' });
+            res.json({ success: false, message: `Σφάλμα κατά τη διαγραφή της ${displayType.singularLower}.` });
         }
     });
 

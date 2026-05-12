@@ -13,6 +13,11 @@ const Policy = db.define('policy',
             allowNull: false,
         },
         policyTypeId: DataTypes.INTEGER,
+        type: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            comment: "Τύπος. Δυνατές τιμές: policy, procedure, standard, guideline, plan.",
+        },
         code: {
             type: DataTypes.STRING,
             allowNull: false,

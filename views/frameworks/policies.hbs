@@ -1,6 +1,7 @@
 <script>
 window.policies = {{{objectify policies}}};
-window.framework = '{{framework}}';
+window.baseUrl = '{{baseUrl}}';
+window.displayType = {{{objectify displayType}}};
 const showID = false;
 </script>
 
@@ -30,12 +31,12 @@ const showID = false;
                                     <th class="sortable" style="width:60ch">Όνομα</th>
                                     <th>Περιγραφή</th>
                                     <th class="text-center sortable" style="width:18ch">
-                                        <sl-tooltip content="Καθορίζει αν η πολιτική θα συμπεριλαμβάνεται στη μαζική απόδοση πολιτικών σε Οργανισμό.">
+                                        <sl-tooltip content="Καθορίζει αν το πρότυπο θα συμπεριλαμβάνεται στη μαζική απόδοση σε Οργανισμό.">
                                             <span>Προεπιλογή</span>
                                         </sl-tooltip>
                                     </th>
                                     <th class="text-center sortable" data-sort-type="number" style="width:12ch">
-                                        <sl-tooltip content="Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης των πολιτικών. Δεν έχει λειτουργική σημασία.">
+                                        <sl-tooltip content="Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης. Δεν έχει λειτουργική σημασία.">
                                             <span>Σειρά</span>
                                         </sl-tooltip>
                                     </th>
@@ -102,7 +103,7 @@ const showID = false;
                 <div class="card-header">
                     <h2 class="card-title h5 mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
-                        Προσθήκη Νέου Τύπου Πολιτικής
+                        Προσθήκη Νέου Πρότυπου
                     </h2>
                 </div>
                 <div class="card-body">
@@ -153,8 +154,7 @@ const showID = false;
     };
 
     function policiesApp() {
-        const fw = window.framework.toLowerCase();
-        const baseUrl = `/admin/frameworks/${fw}/policies`;
+        let baseUrl = window.baseUrl;
 
         return {
             rows: window.policies.map(p => ({ ...p, _saving: false, _codeInvalid: false, _nameInvalid: false })),
@@ -234,7 +234,7 @@ const showID = false;
         codeCount.set(p.code, (codeCount.get(p.code) ?? 0) + 1);
     }
     for (const [code, count] of codeCount) {
-        if (count > 1) Q.alert(`Υπάρχουν ${count} πολιτικές με τον ίδιο κωδικό: ${code}`, 'OK');
+        if (count > 1) Q.alert(`Υπάρχουν ${count} ${window.displayType.pluralLower} με τον ίδιο κωδικό: ${code}`, 'OK');
     }
 </script>
 
