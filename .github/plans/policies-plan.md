@@ -132,35 +132,37 @@
 
 ### 5. File Management
 
+#### Θέση αρχείων
 
-Τα αρχεία σε κάθε πολιτική θα αποθηκεύονται με ασφαλή δομή:
-
-- `/storage/organizations/{organizationId}/modules/:framework/:resourcetype/:resourceId/name`
+- `/storage/organizations/:organizationId/modules/:framework/:resourcetype/:resourceId/name`
 - Παράδειγμα: `/storage/organizations/123/modules/gdpr/policies/456/policy-document.pdf`
 
 ### Αποθήκευση αρχείων
+
 Τα αρχεία θέλουμε ιδανικά να αποθηκεύονται με το original όνομά τους, ακόμα κι αν περιέχουν κενά. 
-- Αυτό μπορεί να γίνει πχ ένα απλό sanitization που να αντικαθιστά τα κενά με plus (+) ή tilde (~). Θα είναι ενσωματωμένο στο `Storage.store()` και `Storage.path()`. Θα εφαρμόζεται σε όλα τα αρχεία που ανεβαίνουν, όχι μόνο σε αυτά των πολιτικών.
+- Αυτό μπορεί να γίνει πχ ένα απλό sanitization που να αντικαθιστά τα κενά με tilde (~). Θα είναι ενσωματωμένο στο `Storage.store()` και `Storage.path()`. Θα εφαρμόζεται σε όλα τα αρχεία που ανεβαίνουν, όχι μόνο σε αυτά των πολιτικών. Το sanitization θα εφαρμόζεται μόνο στα αρχεία κι όχι στους φάκελους, οι οποίοι θα καθορίζονται από τον κώδικα, οπότε θα είναι πάντα με "καθαρά" ονόματα.
 - Θα γίνεται έλεγχος για διπλότυπα ονόματα αρχείων στην ίδια πολιτική, και αν υπάρχει ήδη αρχείο με το ίδιο όνομα, θα ενημερώνει το χρήστη να μετονομάσει το νέο αρχείο ή να διαγράψει πρώτα το παλιό. 
 
 #### Factory router
-Επειδή το file management θα χρησιμοποιηθεί και σε άλλα modules εκτός από τις πολιτικές, καλό είναι να δημιουργηθεί ένα factory router `routes/organizations/storage.js` που θα δέχεται παραμέτρους όπως `framework`, `resourceType` και `resourceId` (ή έστω το `storagePath` μόνο) για να διαχειρίζεται τα αρχεία με βάση το context. Αυτός ο router θα έχει routes για upload, download, delete και list files, και θα χρησιμοποιεί το `Storage` module για όλες τις λειτουργίες. Ο σκοπός είναι οποιοδήποτε router να μπορεί να το χρησιμοποιήσει ως sub-router για να προσθέσει file management σε οποιοδήποτε resource. Για παράδειγμα στο router που διαχειρίζεται το path `/organization/frameworks/nis2/policies` να μπορεί εύκολα να μπει το `storageRouter` στο path `/organization/frameworks/nis2/policies/:policyId/storage` με μια απλή εντολή `thisRouter.use('/:policyId/storage', storageRouter(parameters))`, όπου το `parameters` θα περιλαβμάνει και το policyId. 
 
-### Αρχεία πολιτικών
+- Επειδή το file management θα χρησιμοποιηθεί και σε άλλα modules εκτός από τις πολιτικές, καλό είναι να δημιουργηθεί ένα factory router `routes/organizations/modules/storage.js` που θα δέχεται παραμέτρους όπως `framework`, `resourceType` και `resourceId` (ή έστω το `storagePath` μόνο) για να διαχειρίζεται τα αρχεία με βάση το context. Αυτός ο router θα έχει routes για upload, download, delete και list files, και θα χρησιμοποιεί το `Storage` module για όλες τις λειτουργίες. Ο σκοπός είναι οποιοδήποτε router να μπορεί να το χρησιμοποιήσει ως sub-router για να προσθέσει file management σε οποιοδήποτε resource. Για παράδειγμα στο router που διαχειρίζεται το path `/organization/frameworks/nis2/policies` να μπορεί εύκολα να μπει το `storageRouter` στο path `/organization/frameworks/nis2/policies/:policyId/storage` με μια απλή εντολή `thisRouter.use('/:policyId/storage', storageRouter(parameters))`. 
+- Θα περιέχει middleware check για το org.
+
+### Αρχεία πολιτικών στο view
+
 Τα αρχεία στις πολιτικές θα αποθηκεύονται με ξεχωριστό save σε ήδη υπάρχουνσα πολιτική (δεν θα ανεβαίνουν αρχεία κατά τη δημιουργία πολιτικής). Υπάρχει ήδη χώρος στο `single-policy` view για να τοποθετηθεί η καινούργια φόρμα. 
-Προς συζήτηση αν θα φορτώνονται τα αρχεία κατά το φόρτωμα της σελίδας ή με alpine fetch μετά το φόρτωμα (προτείνεται το δεύτερο για καλύτερη απόδοση). 
-Κάθε αρχείο θα έχει τη δική του γραμμή στο Card Αρχεία και θα γίνεται popultate με alpine.js. Για να είναι πιο απλός ο κώδικας του alpine, έχω δημιουργήσει το `alpine-fetch.js`. 
-Κάθε γραμμή θα έχει κουμπί για download και delete. Το upload θα γίνεται με ξεχωριστό form κάτω από τον πίνακα των αρχείων.
+Κάθε αρχείο θα έχει τη δική του γραμμή στο Card "Αρχεία".
+Προς συζήτηση αν θα φορτώνονται τα αρχεία κατά το φόρτωμα της σελίδας ή αν θα γίνεται populate με alpine fetch μετά το φόρτωμα. προτείνεται το δεύτερο για καλύτερη απόδοση. Για να είναι πιο απλός ο κώδικας του alpine, έχω δημιουργήσει το `alpine-fetch.js` που έχει υλοποιήσει το `$fetch` helper. 
 
-#### Θέση αρχείων
+Κάθε γραμμή θα έχει κουμπί για download και delete. Το upload θα γίνεται με ξεχωριστό form κάτω από τον πίνακα των αρχείων. Δεν θα υπάρχει κουμπί αντικατάστασης/update αρχείου. 
 
-Απαιτούμενες ενέργειες:
+Προς συζήτηση αν θα αποθηκεύεται κάτι στο πεδίο files του `Policy`, αν θα είναι απλά virtual ή αν δεν θα χρησιμοποιηθεί καθόλου. Προς το παρόν, ας μην χρησιμοποιηθεί καθόλου, εφόσον τα αρχεία έχουν ημερομηνία δημιουργίας, 
 
-- υλοποίηση του `Storage.store()`
-- secure upload route
-- secure download route
-- secure delete route
-- ownership checks πριν από κάθε file action
+#### Απαιτούμενες ενέργειες:
+
+- Στο `storage.js` υλοποίηση sanitize, desanitize (ας μπουν σε ένα object με δύο μεθόδους για καθαρό κώδικα) και υλοποίηση του `Storage.store()` που θα χρησιμοποιεί το sanitize. Στο `Storage.list()`, ας προστεθεί ένα δεύτερο όρισμα `sanitize=false` που αν είναι true, θα κάνει desanitization στα ονόματα των αρχείων πριν τα επιστρέψει.
+- Δημιουργία factory router `routes/organizations/storage.js` με routes για upload, download, delete και list files. Θα χρησιμοποιεί το `Storage` module για όλες τις λειτουργίες. Θα περιέχει middleware check για το org. 
+- Υλοποίηση του UI για διαχείριση αρχείων στο `single-policy` view, με alpine.js για το dynamic μέρος (fetching, delete, upload).
 
 Στόχος:
 
