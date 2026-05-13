@@ -4,6 +4,12 @@
  * Χρήση:
  *   import { manageStorageRouter } from './modules/storage.js';
  *   policiesRouter.use('/:resourceId/storage', manageStorageRouter('GDPR', 'policies'));
+ * 
+ *   Με αυτόν τον τρόπο αν το policiesRouter διαχειρίζεται το path: `/organization/frameworks/gdpr/policies`, 
+ *   τότε το storage router του προσθέτει τα paths: `/organization/frameworks/gdpr/policies/:policyId/storage` 
+ *   (πχ `/organization/frameworks/gdpr/policies/1/storage/list`)
+ *   για όλα τα policyId, ενώ έχει πρόσβαση στα URL params του parent router (mergeParams: true), 
+ *   κυρίως για το resourceId (πχ policyId) ώστε να κατασκευάζει το σωστό storage path για κάθε πόρο.
  *
  * Storage path: organizations/{orgId}/modules/{framework}/{resourceType}/{resourceId}/
  */
@@ -31,20 +37,9 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
     /* Κατασκευή του relative storage path για τον πόρο βάσει req context */
     function resourcePath(req) {
         const resourceId = parseInt(req.params[resourceParamName], 10);
+        if (!resourceId) throw new Error('Μη έγκυρο resource ID.');
         return `organizations/${req.org}/modules/${framework.toLowerCase()}/${resourceType}/${resourceId}`;
     }
-
-    /* Middleware: έλεγχος org context και valid resource ID */
-    router.use((req, res, next) => {
-        if (!req.org) {
-            return res.status(403).json({ success: false, message: 'Δεν έχει οριστεί οργανισμός.' });
-        }
-        const resourceId = parseInt(req.params[resourceParamName], 10);
-        if (!resourceId) {
-            return res.status(400).json({ success: false, message: 'Μη έγκυρο resource ID.' });
-        }
-        next();
-    });
 
 
 
@@ -59,13 +54,13 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
         }
     });
 
-    /* GET /download - Λήψη αρχείου με sanitized όνομα στο query param */
+    /* GET /download - Λήψη αρχείου με desanitized όνομα στο query param */
     router.get('/download', async (req, res) => {
         try {
-            const fileName = req.query.name || '';
+            const displayName = req.query.name || '';
+            const fileName = Storage.sanitizer.sanitize(displayName);
             const filePath = `${resourcePath(req)}/${fileName}`;
             const absolutePath = await Storage.path(filePath);
-            const displayName = Storage.sanitizer.desanitize(fileName);
             res.download(absolutePath, displayName);
         } catch (error) {
             log.error(`Storage download error (${framework}/${resourceType}): ${error}`);
@@ -73,10 +68,10 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
         }
     });
 
-    /* DELETE /delete - Διαγραφή αρχείου με sanitized όνομα στο body */
+    /* DELETE /delete - Διαγραφή αρχείου με desanitized όνομα στο body */
     router.delete('/delete', async (req, res) => {
         try {
-            const fileName = req.body.name || '';
+            const fileName = Storage.sanitizer.sanitize(req.body.name || '');
             const filePath = `${resourcePath(req)}/${fileName}`;
             await Storage.delete(filePath);
             log.info(`Διαγράφηκε αρχείο: ${filePath}`);

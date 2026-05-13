@@ -98,15 +98,60 @@
             </div>
 
             {{#unless (eq mode 'create')}}
-            <div class="card mt-3">
+            <div class="card mt-4">
                 <div class="card-header">
                     <h5 class="card-title">
                         <i class="bi bi-paperclip me-2"></i>
                         Αρχεία
                     </h5>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted">Σύντομα διαθέσιμο.</p>
+                <div class="card-body" x-data="fileManager('{{baseUrl}}/{{policy.id}}/storage')">
+
+                    <div x-show="loading" class="text-center py-2">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                    </div>
+
+                    <p x-show="!loading && !files.length" class="text-muted small mb-3">Δεν υπάρχουν ανεβασμένα αρχεία.</p>
+
+                    <div x-show="!loading && files.length > 0" class="mb-3">
+                        <table class="table table-sm table-hover">
+                            <tbody>
+                                <template x-for="file in files" :key="file.name">
+                                    <tr>
+                                        <td class="align-middle">
+                                            <i class="bi bi-file-earmark me-1 text-muted"></i>
+                                            <span x-text="file.name"></span>
+                                        </td>
+                                        <td class="text-muted align-middle text-end" x-text="formatSize(file.size)"></td>
+                                        <td class="align-middle text-end" style="white-space:nowrap">
+                                            <a :href="storageUrl + '/download?name=' + encodeURIComponent(file.name)" class="btn btn-sm btn-outline-primary btn-icon me-1">
+                                                <i class="bi bi-download"></i>
+                                                <span>Λήψη</span>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-icon" @click="deleteFile(file)">
+                                                <i class="bi bi-trash"></i>
+                                                <span>Διαγραφή</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <form @submit.prevent="uploadFile">
+                        <div class="d-flex g-2 align-items-end mt-4">
+                            <div class="flex-grow-1">
+                                <label class="form-label fw-bold small mb-1">Ανέβασμα νέου αρχείου</label>
+                                <input type="file" class="form-control" x-ref="fileInput" :disabled="uploading" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm btn-icon" :disabled="uploading">
+                                <i class="bi bi-upload"></i>
+                                <span>Ανέβασμα</span>
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
             {{/unless}}
@@ -164,6 +209,82 @@
         </div>
     </div>
 </div>
+
+<script>
+function fileManager(storageUrl) {
+    return {
+        storageUrl,
+        loading: true,
+        files: [],
+        uploading: false,
+
+        async init() {
+            await this.loadFiles();
+        },
+
+        async loadFiles() {
+            this.loading = true;
+            try {
+                const res = await fetch(this.storageUrl + '/list');
+                const data = await res.json();
+                this.files = data.files ?? [];
+            } catch {
+                this.files = [];
+            }
+            this.loading = false;
+        },
+
+        // Use shoelace for this
+        formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        },
+
+        async uploadFile() {
+            if (this.uploading) return;
+            this.uploading = true;
+            const formData = new FormData();
+            formData.append('file', this.$refs.fileInput.files[0]);
+            try {
+                const res = await fetch(this.storageUrl + '/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    this.$refs.fileInput.value = '';
+                    showSuccessModal(data.message, 2000);
+                    await this.loadFiles();
+                } else {
+                    showErrorModal(data.message);
+                }
+            } catch {
+                showErrorModal('Σφάλμα κατά το ανέβασμα.');
+            }
+            this.uploading = false;
+        },
+
+        async deleteFile(file) {
+            const confirmed = await Q.confirm(`Θέλετε σίγουρα να διαγράψετε το αρχείο "${file.name}";`, 'Ναι, διαγραφή!', 'Ακύρωση');
+            if (!confirmed) return;
+            try {
+                const res = await fetch(this.storageUrl + '/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: file.name }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showSuccessModal(data.message, 2000);
+                    await this.loadFiles();
+                } else {
+                    showErrorModal(data.message);
+                }
+            } catch {
+                showErrorModal('Σφάλμα κατά τη διαγραφή.');
+            }
+        },
+    };
+}
+</script>
 
 <script type="module">
 const isCreate = {{#if (eq mode 'create')}}true{{else}}false{{/if}};

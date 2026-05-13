@@ -11,32 +11,29 @@
                 <div class="card-body" x-data="storageBrowser()">
 
                     {{!-- Toolbar: κουμπί Πάνω + breadcrumb --}}
-                    <div class="d-flex align-items-center g-3 mb-3">
-                        <button x-show="browsing" @click="goUp()" class="btn btn-sm btn-outline-secondary">
+                    <div class="d-flex align-items-center g-2 mb-3">
+                        <button x-show="browsing" @click="goUp()" class="btn btn-sm btn-outline-secondary mx-2">
                             <i class="bi bi-arrow-up me-1"></i>Πάνω
                         </button>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item" :class="!currentPath ? 'active' : ''">
-                                    <span :class="currentPath ? 'hand' : ''" @click="currentPath && goToPath('')">Storage</span>
-                                </li>
-                                <template x-for="(part, index) in breadcrumbs" :key="index">
-                                    <li class="breadcrumb-item" :class="index === breadcrumbs.length - 1 ? 'active' : ''">
-                                        <span
-                                            :class="index < breadcrumbs.length - 1 ? 'hand' : ''"
-                                            x-text="part"
-                                            @click="index < breadcrumbs.length - 1 && goToBreadcrumb(index)"
-                                        ></span>
-                                    </li>
-                                </template>
-                            </ol>
+                        <nav aria-label="breadcrumb" class="d-flex align-items-center gap-1">
+                            <span :class="currentPath ? 'hand' : 'fw-semibold'" @click="currentPath && goToPath('')">Storage</span>
+                            <template x-for="(part, index) in breadcrumbs" :key="index">
+                                <span class="d-flex align-items-center gap-1">
+                                    <span class="text-muted">/</span>
+                                    <span
+                                        :class="index < breadcrumbs.length - 1 ? 'hand' : 'fw-semibold'"
+                                        x-text="part"
+                                        @click="index < breadcrumbs.length - 1 && goToBreadcrumb(index)"
+                                    ></span>
+                                </span>
+                            </template>
                         </nav>
                     </div>
 
                     {{!-- Αρχική προβολή: μόνο ο φάκελος Storage --}}
                     <template x-if="!browsing">
                         <div class="list-group">
-                            <div class="list-group-item list-group-item-action d-flex align-items-center gap-2 hand" @click="goToPath('')">
+                            <div class="list-group-item list-group-item-action d-flex align-items-center g-2 hand" @click="goToPath('')">
                                 <i class="bi bi-folder-fill text-warning fs-5"></i>
                                 <span>Storage</span>
                             </div>
@@ -54,7 +51,7 @@
                                     Ο φάκελος είναι άδειος.
                                 </div>
                                 <template x-for="folder in items.folders" :key="folder.path">
-                                    <div class="list-group-item list-group-item-action d-flex align-items-center gap-2 hand storage-item" @click="goToPath(folder.path)">
+                                    <div class="list-group-item list-group-item-action d-flex align-items-center g-2 hand storage-item" @click="goToPath(folder.path)">
                                         <i class="bi bi-folder-fill text-warning fs-5"></i>
                                         <span x-text="folder.name"></span>
                                         <button class="delete-icon ms-auto btn btn-outline-danger py-0" @click.stop="deleteItem(folder, true)">
@@ -63,7 +60,7 @@
                                     </div>
                                 </template>
                                 <template x-for="file in items.files" :key="file.path">
-                                    <div class="list-group-item list-group-item-action d-flex align-items-center gap-2 hand storage-item" @click="downloadFile(file)">
+                                    <div class="list-group-item list-group-item-action d-flex align-items-center g-2 hand storage-item" @click="downloadFile(file)">
                                         <i class="bi bi-file-earmark fs-5 text-secondary"></i>
                                         <span class="flex-grow-1" x-text="file.name"></span>
                                         <button class="delete-icon btn btn-outline-danger py-0" @click.stop="deleteItem(file, false)">

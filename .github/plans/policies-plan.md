@@ -146,7 +146,6 @@
 #### Factory router
 
 - Επειδή το file management θα χρησιμοποιηθεί και σε άλλα modules εκτός από τις πολιτικές, καλό είναι να δημιουργηθεί ένα factory router `routes/organizations/modules/storage.js` που θα δέχεται παραμέτρους όπως `framework`, `resourceType` και `resourceId` (ή έστω το `storagePath` μόνο) για να διαχειρίζεται τα αρχεία με βάση το context. Αυτός ο router θα έχει routes για upload, download, delete και list files, και θα χρησιμοποιεί το `Storage` module για όλες τις λειτουργίες. Ο σκοπός είναι οποιοδήποτε router να μπορεί να το χρησιμοποιήσει ως sub-router για να προσθέσει file management σε οποιοδήποτε resource. Για παράδειγμα στο router που διαχειρίζεται το path `/organization/frameworks/nis2/policies` να μπορεί εύκολα να μπει το `storageRouter` στο path `/organization/frameworks/nis2/policies/:policyId/storage` με μια απλή εντολή `thisRouter.use('/:policyId/storage', storageRouter(parameters))`. 
-- Θα περιέχει middleware check για το org.
 
 ### Αρχεία πολιτικών στο view
 
@@ -156,7 +155,7 @@
 
 Κάθε γραμμή θα έχει κουμπί για download και delete. Το upload θα γίνεται με ξεχωριστό form κάτω από τον πίνακα των αρχείων. Δεν θα υπάρχει κουμπί αντικατάστασης/update αρχείου. 
 
-Προς συζήτηση αν θα αποθηκεύεται κάτι στο πεδίο files του `Policy`, αν θα είναι απλά virtual ή αν δεν θα χρησιμοποιηθεί καθόλου. Προς το παρόν, ας μην χρησιμοποιηθεί καθόλου, εφόσον τα αρχεία έχουν ημερομηνία δημιουργίας, 
+Προς συζήτηση αν θα αποθηκεύεται κάτι στο πεδίο files του `Policy`, αν θα είναι απλά virtual ή αν δεν θα χρησιμοποιηθεί καθόλου. Προς το παρόν, ας μην χρησιμοποιηθεί καθόλου, εφόσον τα αρχεία έχουν ημερομηνία δημιουργίας.
 
 #### Απαιτούμενες ενέργειες:
 
