@@ -1,11 +1,11 @@
 import express from 'express';
-import Models from '../models/models.js';
-import Cache from '../models/cache.js';
-import { can, roles, permissions } from '../auth/roles.js';
-import { hashPassword } from '../auth/auth.js';
+import Models from '../../models/models.js';
+import Cache from '../../models/cache.js';
+import { can, roles, permissions } from '../../auth/roles.js';
+import { hashPassword } from '../../auth/auth.js';
 import { Op, ForeignKeyConstraintError } from 'sequelize';
-import log from '../lib/logger.js';
-import { scopes } from '../auth/scopes.js';
+import log from '../../lib/logger.js';
+import { scopes } from '../../auth/scopes.js';
 import storageRouter from './storage.js';
 
 const admin = express.Router();

@@ -127,14 +127,32 @@
 
 Να ξέρεις όμως ότι το πάνω card και το κάτω card θα έχουν το δικό τους ανεξάρτητο save button. Το πάνω card θα αποθηκεύει τα πεδία της πολιτικής, ενώ το κάτω card θα είναι για upload και διαχείριση αρχείων (θα υλοποιηθεί στο επόμενο βήμα).
 
-Όσον αφορά την εμφάνιση των views, πάρε για παράδειγμα το `views\admin\users.hbs` και το `views\admin\single-user.hbs`. Όσον αφορά τα <select> τα badges τον πίνακα, κυρίως για το status, υπάρχουν τα handlebar helpers `label` (κυρίως για badges) και `labelEntries` κυρίως για χρήση σε #each σε select options. 
+Όσον αφορά την εμφάνιση των views, πάρε για παράδειγμα το `views\admin\users.hbs` και το `views\admin\single-user.hbs`. Όσον αφορά τα `<select>` τα badges τον πίνακα, κυρίως για το status, υπάρχουν τα handlebar helpers `label` (κυρίως για badges) και `labelEntries` κυρίως για χρήση σε #each σε select options. 
 
 
 ### 5. File Management
 
-Τα αρχεία θα αποθηκεύονται με ασφαλή δομή:
 
-- `storage/organizations/{orgId}/policies/{policyId}/`
+Τα αρχεία σε κάθε πολιτική θα αποθηκεύονται με ασφαλή δομή:
+
+- `/storage/organizations/{organizationId}/modules/:framework/:resourcetype/:resourceId/name`
+- Παράδειγμα: `/storage/organizations/123/modules/gdpr/policies/456/policy-document.pdf`
+
+### Αποθήκευση αρχείων
+Τα αρχεία θέλουμε ιδανικά να αποθηκεύονται με το original όνομά τους, ακόμα κι αν περιέχουν κενά. 
+- Αυτό μπορεί να γίνει πχ ένα απλό sanitization που να αντικαθιστά τα κενά με plus (+) ή tilde (~). Θα είναι ενσωματωμένο στο `Storage.store()` και `Storage.path()`. Θα εφαρμόζεται σε όλα τα αρχεία που ανεβαίνουν, όχι μόνο σε αυτά των πολιτικών.
+- Θα γίνεται έλεγχος για διπλότυπα ονόματα αρχείων στην ίδια πολιτική, και αν υπάρχει ήδη αρχείο με το ίδιο όνομα, θα ενημερώνει το χρήστη να μετονομάσει το νέο αρχείο ή να διαγράψει πρώτα το παλιό. 
+
+#### Factory router
+Επειδή το file management θα χρησιμοποιηθεί και σε άλλα modules εκτός από τις πολιτικές, καλό είναι να δημιουργηθεί ένα factory router `routes/organizations/storage.js` που θα δέχεται παραμέτρους όπως `framework`, `resourceType` και `resourceId` (ή έστω το `storagePath` μόνο) για να διαχειρίζεται τα αρχεία με βάση το context. Αυτός ο router θα έχει routes για upload, download, delete και list files, και θα χρησιμοποιεί το `Storage` module για όλες τις λειτουργίες. Ο σκοπός είναι οποιοδήποτε router να μπορεί να το χρησιμοποιήσει ως sub-router για να προσθέσει file management σε οποιοδήποτε resource. Για παράδειγμα στο router που διαχειρίζεται το path `/organization/frameworks/nis2/policies` να μπορεί εύκολα να μπει το `storageRouter` στο path `/organization/frameworks/nis2/policies/:policyId/storage` με μια απλή εντολή `thisRouter.use('/:policyId/storage', storageRouter(parameters))`, όπου το `parameters` θα περιλαβμάνει και το policyId. 
+
+### Αρχεία πολιτικών
+Τα αρχεία στις πολιτικές θα αποθηκεύονται με ξεχωριστό save σε ήδη υπάρχουνσα πολιτική (δεν θα ανεβαίνουν αρχεία κατά τη δημιουργία πολιτικής). Υπάρχει ήδη χώρος στο `single-policy` view για να τοποθετηθεί η καινούργια φόρμα. 
+Προς συζήτηση αν θα φορτώνονται τα αρχεία κατά το φόρτωμα της σελίδας ή με alpine fetch μετά το φόρτωμα (προτείνεται το δεύτερο για καλύτερη απόδοση). 
+Κάθε αρχείο θα έχει τη δική του γραμμή στο Card Αρχεία και θα γίνεται popultate με alpine.js. Για να είναι πιο απλός ο κώδικας του alpine, έχω δημιουργήσει το `alpine-fetch.js`. 
+Κάθε γραμμή θα έχει κουμπί για download και delete. Το upload θα γίνεται με ξεχωριστό form κάτω από τον πίνακα των αρχείων.
+
+#### Θέση αρχείων
 
 Απαιτούμενες ενέργειες:
 

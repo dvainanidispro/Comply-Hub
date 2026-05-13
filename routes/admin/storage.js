@@ -1,6 +1,6 @@
 import express from 'express';
-import Storage from '../lib/storage.js';
-import log from '../lib/logger.js';
+import Storage from '../../lib/storage.js';
+import log from '../../lib/logger.js';
 
 const storageRouter = express.Router();
 
@@ -26,7 +26,7 @@ storageRouter.get('/', async (req, res) => {
 storageRouter.get('/download', async (req, res) => {
     try {
         const filePath = req.query.path || '';
-        const absolutePath = await Storage.serve(filePath);
+        const absolutePath = await Storage.path(filePath);
         res.download(absolutePath);
     } catch (error) {
         log.error(`Σφάλμα κατά το download αρχείου: ${error}`);

@@ -61,6 +61,8 @@
 ## Naming Conventions
 - Use `camelCase` for variables and functions. Maybe use `PascalCase` for very impotant objects.
 - Use `PascalCase` for class names and Sequelize models.
+- Use full names for variables and functions to improve readability. Avoid abbreviations unless they are widely recognized (e.g., `id`, `url`). For example, prefer `destinationPath` over `destPath` and `originalFileName` over `origName`.
+- Use descriptive names for functions that indicate their purpose (e.g., `getUserById`, `calculateComplianceScore`).
 
 ## Code Formatting
 - Use semicolons at the end of statements.

@@ -95,7 +95,7 @@ import dashboard from './routes/dashboard.js';
 server.use(dashboard);
 
 // Admin routes
-import admin from './routes/admin.js';
+import admin from './routes/admin/admin.js';
 server.use('/admin', admin);
 
 // Admin Frameworks routes
