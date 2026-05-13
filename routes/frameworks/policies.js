@@ -18,22 +18,22 @@ import log from '../../lib/logger.js';
 
 const typeLabels = {
     policy: {
-        singular: 'Πολιτική',
-        singularLower: 'πολιτική',
-        plural: 'Πολιτικές',
-        pluralLower: 'πολιτικές',
+        singular: 'Πρότυπο πολιτικής',
+        singularLower: 'πρότυπο πολιτικής',
+        plural: 'Πρότυπα πολιτικών',
+        pluralLower: 'πρότυπα πολιτικών',
     },
     procedure: {
-        singular: 'Διαδικασία',
-        singularLower: 'διαδικασία',
-        plural: 'Διαδικασίες',
-        pluralLower: 'διαδικασίες',
+        singular: 'Πρότυπο διαδικασίας',
+        singularLower: 'πρότυπο διαδικασίας',
+        plural: 'Πρότυπα διαδικασιών',
+        pluralLower: 'πρότυπα διαδικασιών',
     },
     default: {
-        singular: 'Έγγραφο',
-        singularLower: 'έγγραφο',
-        plural: 'Έγγραφα',
-        pluralLower: 'έγγραφα',
+        singular: 'Πρότυπο εγγράφου',
+        singularLower: 'πρότυπο εγγράφου',
+        plural: 'Πρότυπα εγγράφων',
+        pluralLower: 'πρότυπα εγγράφων',
     },
 };
 
