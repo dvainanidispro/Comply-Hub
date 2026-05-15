@@ -46,9 +46,6 @@
     /* Prevent all non-defined custom elements from displaying: */
     *:not(:defined) { display: none; }
 
-    /* Hide cloaked elements for Alpine.js */
-    [x-cloak] { display: none !important; }
-
     /* View transition between pages */
     @view-transition {
         navigation: auto;
@@ -177,6 +174,7 @@
 
 
 @layer framework {
+    /* bootstrap, adminator, alpine, shoelace - corrections and additions */
 
     .collapse:not(.show) {
         display: grid;
@@ -198,6 +196,16 @@
         overflow: hidden;
         transition: padding 0.4s ease;
     }
+
+    /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο sl-avatar! */
+    sl-avatar::part(initials) {         
+        text-box: trim-both cap alphabetic;
+    }
+    
+    /* Hide cloaked elements for Alpine.js */
+    [x-cloak] { display: none !important; }
+
+
 }
 
 
@@ -285,6 +293,9 @@
         min-width: 3rem;
     }
     :is(.btn, .btn:focus, .btn:active, .btn:hover):not([class*="btn-outline"]){
+        color: var(--bs-light) !important;
+    }
+    .btn:is([class^="btn-outline-"], [class*=" btn-outline-"]):not(:disabled):is(:hover, :focus) {
         color: var(--bs-light) !important;
     }
     .btn:hover i {
@@ -396,6 +407,14 @@
         background-color: hsl(199, 11%, 58%)  ;
     }
 
+    .btn-primary{
+        background-color: hsl(206, 90%, 45%);
+        border-color: hsl(206, 90%, 45%);
+        &:hover{
+            background-color: hsl(206, 90%, 39%);
+            border-color: hsl(206, 90%, 39%);
+        }
+    }
     .btn-success{
         background-color: hsl(123, 50%, 43%);
         &:hover{

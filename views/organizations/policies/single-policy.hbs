@@ -122,7 +122,7 @@
                                             <i class="bi bi-file-earmark me-1 text-muted"></i>
                                             <span x-text="file.name"></span>
                                         </td>
-                                        <td class="text-muted align-middle text-end" x-text="formatSize(file.size)"></td>
+                                        <td class="text-muted align-middle text-end"><sl-format-bytes :value="file.size"></sl-format-bytes></td>
                                         <td class="align-middle text-end" style="white-space:nowrap">
                                             <a :href="storageUrl + '/download?name=' + encodeURIComponent(file.name)" class="btn btn-sm btn-outline-primary btn-icon me-1">
                                                 <i class="bi bi-download"></i>
@@ -232,13 +232,6 @@ function fileManager(storageUrl) {
                 this.files = [];
             }
             this.loading = false;
-        },
-
-        // Use shoelace for this
-        formatSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         },
 
         async uploadFile() {

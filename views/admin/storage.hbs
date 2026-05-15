@@ -66,7 +66,7 @@
                                         <button class="delete-icon btn btn-outline-danger py-0" @click.stop="deleteItem(file, false)">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <span class="text-muted small" x-text="formatSize(file.size)"></span>
+                                        <span class="text-muted small"><sl-format-bytes :value="file.size"></sl-format-bytes></span>
                                     </div>
                                 </template>
                             </div>
@@ -116,12 +116,6 @@ function storageBrowser() {
         goToBreadcrumb(index) {
             const parts = this.currentPath.split('/').slice(0, index + 1);
             this.goToPath(parts.join('/'));
-        },
-
-        formatSize(bytes) {
-            if (bytes < 1024) return `${bytes} B`;
-            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
         },
 
         async downloadFile(file) {
