@@ -43,10 +43,10 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
 
 
 
-    /* GET /list - Λίστα αρχείων πόρου με desanitized ονόματα για εμφάνιση */
+    /* GET /list - Λίστα αρχείων πόρου (desanitized) */
     router.get('/list', async (req, res) => {
         try {
-            const result = await Storage.list(resourcePath(req), true);
+            const result = await Storage.list(resourcePath(req));
             res.json({ success: true, ...result });
         } catch (error) {
             log.error(`Storage list error (${framework}/${resourceType}): ${error}`);

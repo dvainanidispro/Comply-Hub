@@ -55,7 +55,7 @@ storageRouter.delete('/delete', async (req, res) => {
 storageRouter.get('/list', async (req, res) => {
     try {
         const folderPath = req.query.path || '';
-        const result = await Storage.list(folderPath);
+        const result = await Storage.list(folderPath, false, true);
         res.json({ success: true, ...result });
     } catch (error) {
         log.error(`Σφάλμα κατά τη λίστα storage: ${error}`);

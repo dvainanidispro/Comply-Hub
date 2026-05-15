@@ -115,6 +115,14 @@
 
                     <div x-show="!loading && files.length > 0" class="mb-3">
                         <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Αρχείο</th>
+                                    <th class="text-end">Μέγεθος</th>
+                                    <th class="text-end">Ανέβηκε</th>
+                                    <th class="text-end">Ενέργειες</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <template x-for="file in files" :key="file.name">
                                     <tr>
@@ -123,6 +131,7 @@
                                             <span x-text="file.name"></span>
                                         </td>
                                         <td class="text-muted align-middle text-end"><sl-format-bytes :value="file.size"></sl-format-bytes></td>
+                                        <td class="text-muted align-middle text-end" x-text="Q.date(file.createdAt)"></td>
                                         <td class="align-middle text-end" style="white-space:nowrap">
                                             <a :href="storageUrl + '/download?name=' + encodeURIComponent(file.name)" class="btn btn-sm btn-outline-primary btn-icon me-1">
                                                 <i class="bi bi-download"></i>

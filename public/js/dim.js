@@ -230,6 +230,12 @@ Q.euro = price => (price==null||isNaN(price)) ? "- €" : (new Intl.NumberFormat
     maximumFractionDigits: 2,
 })).format(price);
 
+Q.date = (date = new Date()) => (new Intl.DateTimeFormat('el-GR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+})).format(new Date(date));
+
 
 
 Q.alert = function(message, closeText) {
