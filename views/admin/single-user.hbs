@@ -39,7 +39,7 @@
                             {{/unless}}
                             <div class="col-md-6 mb-3">
                                 <label for="editUserEmail" class="form-label fw-bold">Email *</label>
-                                <input type="email" class="form-control" id="editUserEmail" name="email" value="{{userDetails.email}}" autocomplete="new-email" required>
+                                <input type="email" class="form-control" id="editUserEmail" name="email" value="{{userDetails.email}}" autocomplete="new-email" pattern="^(?!.*[A-Z]).+$" title="Το email πρέπει να περιέχει μόνο πεζά λατινικά γράμματα." required>
                                 <div class="form-text">Χρησιμοποιείται για την είσοδο στην εφαρμογή</div>
                             </div>
                             <div class="col-md-6 mb-3">

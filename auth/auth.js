@@ -89,11 +89,10 @@ let validatePassword = async (password, hashedPassword) => {
 /////////////////////////////    FUNCTIONS & MIDDLEWARE    /////////////////////////////
 
 
-/** Ελέγχει το email και το password του χρήστη σύμφωνα με αυτά που υπάρχουν στη Βάση και επιστρέφει το χρήστη */
-let getUserFromDatabaseByCredentials = async (email, password) => {
-
+/** Ανακτά τον χρήστη από τη βάση δεδομένων με βάση το email */
+let dbUser = async (email) => {
     let user = await Models.User.findOne({
-        where: {email: email.toLowerCase()},
+        where: {email: email.toLowerCase(), active: true},
         // case sensitive! for case insensitive comparison use:
         // where { username: { [Op.iLike]: username } }
         // For PostgreSQL; for other DBs use:  username: { [Op.like]: username.toLowerCase() }
@@ -101,10 +100,16 @@ let getUserFromDatabaseByCredentials = async (email, password) => {
         raw: true,          // Επιστρέφει τα αποτελέσματα ως JSON
         nest : true,        // το organization να είναι αντικείμενο μέσα στο user 
     });
+    return user;
+};
+
+
+/** Ελέγχει το email και το password του χρήστη σύμφωνα με αυτά που υπάρχουν στη Βάση και επιστρέφει το χρήστη */
+let getUserFromDatabaseByCredentials = async (email, password) => {
+    let user = await dbUser(email);
     if (!user) return false;
     // log.dev({user});
 
-    // let passwordMatch = (password === user.password);
     let passwordMatch = await validatePassword(password, user.password);
     if (passwordMatch) {return user}
     else {return false}
@@ -127,8 +132,11 @@ let createAccessToken = (user, forMagicLink=false) => {
     }, jwtsecret, {expiresIn: forMagicLink ? linkExpirationTime : tokenExpirationTime});
 };
 
-/** Ανανεώνει το Access Token του χρήστη, με δεδομένο το παλιό του token */
-let renewAccessToken = (oldDecodedToken) => {
+/** Ανανεώνει το Access Token του χρήστη, μόνο αν ο χρήστης υπάρχει ακόμα και είναι ενεργός */
+let renewAccessToken = async (oldDecodedToken) => {
+    let user = await dbUser(oldDecodedToken.email);
+    if (!user) return false;
+
     let { exp, iat, ...newToken } = oldDecodedToken;     // το newToken είναι το oldDecodedToken χωρίς τα exp and iat
     return jwt.sign(newToken, jwtsecret, {expiresIn: tokenExpirationTime});
 };
@@ -181,7 +189,7 @@ let validateUser = (req, res, next) => {
             token, 
             jwtsecret, 
             {audience: aud, issuer: iss}, 
-            (failure, decodedToken) => {
+            async (failure, decodedToken) => {
                 if ( failure ) {    // Λάθος token ή ληγμένο token (ο χρήστης δεν είναι logged-in)
                     log.info(`Invalid or expired token: ${token}`);
                     log.info(failure);
@@ -194,7 +202,13 @@ let validateUser = (req, res, next) => {
                     /** O χρόνος που απομένει πριν τη λήξη του token σε δευτερόλεπτα */
                     const timeLeft = decodedToken.exp - Math.floor(Date.now()/1000);
                     if (timeLeft < tokenRefreshThreshold) {
-                        res.cookie(cookieName, renewAccessToken(decodedToken), cookieOptions);
+                        let renewedToken = await renewAccessToken(decodedToken);
+                        if (!renewedToken) {
+                            res.locals.error = 'Ο λογαριασμός σας δεν είναι πλέον διαθέσιμος. Παρακαλώ συνδεθείτε ξανά.';
+                            handleLoggedOffUser();
+                            return;
+                        }
+                        res.cookie(cookieName, renewedToken, cookieOptions);
                     }
 
                     // Αποθήκευση του χρήστη στο req.user και res.locals.user
