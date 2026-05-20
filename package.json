@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node --env-file=config/.env --watch server.js",
     "start": "node server.js",
-    "start:local": "node --env-file=config/.env server.js"
+    "start:local": "node --env-file=config/.env server.js",
+    "backup:db": "node --env-file=config/.env services/take-db-backup.js"
   },
   "keywords": [],
   "author": "Computer Studio",
