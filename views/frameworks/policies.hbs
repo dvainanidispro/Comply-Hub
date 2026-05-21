@@ -24,21 +24,22 @@ const showID = false;
                                 <tr>
                                     <th class="sortable" x-show="showID" style="width:7ch">ID</th>
                                     <th class="sortable" style="width:14ch">
-                                        <sl-tooltip content="Προαιρετικό">
-                                            <span>Κωδικός</span>
-                                        </sl-tooltip>
+                                        <wa-tooltip for="table-id">Προαιρετικό</wa-tooltip>
+                                        <span id="table-id">Κωδικός</span>
                                     </th>
                                     <th class="sortable" style="width:60ch">Όνομα</th>
                                     <th>Περιγραφή</th>
                                     <th class="text-center sortable" style="width:18ch">
-                                        <sl-tooltip content="Καθορίζει αν το πρότυπο θα συμπεριλαμβάνεται στη μαζική απόδοση σε Οργανισμό.">
-                                            <span>Προεπιλογή</span>
-                                        </sl-tooltip>
+                                        <wa-tooltip for="table-default">
+                                            Καθορίζει αν το πρότυπο θα συμπεριλαμβάνεται στη μαζική απόδοση σε Οργανισμό.
+                                        </wa-tooltip>
+                                            <span id="table-default">Προεπιλογή</span>
                                     </th>
                                     <th class="text-center sortable" data-sort-type="number" style="width:12ch">
-                                        <sl-tooltip content="Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης. Δεν έχει λειτουργική σημασία.">
-                                            <span>Σειρά</span>
-                                        </sl-tooltip>
+                                        <wa-tooltip for="table-order">
+                                            Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης. Δεν έχει λειτουργική σημασία.</wa-tooltip>
+                                        </wa-tooltip>
+                                            <span id="table-order">Σειρά</span>
                                     </th>
                                     <th class="text-center sortable" style="width:12ch">Ενεργή</th>
                                     <th class="text-center" style="width:15ch">Αποθήκευση</th>
@@ -107,7 +108,7 @@ const showID = false;
                     </h2>
                 </div>
                 <div class="card-body">
-                    <div class="row g-2 align-items-end">
+                    <div class="row g-2 align-items-stretch">
                         <div class="col-auto" style="width:120px">
                             <label class="form-label small">Κωδικός</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.code"
@@ -124,15 +125,15 @@ const showID = false;
                             <label class="form-label small">Περιγραφή</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.description">
                         </div>
-                        <div class="col-auto text-center" style="padding-bottom:8px">
-                            <label class="form-label small d-block">Προεπιλογή</label>
+                        <div class="col-auto text-center center-content" style="padding-bottom:8px">
+                            <label class="form-label small">Προεπιλογή</label>
                             <input type="checkbox" class="form-check-input" x-model="newRow.default">
                         </div>
                         <div class="col-auto" style="width:80px">
                             <label class="form-label small">Σειρά</label>
                             <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
                         </div>
-                        <div class="col-auto">
+                        <div class="col-auto align-self-end">
                             <button class="btn btn-primary btn-sm fs-5" @click="createRow()" :disabled="newRow._saving">
                                 <span x-show="!newRow._saving"><i class="bi bi-plus-circle"></i></span>
                                 <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
@@ -240,6 +241,6 @@ const showID = false;
 
 <style>
     :root {
-        --sl-tooltip-background-color: hsl(242, 36%, 42%);
+        --wa-tooltip-background-color: hsl(242, 36%, 42%);
     }
 </style>

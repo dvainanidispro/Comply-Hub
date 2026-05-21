@@ -12,6 +12,6 @@ function createCodeFromName(name) {
 }
 
 // Ορίζουμε τα αρχικά για όλα τα sl-avatar στοιχεία στη σελίδα από το name τους.
-Q("sl-avatar").forEach(el => {
+Q("wa-avatar").forEach(el => {
     el.setAttribute('initials', createCodeFromName(el.getAttribute('name') || ''));
 });

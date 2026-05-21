@@ -1,6 +1,6 @@
 /* Import των framework αρχείων στο framework layer - πρέπει να είναι πρώτα */
 @import url("/css/adminator.css") layer(framework);
-@import url("https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css") layer(framework);
+@import url("https://ka-f.webawesome.com/webawesome@3.7.0/styles/webawesome.css") layer(framework);
 /* @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css") layer(framework); */
 
 /* Δήλωση των CSS layers με τη σωστή σειρά προτεραιότητας */
@@ -36,9 +36,9 @@
         /* Smooth transitions */
         interpolate-size: allow-keywords; 
 
-        /* Shoelace */
-        --sl-color-primary-600: hsl(210, 100%, 41%);
-        --sl-color-primary-500: hsl(210, 100%, 45%);
+        /* Web-awesome */
+        --wa-color-brand-600: hsl(210, 100%, 41%);
+        --wa-color-brand-500: hsl(210, 100%, 45%);
 
     }
 
@@ -174,7 +174,7 @@
 
 
 @layer framework {
-    /* bootstrap, adminator, alpine, shoelace - corrections and additions */
+    /* bootstrap, adminator, alpine, web-awesome - corrections and additions */
 
     .collapse:not(.show) {
         display: grid;
@@ -197,14 +197,24 @@
         transition: padding 0.4s ease;
     }
 
-    /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο sl-avatar! */
-    sl-avatar::part(initials) {         
+    /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο wa-avatar! */
+    wa-avatar::part(initials) {         
         text-box: trim-both cap alphabetic;
     }
     
     /* Hide cloaked elements for Alpine.js */
     [x-cloak] { display: none !important; }
 
+    /* Web awesome correction */
+    li {
+        margin-inline-start: revert;
+    }
+    button{
+        height: revert;
+    }
+    th {
+        font-size: revert;
+    }
 
 }
 

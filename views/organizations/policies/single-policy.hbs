@@ -130,7 +130,7 @@
                                             <i class="bi bi-file-earmark me-1 text-muted"></i>
                                             <span x-text="file.name"></span>
                                         </td>
-                                        <td class="text-muted align-middle text-end"><sl-format-bytes :value="file.size"></sl-format-bytes></td>
+                                        <td class="text-muted align-middle text-end"><wa-format-bytes :value="file.size"></wa-format-bytes></td>
                                         <td class="text-muted align-middle text-end" x-text="Q.date(file.createdAt)"></td>
                                         <td class="align-middle text-end" style="white-space:nowrap">
                                             <a :href="storageUrl + '/download?name=' + encodeURIComponent(file.name)" class="btn btn-sm btn-outline-primary btn-icon me-1">
