@@ -17,18 +17,21 @@ const typeLabels = {
     policy: {
         singular: 'Πολιτική',
         singularLower: 'πολιτική',
+        singularGenitive: 'πολιτικής',
         plural: 'Πολιτικές',
         pluralLower: 'πολιτικές',
     },
     procedure: {
         singular: 'Διαδικασία',
         singularLower: 'διαδικασία',
+        singularGenitive: 'διαδικασίας',
         plural: 'Διαδικασίες',
         pluralLower: 'διαδικασίες',
     },
     default: {
         singular: 'Έγγραφο',
         singularLower: 'έγγραφο',
+        singularGenitive: 'εγγράφου',
         plural: 'Έγγραφα',
         pluralLower: 'έγγραφα',
     },

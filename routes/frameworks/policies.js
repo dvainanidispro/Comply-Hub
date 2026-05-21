@@ -20,18 +20,21 @@ const typeLabels = {
     policy: {
         singular: 'Πρότυπο πολιτικής',
         singularLower: 'πρότυπο πολιτικής',
+        singularGenitive: 'πρότυπου πολιτικής',
         plural: 'Πρότυπα πολιτικών',
         pluralLower: 'πρότυπα πολιτικών',
     },
     procedure: {
         singular: 'Πρότυπο διαδικασίας',
         singularLower: 'πρότυπο διαδικασίας',
+        singularGenitive: 'πρότυπου διαδικασίας',
         plural: 'Πρότυπα διαδικασιών',
         pluralLower: 'πρότυπα διαδικασιών',
     },
     default: {
         singular: 'Πρότυπο εγγράφου',
         singularLower: 'πρότυπο εγγράφου',
+        singularGenitive: 'πρότυπου εγγράφου',
         plural: 'Πρότυπα εγγράφων',
         pluralLower: 'πρότυπα εγγράφων',
     },
