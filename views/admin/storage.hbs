@@ -10,26 +10,23 @@
                 </div>
                 <div class="card-body" x-data="storageBrowser()">
 
-                    {{!-- Toolbar: κουμπί Πάνω + breadcrumb --}}
+                    {{!-- Toolbar: breadcrumb --}}
                     <div class="d-flex align-items-center g-2 mb-3">
-                        <button x-show="browsing" @click="goUp()" class="btn btn-sm btn-outline-secondary mx-2">
-                            <i class="bi bi-arrow-up me-1"></i>Πάνω
-                        </button>
-                        <nav aria-label="breadcrumb" class="d-flex align-items-center gap-1">
-                            <span :class="currentPath ? 'hand' : 'fw-semibold'" @click="currentPath && goToPath('')">Storage</span>
-                            <template x-for="(part, index) in breadcrumbs" :key="index">
-                                <span class="d-flex align-items-center gap-1">
-                                    <span class="text-muted">/</span>
-                                    <span
-                                        :class="index < breadcrumbs.length - 1 ? 'hand' : 'fw-semibold'"
-                                        x-text="part"
-                                        @click="index < breadcrumbs.length - 1 && goToBreadcrumb(index)"
-                                    ></span>
-                                </span>
+                        <wa-breadcrumb>
+                            <wa-breadcrumb-item
+                                :href="currentPath ? '#' : null"
+                                @click.prevent="currentPath && goToPath('')"
+                            >Storage</wa-breadcrumb-item>
+                            <template x-for="(part, index) in breadcrumbs" :key="`${part}-${index}`">
+                                <wa-breadcrumb-item
+                                    :href="index < breadcrumbs.length - 1 ? '#' : null"
+                                    x-text="part"
+                                    @click.prevent="index < breadcrumbs.length - 1 && goToBreadcrumb(index)"
+                                ></wa-breadcrumb-item>
                             </template>
-                        </nav>
+                        </wa-breadcrumb>
                     </div>
-
+                    
                     {{!-- Αρχική προβολή: μόνο ο φάκελος Storage --}}
                     <template x-if="!browsing">
                         <div class="list-group">
@@ -101,16 +98,6 @@ function storageBrowser() {
                 this.items = { folders: result.folders, files: result.files };
             }
             this.loading = false;
-        },
-
-        goUp() {
-            if (!this.currentPath) {
-                this.browsing = false;
-                return;
-            }
-            const parts = this.currentPath.split('/');
-            parts.pop();
-            this.goToPath(parts.join('/'));
         },
 
         goToBreadcrumb(index) {

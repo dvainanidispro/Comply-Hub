@@ -201,6 +201,12 @@
     wa-avatar::part(initials) {         
         text-box: trim-both cap alphabetic;
     }
+    wa-details::part(header) {
+        background-color: hsl(240, 35%, 93%);
+    }
+    wa-details::part(content) {
+        background-color: var(--bs-body-bg);
+    }
     
     /* Hide cloaked elements for Alpine.js */
     [x-cloak] { display: none !important; }
@@ -214,6 +220,9 @@
     }
     th {
         font-size: revert;
+    }
+    dialog{
+        align-items: stretch;
     }
 
 }

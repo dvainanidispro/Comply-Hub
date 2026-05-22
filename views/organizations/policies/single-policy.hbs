@@ -115,7 +115,7 @@
 
                     <div x-show="!loading && files.length > 0" class="mb-3">
                         <table class="table table-sm table-hover">
-                            <thead>
+                            <thead x-cloak x-show="files.length">
                                 <tr>
                                     <th>Αρχείο</th>
                                     <th class="text-end">Μέγεθος</th>
@@ -149,16 +149,17 @@
                     </div>
 
                     <form @submit.prevent="uploadFile">
-                        <div class="d-flex g-2 align-items-end mt-4">
+                        <wa-details summary="Ανέβασμα νέου αρχείου" appearance="filled-outlined">
+                        <div class="d-flex g-2 align-items-end">
                             <div class="flex-grow-1">
-                                <label class="form-label fw-bold small mb-1">Ανέβασμα νέου αρχείου</label>
-                                <input type="file" class="form-control" x-ref="fileInput" :disabled="uploading" required>
+                                <input type="file" class="form-control" x-ref="fileInput" @change="validateSelectedFile()" :disabled="uploading" required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-sm btn-icon" :disabled="uploading">
                                 <i class="bi bi-upload"></i>
                                 <span>Ανέβασμα</span>
                             </button>
                         </div>
+                        </wa-details>
                     </form>
 
                 </div>
@@ -220,6 +221,8 @@
 </div>
 
 <script>
+var maxUploadSize = 20 * 1024 * 1024;
+
 function fileManager(storageUrl) {
     return {
         storageUrl,
@@ -243,11 +246,25 @@ function fileManager(storageUrl) {
             this.loading = false;
         },
 
+        validateSelectedFile() {
+            const selectedFile = this.$refs.fileInput.files[0];
+            if (!selectedFile || selectedFile.size <= maxUploadSize) return true;
+
+            this.$refs.fileInput.value = '';
+            Q.alert(`Το αρχείο δεν μπορεί να υπερβαίνει τα ${Math.round(maxUploadSize / (1024 * 1024))}ΜΒ σε μέγεθος`, 'ΟΚ');
+            return false;
+        },
+
         async uploadFile() {
             if (this.uploading) return;
+            if (!this.validateSelectedFile()) return;
+
+            const selectedFile = this.$refs.fileInput.files[0];
+            if (!selectedFile) return;
+
             this.uploading = true;
             const formData = new FormData();
-            formData.append('file', this.$refs.fileInput.files[0]);
+            formData.append('file', selectedFile);
             try {
                 const res = await fetch(this.storageUrl + '/upload', { method: 'POST', body: formData });
                 const data = await res.json();
