@@ -75,12 +75,6 @@
         min-height: calc(100vh - 45px);
     }
 
-    div {
-        /* background-color: var(--bs-body-bg); */
-        /* background-color: revert; */
-        /* color: revert; */
-    }
-
     a{
         color: navy;
     }
@@ -95,6 +89,7 @@
     .table td{min-width: 18ch}
 
 }
+
 
 /****************      DIM LAYER      ******************/
 @layer dim {
@@ -165,7 +160,27 @@
         }
     }
 
-
+    dim-upload {
+        position: relative;
+        display: block;
+        label {
+            display: block;
+        }
+        input[type="file"] {
+            /* Το inset: 0 με το position: absolute κάνει το input να καλύπτει ακριβώς το container, 
+            του οποίου τις διαστάσεις τις ορίζει το label */
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0; /* Δεν φαίνεται αλλά υπάρχει πάνω από το label ώστε να λειτουργεί το drag & drop */
+            cursor: pointer;
+        }
+        input[type="file"]:disabled {
+            cursor: not-allowed;
+        }
+    }
 
 } 
 /* Τέλος dim layer */
@@ -329,9 +344,6 @@
 
         .bi {
             font-size: 1.2rem;
-        }
-        div {
-            /* transform: translateY(-1px); */
         }
     }
 

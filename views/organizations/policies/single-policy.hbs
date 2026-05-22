@@ -152,7 +152,10 @@
                         <wa-details summary="Ανέβασμα νέου αρχείου" appearance="filled-outlined">
                         <div class="d-flex g-2 align-items-end">
                             <div class="flex-grow-1">
-                                <input type="file" class="form-control" x-ref="fileInput" @change="validateSelectedFile()" :disabled="uploading" required>
+                                <dim-upload>
+                                    <label class="btn btn-outline-secondary">Επιλέξτε ή σύρετε αρχείο</label>
+                                    <input type="file" class="w-100" x-ref="fileInput" @change="validateSelectedFile()" :disabled="uploading" required>
+                                </dim-upload>
                             </div>
                             <button type="submit" class="btn btn-primary btn-sm btn-icon" :disabled="uploading">
                                 <i class="bi bi-upload"></i>
@@ -246,11 +249,16 @@ function fileManager(storageUrl) {
             this.loading = false;
         },
 
+        resetSelectedFile() {
+            this.$refs.fileInput.value = '';
+            this.$refs.fileInput.dispatchEvent(new Event('change'));
+        },
+
         validateSelectedFile() {
             const selectedFile = this.$refs.fileInput.files[0];
             if (!selectedFile || selectedFile.size <= maxUploadSize) return true;
 
-            this.$refs.fileInput.value = '';
+            this.resetSelectedFile();
             Q.alert(`Το αρχείο δεν μπορεί να υπερβαίνει τα ${Math.round(maxUploadSize / (1024 * 1024))}ΜΒ σε μέγεθος`, 'ΟΚ');
             return false;
         },
@@ -269,7 +277,7 @@ function fileManager(storageUrl) {
                 const res = await fetch(this.storageUrl + '/upload', { method: 'POST', body: formData });
                 const data = await res.json();
                 if (data.success) {
-                    this.$refs.fileInput.value = '';
+                    this.resetSelectedFile();
                     showSuccessModal(data.message, 2000);
                     await this.loadFiles();
                 } else {

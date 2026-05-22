@@ -301,4 +301,27 @@ class requiredField extends HTMLElement {
 }
 window.customElements.define('req-star',requiredField);
 
+// Χρήση: <dim-upload><label>...</label><input type="file"></dim-upload>. 
+// Κάνε dispachEvent('change') στο <input> αν κάνεις αλλαγές στο αρχείο του (πχ validation) με JavaScript. 
+// Το has-file attribute προστίθεται στο dim-upload όταν υπάρχει αρχείο, για styling purposes.
+class DimUpload extends HTMLElement {
+  connectedCallback() {
+    if (this._initialized) return;
+    this._initialized = true;
+
+    this.labelEl = this.querySelector(':scope > label');
+    this.inputEl = this.querySelector(':scope > input[type="file"]');
+    this._placeholder = this.labelEl.textContent.trim();
+
+    this.inputEl.addEventListener('change', () => this.refresh());
+    this.refresh();
+  }
+
+  refresh() {
+    const file = this.inputEl.files?.[0] ?? null;
+    this.labelEl.textContent = file ? file.name : this._placeholder;
+    this.toggleAttribute('has-file', !!file);  // 
+  }
+}
+window.customElements.define('dim-upload', DimUpload);
 
