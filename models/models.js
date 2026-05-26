@@ -2,6 +2,7 @@ import { User } from "./user.js";
 import { Organization } from "./organization.js";
 import { PolicyType } from "./policy_type.js";
 import { Policy } from "./policy.js";
+import { Legislation } from "./legislation.js";
 import { db } from '../config/database.js';
 import log from '../lib/logger.js';
 
@@ -45,4 +46,5 @@ export default {
     Organization,
     PolicyType,
     Policy,
+    Legislation,
 };

@@ -58,7 +58,7 @@ export function managePoliciesRouter(framework, type, label) {
                     type,
                 },
                 include: [{ model: Models.PolicyType, as: 'policyType' }],
-                order: [['createdAt', 'ASC']],
+                order: [[{ model: Models.PolicyType, as: 'policyType' }, 'sequence', 'ASC NULLS LAST']],    // order by policyType
             });
 
             res.render('organizations/policies/policies', {

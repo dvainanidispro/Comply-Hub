@@ -1,19 +1,17 @@
 <script>
-window.policies = {{{objectify policies}}};
+window.items = {{{objectify items}}};
 window.baseUrl = '{{baseUrl}}';
-window.displayType = {{{objectify displayType}}};
-const showID = false;
 </script>
 
-<div class="container-fluid" x-data="policiesApp()">
+<div class="container-fluid" x-cloak x-data="legislationApp()">
 
-    <!-- Πίνακας πολιτικών -->
+    <!-- Πίνακας νομοθεσίας -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h1 class="card-title h3">
-                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <i class="bi bi-journal-text me-2"></i>
                         {{title}}
                     </h1>
                 </div>
@@ -22,33 +20,19 @@ const showID = false;
                         <table class="table table-striped dim-table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th class="sortable" x-show="showID" style="width:7ch">ID</th>
-                                    <th class="sortable" style="width:14ch">
-                                        <wa-tooltip for="table-id">Προαιρετικό</wa-tooltip>
-                                        <span id="table-id">Κωδικός</span>
-                                    </th>
-                                    <th class="sortable" style="width:60ch">Όνομα</th>
+                                    <th class="sortable" style="width:12ch">Κωδικός</th>
+                                    <th class="sortable" style="width:28ch">Όνομα</th>
                                     <th>Περιγραφή</th>
-                                    <th class="text-center sortable" style="width:18ch">
-                                        <wa-tooltip for="table-default">
-                                            Καθορίζει αν το πρότυπο θα συμπεριλαμβάνεται στη μαζική απόδοση σε Οργανισμό.
-                                        </wa-tooltip>
-                                            <span id="table-default">Προεπιλογή</span>
-                                    </th>
-                                    <th class="text-center sortable" data-sort-type="number" style="width:12ch">
-                                        <wa-tooltip for="table-order">
-                                            Προαιρετικό. Kαθορίζει τη σειρά εμφάνισης. Δεν έχει λειτουργική σημασία.</wa-tooltip>
-                                        </wa-tooltip>
-                                            <span id="table-order">Σειρά</span>
-                                    </th>
-                                    <th class="text-center sortable" style="width:12ch">Ενεργή</th>
-                                    <th class="text-center" style="width:15ch">Αποθήκευση</th>
+                                    <th style="width:30ch">Αρχείο</th>
+                                    <th style="width:30ch">Link</th>
+                                    <th class="text-center sortable" data-sort-type="number" style="width:10ch">Σειρά</th>
+                                    <th class="text-center sortable" style="width:12ch">Ενεργό</th>
+                                    <th class="text-center" style="width:16ch">Ενέργειες</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="row in rows" :key="row.id">
                                     <tr :class="!row.active ? 'table-secondary text-muted' : ''">
-                                        <td x-show="showID" x-text="row.id"></td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.code"
@@ -59,20 +43,47 @@ const showID = false;
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.name"
                                                 :class="{ 'is-invalid': row._nameInvalid }"
-                                                @input.debounce="row._nameInvalid = false; if (!row.code) row.code = createCodeFromName(row.name)">
+                                                @input="row._nameInvalid = false">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.description">
                                         </td>
-                                        <td class="text-center">
-                                            <input type="checkbox" class="form-check-input"
-                                                :checked="row.default"
-                                                @change="row.default = $event.target.checked">
+                                        <td>
+                                            <template x-if="row.file">
+                                                <div>
+                                                    <small class="text-muted d-block mb-1 text-truncate" x-text="row.file"></small>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm btn-icon" @click="row.file = null; row._clearFile = true">
+                                                            <i class="bi bi-trash me-1"></i>
+                                                            {{!-- <span>Διαγραφή</span> --}}
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-primary btn-sm btn-icon">
+                                                            <i class="bi bi-download me-1"></i>
+                                                            {{!-- <span>Κατέβασμα</span> --}}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template x-if="!row.file">
+                                                <dim-upload>
+                                                    <label class="btn btn-outline-secondary btn-sm">Ανέβασμα</label>
+                                                    <input type="file" @change="row._file = $event.target.files[0]">
+                                                </dim-upload>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    x-model="row.link">
+                                                <a :href="row.link" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                         <td>
                                             <input type="number" class="form-control form-control-sm"
-                                                x-model="row.sequence" style="width:60px">
+                                                x-model="row.sequence" style="width:65px">
                                         </td>
                                         <td class="text-center">
                                             <input type="checkbox" class="form-check-input"
@@ -80,7 +91,7 @@ const showID = false;
                                                 @change="row.active = $event.target.checked">
                                         </td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-success fs-5 me-1" title="Αποθήκευση"
+                                            <button class="btn btn-sm btn-success fs-5" title="Αποθήκευση"
                                                 @click="saveRow(row)"
                                                 :disabled="row._saving">
                                                 <span x-show="!row._saving"><i class="bi bi-floppy"></i></span>
@@ -97,43 +108,52 @@ const showID = false;
         </div>
     </div>
 
-    <!-- Προσθήκη νέου policy type -->
+    <!-- Προσθήκη νέου εγγράφου -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title h5 mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
-                        Προσθήκη νέου πρότυπου
+                        Προσθήκη νέου εγγράφου
                     </h2>
                 </div>
                 <div class="card-body">
                     <div class="row g-2 align-items-stretch">
-                        <div class="col-auto" style="width:120px">
+                        <div class="col justify-content-between" style="width:12ch">
                             <label class="form-label small">Κωδικός</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.code"
                                 :class="{ 'is-invalid': newRow._codeInvalid }"
                                 @input="newRow._codeInvalid = false">
                         </div>
-                        <div class="col" style="min-width:180px">
+                        <div class="col" style="min-width:30ch">
                             <label class="form-label small">Όνομα</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.name"
                                 :class="{ 'is-invalid': newRow._nameInvalid }"
-                                @input.debounce="newRow._nameInvalid = false; if (!newRow.code) newRow.code = createCodeFromName(newRow.name)">
+                                @input="newRow._nameInvalid = false">
                         </div>
-                        <div class="col" style="min-width:200px">
+                        <div class="col" style="min-width:50ch">
                             <label class="form-label small">Περιγραφή</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.description">
                         </div>
-                        <div class="col-auto text-center center-content" style="padding-bottom:8px">
-                            <label class="form-label small">Προεπιλογή</label>
-                            <input type="checkbox" class="form-check-input" x-model="newRow.default">
+                        <div class="col-auto" style="width: 20ch">
+                            <label class="form-label small">Αρχείο</label>
+                                <dim-upload>
+                                    <label class="btn btn-outline-secondary btn-sm">
+                                        Επιλέξτε ή σύρετε
+                                    </label>
+                                    <input type="file" @change="newRow._file = $event.target.files[0]">
+                                </dim-upload>
                         </div>
-                        <div class="col-auto" style="width:80px">
+                        <div class="col" style="min-width:30ch">
+                            <label class="form-label small">Link</label>
+                            <input type="text" class="form-control form-control-sm" x-model="newRow.link">
+                        </div>
+                        <div class="col" style="width:8ch">
                             <label class="form-label small">Σειρά</label>
                             <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
                         </div>
-                        <div class="col-auto align-self-end">
+                        <div class="col-auto align-self-middle">
                             <button class="btn btn-primary btn-sm fs-5" @click="createRow()" :disabled="newRow._saving">
                                 <span x-show="!newRow._saving"><i class="bi bi-plus-circle"></i></span>
                                 <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
@@ -149,35 +169,37 @@ const showID = false;
 </div>
 
 <script>
-
     window.dimtablesOptions = {
         showTopBar: false,
     };
 
-    function policiesApp() {
-        let baseUrl = window.baseUrl;
+    function legislationApp() {
+        const baseUrl = window.baseUrl;
 
         return {
-            rows: window.policies.map(p => ({ ...p, _saving: false, _codeInvalid: false, _nameInvalid: false })),
-            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false, _codeInvalid: false },
+            rows: window.items.map(i => ({ ...i, _file: null, _clearFile: false, _saving: false, _codeInvalid: false, _nameInvalid: false })),
+            newRow: { code: '', name: '', description: '', link: '', sequence: '', _file: null, _saving: false, _error: '', _codeInvalid: false, _nameInvalid: false },
 
             async saveRow(row) {
                 if (!row.code?.trim()) row._codeInvalid = true;
                 if (!row.name?.trim()) row._nameInvalid = true;
                 if (row._codeInvalid || row._nameInvalid) return;
+
                 row._saving = true;
+                const formData = new FormData();
+                formData.append('code', row.code ?? '');
+                formData.append('name', row.name ?? '');
+                formData.append('description', row.description ?? '');
+                formData.append('link', row.link ?? '');
+                formData.append('sequence', row.sequence ?? '');
+                formData.append('active', row.active ? 'true' : 'false');
+                if (row._clearFile) formData.append('clearFile', 'true');
+                if (row._file) formData.append('file', row._file);
+
                 try {
                     const res = await fetch(`${baseUrl}/${row.id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            code: row.code,
-                            name: row.name,
-                            description: row.description,
-                            sequence: row.sequence !== '' ? row.sequence : null,
-                            default: row.default,
-                            active: row.active,
-                        }),
+                        body: formData,
                     });
                     const data = await res.json();
                     if (data.ok) {
@@ -186,7 +208,7 @@ const showID = false;
                         row._saving = false;
                         alert(data.message || 'Σφάλμα κατά την αποθήκευση.');
                     }
-                } catch (e) {
+                } catch {
                     row._saving = false;
                     alert('Σφάλμα δικτύου.');
                 }
@@ -194,22 +216,23 @@ const showID = false;
 
             async createRow() {
                 if (!this.newRow.code?.trim()) this.newRow._codeInvalid = true;
-                if (!this.newRow.name.trim()) this.newRow._nameInvalid = true;
+                if (!this.newRow.name?.trim()) this.newRow._nameInvalid = true;
                 if (this.newRow._codeInvalid || this.newRow._nameInvalid) return;
+
                 this.newRow._saving = true;
                 this.newRow._error = '';
+                const formData = new FormData();
+                formData.append('code', this.newRow.code);
+                formData.append('name', this.newRow.name);
+                formData.append('description', this.newRow.description ?? '');
+                formData.append('link', this.newRow.link ?? '');
+                formData.append('sequence', this.newRow.sequence ?? '');
+                if (this.newRow._file) formData.append('file', this.newRow._file);
+
                 try {
                     const res = await fetch(baseUrl, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            code: this.newRow.code,
-                            name: this.newRow.name,
-                            description: this.newRow.description,
-                            sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
-                            default: this.newRow.default,
-                            active: true,
-                        }),
+                        body: formData,
                     });
                     const data = await res.json();
                     if (data.ok) {
@@ -218,29 +241,12 @@ const showID = false;
                         this.newRow._saving = false;
                         this.newRow._error = data.message || 'Σφάλμα κατά την προσθήκη.';
                     }
-                } catch (e) {
+                } catch {
                     this.newRow._saving = false;
                     this.newRow._error = 'Σφάλμα δικτύου.';
                 }
             },
+
         };
     }
 </script>
-
-<script type="module">
-    /* Έλεγχος για διπλότυπους κωδικούς */
-    const codeCount = new Map();
-    for (const p of window.policies) {
-        if (!p.code) continue;
-        codeCount.set(p.code, (codeCount.get(p.code) ?? 0) + 1);
-    }
-    for (const [code, count] of codeCount) {
-        if (count > 1) Q.alert(`Υπάρχουν ${count} ${window.displayType.pluralLower} με τον ίδιο κωδικό: ${code}`, 'OK');
-    }
-</script>
-
-<style>
-    :root {
-        --wa-tooltip-background-color: hsl(242, 36%, 42%);
-    }
-</style>
