@@ -21,7 +21,7 @@ window.baseUrl = '{{baseUrl}}';
                             <thead class="table-dark">
                                 <tr>
                                     <th class="sortable" style="width:12ch">Κωδικός</th>
-                                    <th class="sortable" style="width:28ch">Όνομα</th>
+                                    <th class="sortable" style="width:40ch">Όνομα</th>
                                     <th>Περιγραφή</th>
                                     <th style="width:30ch">Αρχείο</th>
                                     <th style="width:30ch">Link</th>
@@ -53,14 +53,12 @@ window.baseUrl = '{{baseUrl}}';
                                             <template x-if="row.file">
                                                 <div>
                                                     <small class="text-muted d-block mb-1 text-truncate" x-text="row.file"></small>
-                                                    <div class="btn-group">
-                                                        <button type="button" class="btn btn-outline-danger btn-sm btn-icon" @click="row.file = null; row._clearFile = true">
-                                                            <i class="bi bi-trash me-1"></i>
-                                                            {{!-- <span>Διαγραφή</span> --}}
+                                                    <div class="btn-group w-100">
+                                                        <button type="button" class="btn btn-reset btn-outline-danger btn-sm btn-icon" @click="row.file = null; row._clearFile = true">
+                                                            <i class="bi bi-trash"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-primary btn-sm btn-icon">
-                                                            <i class="bi bi-download me-1"></i>
-                                                            {{!-- <span>Κατέβασμα</span> --}}
+                                                        <button type="button" class="btn btn-reset btn-outline-primary btn-sm btn-icon">
+                                                            <i class="bi bi-download"></i>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -76,9 +74,9 @@ window.baseUrl = '{{baseUrl}}';
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm"
                                                     x-model="row.link">
-                                                <a :href="row.link" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                                    <i class="bi bi-box-arrow-up-right"></i>
-                                                </a>
+                                                    <a :href="row.link" target="_blank" class="btn btn-reset btn-outline-secondary btn-sm" x-show="row.link?.length > 10">
+                                                        <i class="bi bi-box-arrow-up-right"></i>
+                                                    </a>
                                             </div>
                                         </td>
                                         <td>
@@ -86,12 +84,12 @@ window.baseUrl = '{{baseUrl}}';
                                                 x-model="row.sequence" style="width:65px">
                                         </td>
                                         <td class="text-center">
-                                            <input type="checkbox" class="form-check-input"
+                                            <input type="checkbox" class=""
                                                 :checked="row.active"
                                                 @change="row.active = $event.target.checked">
                                         </td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-success fs-5" title="Αποθήκευση"
+                                            <button class="btn btn-success btn-action" title="Αποθήκευση"
                                                 @click="saveRow(row)"
                                                 :disabled="row._saving">
                                                 <span x-show="!row._saving"><i class="bi bi-floppy"></i></span>
@@ -119,45 +117,52 @@ window.baseUrl = '{{baseUrl}}';
                     </h2>
                 </div>
                 <div class="card-body">
-                    <div class="row g-2 align-items-stretch">
-                        <div class="col justify-content-between" style="width:12ch">
+                    <div class="d-flex g-3 justify-content-around align-items-stretch">
+                        <div class="full-column" style="width:12ch">
                             <label class="form-label small">Κωδικός</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.code"
                                 :class="{ 'is-invalid': newRow._codeInvalid }"
                                 @input="newRow._codeInvalid = false">
                         </div>
-                        <div class="col" style="min-width:30ch">
+                        <div class="full-column" style="min-width:50ch">
                             <label class="form-label small">Όνομα</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.name"
                                 :class="{ 'is-invalid': newRow._nameInvalid }"
                                 @input="newRow._nameInvalid = false">
                         </div>
-                        <div class="col" style="min-width:50ch">
+                        <div class="full-column" style="min-width:50ch">
                             <label class="form-label small">Περιγραφή</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.description">
                         </div>
-                        <div class="col-auto" style="width: 20ch">
+                        <div class="full-column" style="width: 25ch">
                             <label class="form-label small">Αρχείο</label>
-                                <dim-upload>
-                                    <label class="btn btn-outline-secondary btn-sm">
-                                        Επιλέξτε ή σύρετε
-                                    </label>
-                                    <input type="file" @change="newRow._file = $event.target.files[0]">
-                                </dim-upload>
+                            <dim-upload>
+                                <label class="btn btn-reset btn-outline-secondary">
+                                    Επιλέξτε ή σύρετε
+                                </label>
+                                <input type="file" @change="newRow._file = $event.target.files[0]">
+                            </dim-upload>
                         </div>
-                        <div class="col" style="min-width:30ch">
+                        <div class="full-column" style="min-width:30ch">
                             <label class="form-label small">Link</label>
-                            <input type="text" class="form-control form-control-sm" x-model="newRow.link">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" x-model="newRow.link">
+                                <a :href="newRow.link" target="_blank" class="btn btn-reset btn-outline-secondary btn-sm" x-show="newRow.link?.length > 10">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                                </div>
                         </div>
-                        <div class="col" style="width:8ch">
+                        <div class="full-column" style="width:8ch">
                             <label class="form-label small">Σειρά</label>
                             <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
                         </div>
-                        <div class="col-auto align-self-middle">
-                            <button class="btn btn-primary btn-sm fs-5" @click="createRow()" :disabled="newRow._saving">
+                        <div class="row align-self-end" style="width:12ch">
+                            <div class="center-content">
+                            <button class="btn btn-primary btn-action" @click="createRow()" :disabled="newRow._saving">
                                 <span x-show="!newRow._saving"><i class="bi bi-plus-circle"></i></span>
                                 <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
                             </button>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-2 text-danger small" x-show="newRow._error" x-text="newRow._error"></div>
