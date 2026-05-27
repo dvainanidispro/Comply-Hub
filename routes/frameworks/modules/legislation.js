@@ -58,7 +58,7 @@ export function manageLegislationRouter(framework, label) {
                 where: { framework },
                 order: [
                     ['sequence', 'ASC NULLS LAST'],
-                    ['code', 'ASC'],
+                    ['name', 'ASC'],
                 ],
                 raw: true,
             });
@@ -79,7 +79,7 @@ export function manageLegislationRouter(framework, label) {
     /* POST / - Δημιουργία νέου εγγράφου */
     legislation.post('/', upload.single('file'), async (req, res) => {
         try {
-            const { code, name, description, link, sequence } = req.body;
+            const { name, description, link, sequence } = req.body;
             const seqInt = parseInt(sequence);
 
             let storedFileName = null;
@@ -91,7 +91,6 @@ export function manageLegislationRouter(framework, label) {
 
             await Models.Legislation.create({
                 framework,
-                code: code || null,
                 name: name || null,
                 description: description || null,
                 link: link || null,
@@ -100,7 +99,7 @@ export function manageLegislationRouter(framework, label) {
                 active: true,
             });
 
-            log.success(`Νέο έγγραφο νομοθεσίας δημιουργήθηκε: ${code || name} (Framework: ${framework})`);
+            log.success(`Νέο έγγραφο νομοθεσίας δημιουργήθηκε: ${name} (Framework: ${framework})`);
 
             res.json({ ok: true });
             cleanup();
@@ -109,7 +108,7 @@ export function manageLegislationRouter(framework, label) {
                 return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη αρχείο νομοθεσίας με το ίδιο όνομα. Μετονομάστε το νέο αρχείο ή διαγράψτε πρώτα το παλιό.' });
             }
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
-                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη νομοθεσία με τον ίδιο κωδικό.' });
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη εγγραφή νομοθεσίας με τα ίδια στοιχεία.' });
             }
             log.error(`${framework} legislation POST error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });
@@ -120,7 +119,7 @@ export function manageLegislationRouter(framework, label) {
     legislation.put('/:id', upload.single('file'), async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const { code, name, description, link, sequence, active } = req.body;
+            const { name, description, link, sequence, active } = req.body;
 
             const item = await Models.Legislation.findOne({ where: { id, framework } });
             if (!item) return res.status(404).json({ ok: false, message: 'Δεν βρέθηκε.' });
@@ -128,7 +127,6 @@ export function manageLegislationRouter(framework, label) {
             const seqInt = parseInt(sequence);
 
             const updateData = {
-                code: code || null,
                 name: name || null,
                 description: description || null,
                 link: link || null,
@@ -144,7 +142,7 @@ export function manageLegislationRouter(framework, label) {
             }
 
             await item.update(updateData);
-            log.success(`Έγγραφο νομοθεσίας ενημερώθηκε: ${code || name} (ID: ${id}, Framework: ${framework})`);
+            log.success(`Έγγραφο νομοθεσίας ενημερώθηκε: ${name} (ID: ${id}, Framework: ${framework})`);
 
             res.json({ ok: true });
             cleanup();
@@ -153,7 +151,7 @@ export function manageLegislationRouter(framework, label) {
                 return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη αρχείο νομοθεσίας με το ίδιο όνομα. Μετονομάστε το νέο αρχείο ή διαγράψτε πρώτα το παλιό.' });
             }
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
-                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη νομοθεσία με τον ίδιο κωδικό.' });
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη εγγραφή νομοθεσίας με τα ίδια στοιχεία.' });
             }
             log.error(`${framework} legislation PUT ${req.params.id} error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });

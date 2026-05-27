@@ -20,10 +20,9 @@ window.baseUrl = '{{baseUrl}}';
                         <table class="table table-striped dim-table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th class="sortable" style="width:12ch">Κωδικός</th>
-                                    <th class="sortable" style="width:40ch">Όνομα</th>
+                                    <th class="sortable" style="width:20vw">Όνομα</th>
                                     <th>Περιγραφή</th>
-                                    <th style="width:30ch">Αρχείο</th>
+                                    <th style="width:8vw">Αρχείο</th>
                                     <th style="width:30ch">Link</th>
                                     <th class="text-center sortable" data-sort-type="number" style="width:10ch">Σειρά</th>
                                     <th class="text-center sortable" style="width:12ch">Ενεργό</th>
@@ -33,12 +32,6 @@ window.baseUrl = '{{baseUrl}}';
                             <tbody>
                                 <template x-for="row in rows" :key="row.id">
                                     <tr :class="!row.active ? 'table-secondary text-muted' : ''">
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm"
-                                                x-model="row.code"
-                                                :class="{ 'is-invalid': row._codeInvalid }"
-                                                @input="row._codeInvalid = false">
-                                        </td>
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.name"
@@ -113,24 +106,18 @@ window.baseUrl = '{{baseUrl}}';
                 <div class="card-header">
                     <h2 class="card-title h5 mb-0">
                         <i class="bi bi-plus-circle me-2"></i>
-                        Προσθήκη νέου εγγράφου
+                        Προσθήκη νέου στοιχείου νομοθεσίας
                     </h2>
                 </div>
                 <div class="card-body">
                     <div class="d-flex g-3 justify-content-around align-items-stretch">
-                        <div class="full-column" style="width:12ch">
-                            <label class="form-label small">Κωδικός</label>
-                            <input type="text" class="form-control form-control-sm" x-model="newRow.code"
-                                :class="{ 'is-invalid': newRow._codeInvalid }"
-                                @input="newRow._codeInvalid = false">
-                        </div>
-                        <div class="full-column" style="min-width:50ch">
+                        <div class="full-column" style="flex: 5 1 0; min-width: 0;">
                             <label class="form-label small">Όνομα</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.name"
                                 :class="{ 'is-invalid': newRow._nameInvalid }"
                                 @input="newRow._nameInvalid = false">
                         </div>
-                        <div class="full-column" style="min-width:50ch">
+                        <div class="full-column" style="flex: 4 1 0; min-width: 0;">
                             <label class="form-label small">Περιγραφή</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.description">
                         </div>
@@ -143,7 +130,7 @@ window.baseUrl = '{{baseUrl}}';
                                 <input type="file" @change="newRow._file = $event.target.files[0]">
                             </dim-upload>
                         </div>
-                        <div class="full-column" style="min-width:30ch">
+                        <div class="full-column" style="flex: 3 1 0; min-width: 0;">
                             <label class="form-label small">Link</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control form-control-sm" x-model="newRow.link">
@@ -182,17 +169,15 @@ window.baseUrl = '{{baseUrl}}';
         const baseUrl = window.baseUrl;
 
         return {
-            rows: window.items.map(i => ({ ...i, _file: null, _clearFile: false, _saving: false, _codeInvalid: false, _nameInvalid: false })),
-            newRow: { code: '', name: '', description: '', link: '', sequence: '', _file: null, _saving: false, _error: '', _codeInvalid: false, _nameInvalid: false },
+            rows: window.items.map(i => ({ ...i, _file: null, _clearFile: false, _saving: false, _nameInvalid: false })),
+            newRow: { name: '', description: '', link: '', sequence: '', _file: null, _saving: false, _error: '', _nameInvalid: false },
 
             async saveRow(row) {
-                if (!row.code?.trim()) row._codeInvalid = true;
                 if (!row.name?.trim()) row._nameInvalid = true;
-                if (row._codeInvalid || row._nameInvalid) return;
+                if (row._nameInvalid) return;
 
                 row._saving = true;
                 const formData = new FormData();
-                formData.append('code', row.code ?? '');
                 formData.append('name', row.name ?? '');
                 formData.append('description', row.description ?? '');
                 formData.append('link', row.link ?? '');
@@ -220,14 +205,12 @@ window.baseUrl = '{{baseUrl}}';
             },
 
             async createRow() {
-                if (!this.newRow.code?.trim()) this.newRow._codeInvalid = true;
                 if (!this.newRow.name?.trim()) this.newRow._nameInvalid = true;
-                if (this.newRow._codeInvalid || this.newRow._nameInvalid) return;
+                if (this.newRow._nameInvalid) return;
 
                 this.newRow._saving = true;
                 this.newRow._error = '';
                 const formData = new FormData();
-                formData.append('code', this.newRow.code);
                 formData.append('name', this.newRow.name);
                 formData.append('description', this.newRow.description ?? '');
                 formData.append('link', this.newRow.link ?? '');

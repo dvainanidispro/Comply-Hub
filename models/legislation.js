@@ -13,10 +13,10 @@ const Legislation = db.define('legislation',
             allowNull: false,
             comment: 'Πλαίσιο νομοθεσίας (πχ nis2, gdpr).',
         },
-        code: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
+        // code: {
+        //     type: DataTypes.STRING,
+        //     allowNull: false,
+        // },
         name: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -46,11 +46,11 @@ const Legislation = db.define('legislation',
                 name: 'legislation_framework',
                 fields: ['framework'],
             },
-            {
-                name: 'legislation_framework_code_unique',
-                fields: ['framework', 'code'],
-                unique: true,
-            },
+            // {
+            //     name: 'legislation_framework_code_unique',
+            //     fields: ['framework', 'code'],
+            //     unique: true,
+            // },
         ],
     }
 );
