@@ -38,7 +38,7 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
     function resourcePath(req) {
         const resourceId = parseInt(req.params[resourceParamName], 10);
         if (!resourceId) throw new Error('Μη έγκυρο resource ID.');
-        return `organizations/${req.org}/modules/${framework.toLowerCase()}/${resourceType}/${resourceId}`;
+        return `organizations/${req.org}/${framework.toLowerCase()}/${resourceType}/${resourceId}`;
     }
 
 

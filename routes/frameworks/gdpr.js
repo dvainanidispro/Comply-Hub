@@ -1,6 +1,6 @@
 import express from 'express';
-import { managePoliciesRouter } from './policies.js';
-import { manageLegislationRouter } from './legislation.js';
+import { managePoliciesRouter } from './modules/policies.js';
+import { manageLegislationRouter } from './modules/legislation.js';
 
 const gdpr = express.Router();
 

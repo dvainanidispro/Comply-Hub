@@ -134,8 +134,8 @@
 
 #### Θέση αρχείων
 
-- `/storage/organizations/:organizationId/modules/:framework/:resourcetype/:resourceId/name`
-- Παράδειγμα: `/storage/organizations/123/modules/gdpr/policies/456/policy-document.pdf`
+- `/storage/organizations/:organizationId/:framework/:resourcetype/:resourceId/name`
+- Παράδειγμα: `/storage/organizations/123/gdpr/policies/456/policy-document.pdf`
 
 ### Αποθήκευση αρχείων
 

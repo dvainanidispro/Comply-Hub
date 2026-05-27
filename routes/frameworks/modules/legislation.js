@@ -9,8 +9,8 @@
 import express from 'express';
 import multer from 'multer';
 import { UniqueConstraintError } from 'sequelize';
-import Models from '../../models/models.js';
-import log from '../../lib/logger.js';
+import Models from '../../../models/models.js';
+import log from '../../../lib/logger.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -23,7 +23,10 @@ const decodeFilename = name => Buffer.from(name, 'latin1').toString('utf8');
  * @returns {express.Router}
  */
 export function manageLegislationRouter(framework, label) {
+
     const legislation = express.Router();
+    const resourcePath = `modules/legislation/${framework.toLowerCase()}`;
+
 
     /* GET / - Λίστα νομοθεσίας για το framework */
     legislation.get('/', async (req, res) => {

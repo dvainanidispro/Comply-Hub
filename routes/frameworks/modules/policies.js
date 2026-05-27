@@ -11,10 +11,10 @@
  */
 
 import express from 'express';
-import Models from '../../models/models.js';
-import Cache from '../../models/cache.js';
+import Models from '../../../models/models.js';
+import Cache from '../../../models/cache.js';
 import { ForeignKeyConstraintError, UniqueConstraintError } from 'sequelize';
-import log from '../../lib/logger.js';
+import log from '../../../lib/logger.js';
 
 const typeLabels = {
     policy: {
