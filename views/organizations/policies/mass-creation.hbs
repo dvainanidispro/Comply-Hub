@@ -1,3 +1,11 @@
+<style>
+    input[type="checkbox"]:checked:disabled {
+        background-color: lightgray;
+        border-color: gray;
+        opacity: 1;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 mb-3">
@@ -21,9 +29,9 @@
                     <p class="text-muted mb-4">Επιλέξτε τις {{displayType.pluralLower}} που θέλετε να δημιουργήσετε για τον οργανισμό. Οι {{displayType.pluralLower}} που έχουν ήδη δημιουργηθεί εμφανίζονται ως ανενεργές.</p>
                     <form id="massCreationForm">
                         {{#each policyTypes}}
-                        <div class="form-check mb-2">
+                        <div class="form-check mb-2 d-flex g-2 align-items-center">
                             <input
-                                class="form-check-input"
+                                class=""
                                 type="checkbox"
                                 name="policyTypeIds"
                                 value="{{this.id}}"
@@ -63,7 +71,11 @@ const baseUrl = '{{baseUrl}}';
 Q('#massCreationForm').on('submit', async function(e) {
     Q("#modalSuccessTitle").set("Μαζική Δημιουργία");
     e.preventDefault();
-    const checked = [...Q('input[name="policyTypeIds"]:checked')].map(el => el.value);
+    const checked = [...Q('input[name="policyTypeIds"]:checked:not(:disabled)')].map(el => el.value);
+    if (checked.length == 0) {
+        Q.alert('Παρακαλώ επιλέξτε τουλάχιστον μία {{displayType.singularLower}} για δημιουργία.');
+        return;
+    }
     await submitData({ policyTypeIds: checked }, `${baseUrl}/mass-creation`, 'POST', baseUrl);
 });
 </script>

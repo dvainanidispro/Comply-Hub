@@ -48,6 +48,7 @@ export function managePoliciesRouter(framework, type, label) {
     const policies = express.Router();
     const displayType = typeLabels[type||'default'];
 
+
     /* GET / - Λίστα πολιτικών οργανισμού για το framework */
     policies.get('/', async (req, res) => {
         try {
@@ -132,11 +133,21 @@ export function managePoliciesRouter(framework, type, label) {
                 };
             }).filter(Boolean);
 
+            let createdCount = 0;
             if (records.length) {
-                await Models.Policy.bulkCreate(records, { ignoreDuplicates: true });
+                const result = await Models.Policy.bulkCreate(records, { ignoreDuplicates: true });
+                createdCount = result.filter(r=>r.id).length;   
+                // Αυτό το φίλτρο αφήνει τα δημιουργημένα records (τα duplicates έρχονται με id null).
             }
 
-            res.json({ success: true, message: `Οι επιλεγμένες ${displayType.pluralLower} δημιουργήθηκαν επιτυχώς.` });
+            log.success(`${framework}: ${createdCount} ${displayType.pluralLower} δημιουργήθηκαν για τον οργανισμό ${req.org}`);
+            let messageToUser = `${createdCount} ${displayType.pluralLower} δημιουργήθηκαν επιτυχώς.`;
+            const duplicates = records.length - createdCount;
+            if (duplicates > 0) {
+                messageToUser += ` ${duplicates} δεν δημιουργήθηκαν διότι υπήρχαν ήδη.`;
+                log.warn(`${framework}: ${duplicates} ${displayType.pluralLower} δεν δημιουργήθηκαν λόγω διπλοτυπίας για τον οργανισμό ${req.org}`);
+            }
+            res.json({ success: true, message: messageToUser });
         } catch (error) {
             log.error(`${framework} mass-creation POST error: ${error}`);
             res.status(500).render('errors/500');
