@@ -138,7 +138,7 @@ admin.post('/users', async (req, res) => {
             scope,
         });
         
-        log.info(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);
+        log.success(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);
         
         res.status(201).json({ 
             success: true, 
@@ -212,7 +212,7 @@ admin.put('/users/:id', async (req, res) => {
         
         await user.update(updateData);
         
-        log.info(`Ο Χρήστης ${user.email} ενημερώθηκε (ID: ${user.id})`);
+        log.success(`Ο Χρήστης ${user.email} ενημερώθηκε (ID: ${user.id})`);
         
         res.json({ 
             success: true, 
@@ -259,7 +259,7 @@ admin.delete('/users/:id', async (req, res) => {
         
         await user.destroy();
         
-        log.info(`Χρήστης διαγράφηκε: ${user.email} (ID: ${user.id})`);
+        log.success(`Χρήστης διαγράφηκε: ${user.email} (ID: ${user.id})`);
         
         res.json({ 
             success: true, 
@@ -365,7 +365,7 @@ admin.post('/organizations', async (req, res) => {
         });
 
         Cache.refresh('Organization');
-        log.info(`Νέος οργανισμός δημιουργήθηκε: ${newOrg.name} (ID: ${newOrg.id})`);
+        log.success(`Νέος οργανισμός δημιουργήθηκε: ${newOrg.name} (ID: ${newOrg.id})`);
 
         res.status(201).json({ success: true, message: 'Ο οργανισμός δημιουργήθηκε επιτυχώς' });
     } catch (error) {
@@ -402,7 +402,7 @@ admin.put('/organizations/:id', async (req, res) => {
         });
 
         Cache.refresh('Organization');
-        log.info(`Οργανισμός ενημερώθηκε: ${org.name} (ID: ${org.id})`);
+        log.success(`Οργανισμός ενημερώθηκε: ${org.name} (ID: ${org.id})`);
 
         res.json({ success: true, message: 'Ο οργανισμός ενημερώθηκε επιτυχώς' });
     } catch (error) {
@@ -426,7 +426,7 @@ admin.delete('/organizations/:id', async (req, res) => {
         await org.destroy();
 
         Cache.refresh('Organization');
-        log.info(`Οργανισμός διαγράφηκε: ${org.name} (ID: ${org.id})`);
+        log.success(`Οργανισμός διαγράφηκε: ${org.name} (ID: ${org.id})`);
 
         res.json({ success: true, message: 'Ο οργανισμός διαγράφηκε επιτυχώς' });
     } catch (error) {

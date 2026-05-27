@@ -11,6 +11,7 @@ import multer from 'multer';
 import { UniqueConstraintError } from 'sequelize';
 import Models from '../../../models/models.js';
 import log from '../../../lib/logger.js';
+import Storage from '../../../lib/storage.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -26,6 +27,28 @@ export function manageLegislationRouter(framework, label) {
 
     const legislation = express.Router();
     const resourcePath = `modules/legislation/${framework.toLowerCase()}`;
+
+    /* Εκτελείται μετά από POST/PUT για εκκαθάριση ορφανών αρχείων */
+    async function cleanup() {
+        try {
+            const [{ files }, dbRecords] = await Promise.all([
+                Storage.list(resourcePath),
+                Models.Legislation.findAll({ where: { framework }, attributes: ['file'], raw: true }),
+            ]);
+
+            const dbFileNames = new Set(dbRecords.map(r => r.file).filter(Boolean));
+
+            for (const file of files) {
+                if (!dbFileNames.has(file.name)) {
+                    const sanitizedName = Storage.sanitizer.sanitize(file.name);
+                    await Storage.delete(`${resourcePath}/${sanitizedName}`);
+                    log.info(`Cleanup: διαγράφηκε ορφανό αρχείο ${resourcePath}/${sanitizedName}`);
+                }
+            }
+        } catch (error) {
+            log.error(`${framework} legislation cleanup error: ${error}`);
+        }
+    }
 
 
     /* GET / - Λίστα νομοθεσίας για το framework */
@@ -59,21 +82,34 @@ export function manageLegislationRouter(framework, label) {
             const { code, name, description, link, sequence } = req.body;
             const seqInt = parseInt(sequence);
 
+            let storedFileName = null;
+            if (req.file) {
+                const decodedName = decodeFilename(req.file.originalname);
+                await Storage.store(resourcePath, { ...req.file, originalname: decodedName });
+                storedFileName = decodedName;
+            }
+
             await Models.Legislation.create({
                 framework,
                 code: code || null,
                 name: name || null,
                 description: description || null,
                 link: link || null,
-                file: req.file ? decodeFilename(req.file.originalname) : null,
+                file: storedFileName,
                 sequence: isNaN(seqInt) ? null : seqInt,
                 active: true,
             });
 
+            log.success(`Νέο έγγραφο νομοθεσίας δημιουργήθηκε: ${code || name} (Framework: ${framework})`);
+
             res.json({ ok: true });
+            cleanup();
         } catch (error) {
+            if (error?.code === Storage.errorCodes.duplicateFile) {
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη αρχείο νομοθεσίας με το ίδιο όνομα. Μετονομάστε το νέο αρχείο ή διαγράψτε πρώτα το παλιό.' });
+            }
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
-                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη έγγραφο με τον ίδιο κωδικό.' });
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη νομοθεσία με τον ίδιο κωδικό.' });
             }
             log.error(`${framework} legislation POST error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });
@@ -100,16 +136,24 @@ export function manageLegislationRouter(framework, label) {
                 active: active === 'true' || active === true,
             };
             if (req.file) {
-                updateData.file = decodeFilename(req.file.originalname);
+                const decodedName = decodeFilename(req.file.originalname);
+                await Storage.store(resourcePath, { ...req.file, originalname: decodedName });
+                updateData.file = decodedName;
             } else if (req.body.clearFile === 'true') {
                 updateData.file = null;
             }
 
             await item.update(updateData);
+            log.success(`Έγγραφο νομοθεσίας ενημερώθηκε: ${code || name} (ID: ${id}, Framework: ${framework})`);
+
             res.json({ ok: true });
+            cleanup();
         } catch (error) {
+            if (error?.code === Storage.errorCodes.duplicateFile) {
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη αρχείο νομοθεσίας με το ίδιο όνομα. Μετονομάστε το νέο αρχείο ή διαγράψτε πρώτα το παλιό.' });
+            }
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
-                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη έγγραφο με τον ίδιο κωδικό.' });
+                return res.status(400).json({ ok: false, message: 'Υπάρχει ήδη νομοθεσία με τον ίδιο κωδικό.' });
             }
             log.error(`${framework} legislation PUT ${req.params.id} error: ${error}`);
             res.status(500).json({ ok: false, message: error.message });
