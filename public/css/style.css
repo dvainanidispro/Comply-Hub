@@ -7,8 +7,6 @@
 @layer framework, base, dim, layout, theme, components, utilities;
 
 
-
-
 /****************      BASE LAYER      ******************/
 @layer base {
     :root{
@@ -32,6 +30,8 @@
         --bs-pink: hsl(332, 100%, 60%);
 
         --card-gradient: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+
+        --btn-padding: 0.6rem 1.2rem;
 
         /* --bs-form-check-bg-image: url("#"); */
 
@@ -193,6 +193,7 @@
 @layer framework {
     /* bootstrap, adminator, alpine, web-awesome - corrections and additions */
 
+    /* Adminator corrections */
     .collapse:not(.show) {
         display: grid;
         grid-template-rows: 0fr;
@@ -214,6 +215,11 @@
         transition: padding 0.4s ease;
     }
 
+    :is(.gap-2, .gap-3)  > .btn:not(.btn-reset):not(.btn-action) {
+        padding: var(--btn-padding) !important;
+    }
+
+
     /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο wa-avatar! */
     wa-avatar::part(initials) {         
         text-box: trim-both cap alphabetic;
@@ -228,7 +234,7 @@
     /* Hide cloaked elements for Alpine.js */
     [x-cloak] { display: none !important; }
 
-    /* Web awesome correction */
+    /* Web awesome corrections */
     li {
         margin-inline-start: revert;
     }
@@ -328,7 +334,7 @@
     }
 
     .btn:not(.btn-reset):not(.btn-action) {
-        padding: 0.6rem 1.2rem !important;
+        padding: var(--btn-padding) !important;
         min-width: 3rem;
     }
     :is(.btn, .btn:focus, .btn:active, .btn:hover):not([class*="btn-outline"]){
@@ -350,6 +356,13 @@
         .bi {
             font-size: 1.2rem;
         }
+    }
+    .btn-action{
+        padding: 0.6rem 1rem !important;
+        font-size: 1.2rem;
+    }
+    .btn-aligned{
+        width: 20ch;
     }
 
     input.form-control{
@@ -465,11 +478,6 @@
     .btn-warning-caution{
         background-color: var(--bs-warning-caution) !important;
         color: var(--bs-light) !important;
-    }
-    
-    .btn-action{
-        padding: 0.6rem 1rem !important;
-        font-size: 1.2rem;
     }
 
     .text-red{

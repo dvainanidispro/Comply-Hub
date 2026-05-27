@@ -1,0 +1,60 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="bi bi-journal-text me-2"></i>
+                        {{title}}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{#if legislation.length}}
+                    <div class="d-flex flex-column gap-3">
+                        {{#each legislation}}
+                        <div class="card border border-info">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center gap-3">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1">{{this.name}}</h5>
+                                        {{#if this.description}}
+                                        <p class="card-text text-muted mt-2 mb-0">{{this.description}}</p>
+                                        {{/if}}
+                                    </div>
+                                    <div class="d-flex gap-2 flex-shrink-0">
+                                        {{#if this.link}}
+                                        <a href="{{this.link}}" target="_blank" rel="noopener noreferrer" 
+                                            class="btn btn-aligned btn-outline-primary btn-sm btn-icon">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                                <span>Σύνδεσμος</span>
+                                        </a>
+                                        {{/if}}
+                                        {{#if this.file}}
+                                        <btn  
+                                            class="btn btn-aligned btn-outline-dark btn-sm btn-icon"
+                                            data-file="{{this.file}}">
+                                                <i class="bi bi-download"></i>
+                                                <span>Αρχείο</span>
+                                        </btn>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                    {{else}}
+                    <p class="text-muted mb-0">Δεν υπάρχουν εγγραφές νομοθεσίας για αυτό το πλαίσιο.</p>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    Q('[data-file]').on('click', function() {
+        const fileName = this.dataset.file;
+        window.location.href = '{{downloadUrl}}?name=' + encodeURIComponent(fileName);
+    });
+</script>

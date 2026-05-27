@@ -1,6 +1,7 @@
 import express from 'express';
 import { managePoliciesRouter } from './modules/policies.js';
 import { manageStorageRouter } from './modules/storage.js';
+import { legislationRouter } from './modules/legislation.js';
 
 const nis2 = express.Router();
 
@@ -13,5 +14,8 @@ nis2.use('/policies', nis2Policies);
 const nis2Procedures = managePoliciesRouter('NIS2', 'procedure', 'NIS2 - Διαδικασίες');
 nis2Procedures.use('/:resourceId/storage', manageStorageRouter('NIS2', 'procedures'));
 nis2.use('/procedures', nis2Procedures);
+
+// NIS2 Legislation
+nis2.use('/legislation', legislationRouter('NIS2', 'NIS2 - Νομοθεσία'));
 
 export default nis2;

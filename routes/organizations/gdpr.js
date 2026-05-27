@@ -1,6 +1,7 @@
 import express from 'express';
 import { managePoliciesRouter } from './modules/policies.js';
 import { manageStorageRouter } from './modules/storage.js';
+import { legislationRouter } from './modules/legislation.js';
 
 const gdpr = express.Router();
 
@@ -13,5 +14,8 @@ gdpr.use('/policies', gdprPolicies);
 const gdprProcedures = managePoliciesRouter('GDPR', 'procedure', 'GDPR - Διαδικασίες');
 gdprProcedures.use('/:resourceId/storage', manageStorageRouter('GDPR', 'procedures'));
 gdpr.use('/procedures', gdprProcedures);
+
+// GDPR Legislation
+gdpr.use('/legislation', legislationRouter('GDPR', 'GDPR - Νομοθεσία'));
 
 export default gdpr;
