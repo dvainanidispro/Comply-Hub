@@ -51,6 +51,25 @@ export function manageLegislationRouter(framework, label) {
     }
 
 
+    /* GET /download?name=filename - Λήψη αρχείου νομοθεσίας */
+    legislation.get('/download', async (req, res) => {
+        try {
+            const displayName = req.query.name || '';
+            if (!displayName) {
+                return res.status(400).json({ ok: false, message: 'Δεν δόθηκε όνομα αρχείου.' });
+            }
+
+            const absolutePath = await Storage.path(resourcePath, displayName);
+            res.download(absolutePath, displayName);
+        } catch (error) {
+            if (error?.code === 'ENOENT') {
+                return res.status(404).json({ ok: false, message: 'Το αρχείο δεν βρέθηκε.' });
+            }
+            log.error(`${framework} legislation download error: ${error}`);
+            res.status(500).json({ ok: false, message: 'Αδύνατη η λήψη του αρχείου.' });
+        }
+    });
+
     /* GET / - Λίστα νομοθεσίας για το framework */
     legislation.get('/', async (req, res) => {
         try {

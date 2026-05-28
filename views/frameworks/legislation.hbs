@@ -50,7 +50,7 @@ window.baseUrl = '{{baseUrl}}';
                                                         <button type="button" class="btn btn-reset btn-outline-danger btn-sm btn-icon" @click="row.file = null; row._clearFile = true">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-reset btn-outline-primary btn-sm btn-icon">
+                                                        <button type="button" class="btn btn-reset btn-outline-primary btn-sm btn-icon" @click="window.location.href = `${baseUrl}/download?name=` + encodeURIComponent(row.file)">
                                                             <i class="bi bi-download"></i>
                                                         </button>
                                                     </div>
