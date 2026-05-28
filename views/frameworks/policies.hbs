@@ -27,8 +27,9 @@ const showID = false;
                                         <wa-tooltip for="table-id">Προαιρετικό</wa-tooltip>
                                         <span id="table-id">Κωδικός</span>
                                     </th>
-                                    <th class="sortable" style="width:60ch">Όνομα</th>
-                                    <th>Περιγραφή</th>
+                                    <th class="sortable" style="width:20vw">Όνομα</th>
+                                    <th >Περιγραφή</th>
+                                    <th class="sortable" style="width:20ch">Διαβάθμιση</th>
                                     <th class="text-center sortable" style="width:18ch">
                                         <wa-tooltip for="table-default">
                                             Καθορίζει αν το πρότυπο θα συμπεριλαμβάνεται στη μαζική απόδοση σε Οργανισμό.
@@ -64,6 +65,14 @@ const showID = false;
                                         <td>
                                             <input type="text" class="form-control form-control-sm"
                                                 x-model="row.description">
+                                        </td>
+                                        <td>
+                                            <select class="form-select form-select-sm" x-model="row.classification">
+                                                <option value=""></option>
+                                                <option value="public">Δημόσιο</option>
+                                                <option value="internal">Εσωτερικό</option>
+                                                <option value="confidential">Εμπιστευτικό</option>
+                                            </select>
                                         </td>
                                         <td class="text-center">
                                             <input type="checkbox" class=""
@@ -115,15 +124,24 @@ const showID = false;
                                 :class="{ 'is-invalid': newRow._codeInvalid }"
                                 @input="newRow._codeInvalid = false">
                         </div>
-                        <div class="full-column" style="min-width:50ch">
+                        <div class="full-column" style="width:20vw">
                             <label class="form-label small">Όνομα</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.name"
                                 :class="{ 'is-invalid': newRow._nameInvalid }"
                                 @input.debounce="newRow._nameInvalid = false; if (!newRow.code) newRow.code = createCodeFromName(newRow.name)">
                         </div>
-                        <div class="full-column" style="min-width:50ch">
+                        <div class="full-column" style="width:20vw">
                             <label class="form-label small">Περιγραφή</label>
                             <input type="text" class="form-control form-control-sm" x-model="newRow.description">
+                        </div>
+                        <div class="full-column" style="width:20ch">
+                            <label class="form-label small">Διαβάθμιση</label>
+                            <select class="form-select form-select-sm" x-model="newRow.classification">
+                                <option value=""></option>
+                                <option value="public">Δημόσιο</option>
+                                <option value="internal">Εσωτερικό</option>
+                                <option value="confidential">Εμπιστευτικό</option>
+                            </select>
                         </div>
                         <div class="full-column text-center center-content" style="width:14ch; padding-bottom:8px">
                             <label class="form-label small">Προεπιλογή</label>
@@ -160,8 +178,8 @@ const showID = false;
         let baseUrl = window.baseUrl;
 
         return {
-            rows: window.policies.map(p => ({ ...p, _saving: false, _codeInvalid: false, _nameInvalid: false })),
-            newRow: { sequence: '', code: '', name: '', description: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false, _codeInvalid: false },
+            rows: window.policies.map(p => ({ ...p, classification: p.classification ?? '', _saving: false, _codeInvalid: false, _nameInvalid: false })),
+            newRow: { sequence: '', code: '', name: '', description: '', classification: '', default: false, active: true, _saving: false, _error: '', _nameInvalid: false, _codeInvalid: false },
 
             async saveRow(row) {
                 if (!row.code?.trim()) row._codeInvalid = true;
@@ -176,6 +194,7 @@ const showID = false;
                             code: row.code,
                             name: row.name,
                             description: row.description,
+                            classification: row.classification || null,
                             sequence: row.sequence !== '' ? row.sequence : null,
                             default: row.default,
                             active: row.active,
@@ -208,6 +227,7 @@ const showID = false;
                             code: this.newRow.code,
                             name: this.newRow.name,
                             description: this.newRow.description,
+                            classification: this.newRow.classification || null,
                             sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
                             default: this.newRow.default,
                             active: true,

@@ -31,6 +31,10 @@ const PolicyType = db.define('policy_type',
             defaultValue: false,
             comment: "Εάν θα συμπεριλαμβάνεται στην μαζική δήλωση πολιτικών σε νέους οργανισμούς."
         },
+        classification: {
+            type: DataTypes.STRING,
+            comment: 'Διαβάθμιση. Δυνατές τιμές: public, internal, confidential.',
+        },
         sequence: {
             type: DataTypes.SMALLINT,
             comment: 'Χρησιμοποιείται για την οπτική ταξινόμηση, δεν έχει λειτουργική σημασία.',

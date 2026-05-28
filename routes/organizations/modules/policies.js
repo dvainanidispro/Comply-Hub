@@ -128,6 +128,7 @@ export function managePoliciesRouter(framework, type, label) {
                     code: pt.code,
                     name: pt.name,
                     description: pt.description,
+                    classification: pt.classification || null,
                     status: 'to_be_created',
                     framework: pt.framework,
                 };
@@ -191,7 +192,7 @@ export function managePoliciesRouter(framework, type, label) {
     /* POST / - Δημιουργία νέας πολιτικής */
     policies.post('/', async (req, res) => {
         try {
-            const { policyTypeId, code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            const { policyTypeId, code, name, description, classification, version, effectiveDate, reviewDate, status } = req.body;
 
             /* Έλεγχος για duplicate code ή policyTypeId στο ίδιο framework */
             const duplicateConditions = [{ code }];
@@ -215,6 +216,7 @@ export function managePoliciesRouter(framework, type, label) {
                 code,
                 name,
                 description,
+                classification: classification || null,
                 version,
                 effectiveDate: effectiveDate || null,
                 reviewDate: reviewDate || null,
@@ -261,7 +263,7 @@ export function managePoliciesRouter(framework, type, label) {
     /* PUT /:id - Ενημέρωση πολιτικής */
     policies.put('/:id', async (req, res) => {
         try {
-            const { code, name, description, version, effectiveDate, reviewDate, status } = req.body;
+            const { code, name, description, classification, version, effectiveDate, reviewDate, status } = req.body;
             const policyId = parseInt(req.params.id);
 
             /* Query για fetch της πολιτικής προς επεξεργασίας και ενδεχομένως και άλλης με duplicate code */
@@ -280,7 +282,7 @@ export function managePoliciesRouter(framework, type, label) {
             const duplicate = candidates.find(p => p.code === code && p.id !== policyId);
             if (duplicate) return res.json({ success: false, message: `Υπάρχει ήδη ${displayType.singularLower} με τον ίδιο κωδικό.` });
 
-            await policy.update({ code, name, description, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
+            await policy.update({ code, name, description, classification: classification || null, version, effectiveDate: effectiveDate || null, reviewDate: reviewDate || null, status });
 
             res.json({ success: true, message: `Η ${displayType.singularLower} αποθηκεύτηκε επιτυχώς.` });
         } catch (error) {

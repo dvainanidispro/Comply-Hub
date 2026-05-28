@@ -85,7 +85,7 @@ export function managePoliciesRouter(framework, type, label) {
     /* POST /policies - Δημιουργία νέου policy type */
     policies.post('/', async (req, res) => {
         try {
-            const { code, name, description, sequence, default: isDefault, active } = req.body;
+            const { code, name, description, classification, sequence, default: isDefault, active } = req.body;
 
             const seqInt = parseInt(sequence);
 
@@ -95,6 +95,7 @@ export function managePoliciesRouter(framework, type, label) {
                 code: code || null,
                 name: name || null,
                 description: description || null,
+                classification: classification || null,
                 sequence: isNaN(seqInt) ? null : seqInt,
                 default: isDefault === 'true' || isDefault === true,
                 active: active === undefined ? true : (active === 'true' || active === true),
@@ -115,7 +116,7 @@ export function managePoliciesRouter(framework, type, label) {
     policies.put('/:id', async (req, res) => {
         try {
             const id = parseInt(req.params.id);
-            const { code, name, description, sequence, default: isDefault, active } = req.body;
+            const { code, name, description, classification, sequence, default: isDefault, active } = req.body;
 
             const policy = await Models.PolicyType.findOne({ where: { id, framework, type } });
             if (!policy) {
@@ -128,6 +129,7 @@ export function managePoliciesRouter(framework, type, label) {
                 code: code || null,
                 name: name || null,
                 description: description || null,
+                classification: classification || null,
                 sequence: isNaN(seqInt) ? null : seqInt,
                 default: isDefault === 'true' || isDefault === true,
                 active: active === 'true' || active === true,

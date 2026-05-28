@@ -35,6 +35,10 @@ const Policy = db.define('policy',
             type: DataTypes.STRING,
             comment: 'Χρησιμοποιείται για filtering των custom policies (όταν policyTypeId=null).',
         },
+        classification: {
+            type: DataTypes.STRING,
+            comment: 'Διαβάθμιση. Δυνατές τιμές: public, internal, confidential.',
+        },
         files: {
             type: DataTypes.ARRAY(DataTypes.STRING),
             defaultValue: [],
