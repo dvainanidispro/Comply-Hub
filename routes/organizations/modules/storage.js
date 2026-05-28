@@ -55,25 +55,7 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
     });
 
     /* GET /download - Λήψη αρχείου με όνομα στο query param */
-    router.get('/download', async (req, res) => {
-        try {
-            const displayName = req.query.name || '';
-            if (!displayName) {
-                return res.status(400).json({ success: false, message: 'Δεν δόθηκε όνομα αρχείου.' });
-            }
-
-            const folderPath = resourcePath(req);
-            const absolutePath = await Storage.path(folderPath, displayName);
-            res.download(absolutePath, displayName);
-        } catch (error) {
-                if (error?.code === 'ENOENT') {
-                    return res.status(404).json({ success: false, message: 'Το αρχείο δεν βρέθηκε.' });
-                }
-
-            log.error(`Storage download error (${framework}/${resourceType}): ${error}`);
-                res.status(500).json({ success: false, message: 'Αδύνατη η λήψη του αρχείου.' });
-        }
-    });
+    router.get('/download', Storage.download(resourcePath));
 
     /* DELETE /delete - Διαγραφή αρχείου με όνομα στο body */
     router.delete('/delete', async (req, res) => {
