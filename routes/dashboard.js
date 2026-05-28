@@ -7,10 +7,11 @@ const dashboard = Router();
 dashboard.get(['/', '/dashboard'], 
     validateUser, 
     (req, res) => {
-    res.render('dashboard', {
-        layout: 'main',
-        user: req.user,
-    });
+        if (req.user.role=='admin') {
+            res.redirect('/admin/dashboard');
+        } else  {
+            res.redirect('/organization/dashboard');
+        }
 });
 
 

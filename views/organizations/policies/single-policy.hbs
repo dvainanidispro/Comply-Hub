@@ -65,7 +65,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="classification" class="form-label fw-bold">Διαβάθμιση</label>
                                 <select class="form-select" id="classification" name="classification">
-                                    <option value=""></option>
+                                    <option value="">(Χωρίς διαβάθμιση)</option>
                                     {{#each (labelEntries 'classification')}}
                                     <option value="{{this.value}}" {{#if (eq this.value ../policy.classification)}}selected{{/if}}>{{this.name}}</option>
                                     {{/each}}

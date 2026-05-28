@@ -27,16 +27,16 @@
             <!-- ### $Sidebar Navigation ### -->
             <nav class="sidebar-nav" aria-label="Main navigation">
                 <ul class="sidebar-menu scrollable pos-r">
-                        <li class="nav-item mT-30 actived">
-                            <a class="sidebar-link" href="/dashboard">
+                    
+                    {{#if (can "manage:platform")}}
+                        <li class="nav-item mT-30 bg-admin actived ">
+                            <a class="sidebar-link" href="/admin/dashboard">
                                 <span class="icon-holder">
                                 <i class="bi bi-speedometer2 c-blue-500"></i>
                                 </span>
-                                <span class="title">Dashboard</span>
+                                <span class="title">Admin Dashboard</span>
                             </a>
                         </li>
-                    
-                    {{#if (can "manage:platform")}}
                         <li class="nav-item dropdown bg-admin">
                             <a class="dropdown-toggle" href="javascript:void(0);">
                                 <span class="icon-holder">
@@ -178,6 +178,15 @@
 
                     {{/if}}
    
+
+                    <li class="nav-item mT-30 actived">
+                        <a class="sidebar-link" href="/organization/dashboard">
+                            <span class="icon-holder">
+                            <i class="bi bi-speedometer2 c-blue-500"></i>
+                            </span>
+                            <span class="title">Dashboard</span>
+                        </a>
+                    </li>
 
                     {{#if (scope "nis2")}}
                         <li class="nav-item dropdown">

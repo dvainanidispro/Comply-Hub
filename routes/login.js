@@ -22,7 +22,11 @@ router.get('/login', (req, res) => {
 
 router.post('/login', validateCredentials, (req, res) => {
     if (req.user) {
-        res.redirect('/dashboard');
+        if (req.user.role=='admin') {
+            return res.redirect('/admin/dashboard');
+        } else  {
+            res.redirect('/organization/dashboard');
+        }
     } else {
         res.render('login/login', { layout: 'basic', error: "Τα στοιχεία σας δεν είναι σωστά. Παρακαλώ προσπαθήστε ξανά." });
     }
