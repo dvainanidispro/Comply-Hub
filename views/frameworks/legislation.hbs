@@ -39,8 +39,9 @@ window.baseUrl = '{{baseUrl}}';
                                                 @input="row._nameInvalid = false">
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control form-control-sm"
+                                            <textarea class="form-control form-control-sm"
                                                 x-model="row.description">
+                                            </textarea>
                                         </td>
                                         <td>
                                             <template x-if="row.file">
@@ -119,7 +120,7 @@ window.baseUrl = '{{baseUrl}}';
                         </div>
                         <div class="full-column" style="flex: 4 1 0; min-width: 0;">
                             <label class="form-label small">Περιγραφή</label>
-                            <input type="text" class="form-control form-control-sm" x-model="newRow.description">
+                            <textarea class="form-control form-control-sm" x-model="newRow.description"></textarea>
                         </div>
                         <div class="full-column" style="width: 25ch">
                             <label class="form-label small">Αρχείο</label>

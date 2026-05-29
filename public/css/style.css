@@ -707,6 +707,9 @@
     .unseparated {
         white-space: nowrap !important;
     }
+    .text-prewrap {
+        white-space: pre-wrap !important;
+    }
     .larger{
         font-size: larger;
     }
