@@ -42,6 +42,15 @@
                                 <input type="text" class="form-control" id="editOrgName" name="name" value="{{orgDetails.name}}" required>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label for="editOrgScope" class="form-label fw-bold">Frameworks</label>
+                                <select class="form-select" id="editOrgScope" name="scope" multiple size="3">
+                                    {{#each scopes}}
+                                        <option value="{{this.name}}" {{#if (includes ../orgDetails.scope this.name)}}selected{{/if}}>{{this.displayName}}</option>
+                                    {{/each}}
+                                </select>
+                                <div class="form-text">Τα frameworks που ακολουθεί ο οργανισμός. Πατήστε Ctrl/Shift για πολλαπλή επιλογή.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label for="editOrgActive" class="form-label fw-bold">Κατάσταση *</label>
                                 <select class="form-select" id="editOrgActive" name="active">
                                     <option value="true" {{#unless (eq orgDetails.active false)}}selected{{/unless}}>Ενεργός</option>
@@ -108,8 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     Q('#form').on('submit', async function(e) {
         e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        data.scope = formData.getAll('scope');
         await submitData(
-            this,
+            data,
             '/admin/organizations',
             isNew ? 'POST' : 'PUT',
             isNew ? '/admin/organizations' : null

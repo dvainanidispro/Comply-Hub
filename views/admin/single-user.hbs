@@ -63,7 +63,7 @@
                                 <select class="form-select" id="editUserOrganization" name="organizationId" disabled>
                                     <option value="">Όλα</option>
                                     {{#each organizations}}
-                                        <option value="{{this.id}}" {{#if (eq this.id ../userDetails.organizationId)}}selected{{/if}}>{{this.name}}</option>
+                                        <option value="{{this.id}}" data-scope="{{objectify this.scope}}" {{#if (eq this.id ../userDetails.organizationId)}}selected{{/if}}>{{this.name}}</option>
                                     {{/each}}
                                 </select>
                                 <div class="form-text">Ο Οργανισμός στον οποίο ανήκει ο χρήστης</div>
@@ -75,7 +75,7 @@
                                         <option value="{{this.name}}" {{#if (includes ../userDetails.scope this.name)}}selected{{/if}}>{{this.displayName}}</option>
                                     {{/each}}
                                 </select>
-                                <div class="form-text">Καθορίζει τις λειτουργίες στις οποίες έχει πρόσβαση ο χρήστης. Πατήστε Ctrl για πολλαπλή επιλογή.</div>
+                                <div class="form-text">Καθορίζει τις λειτουργίες στις οποίες έχει πρόσβαση ο χρήστης. Πατήστε Ctrl/Shift για πολλαπλή επιλογή.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editUserPassword" class="form-label fw-bold">{{#if isNew}}Password *{{else}}Νέο Password{{/if}}</label>
@@ -191,12 +191,28 @@ document.addEventListener('DOMContentLoaded', function() {
         Q('#editUserScope').disabled = !canHaveScope;
         Q('#editUserScope').required = canHaveScope;
         if (!canHaveScope) Q('#editUserScope option').forEach(option => option.selected = false);
+
+        updateScopeOptions();
+    }
+
+    // Εμφάνιση μόνο των scope options που υποστηρίζει ο επιλεγμένος οργανισμός
+    function updateScopeOptions() {
+        const selectedOption = Q('#editUserOrganization').options[Q('#editUserOrganization').selectedIndex];
+        const orgScope = JSON.parse(selectedOption?.dataset.scope || 'null');
+
+        Q('#editUserScope option').forEach(option => {
+            const visible = !orgScope || orgScope.includes(option.value);
+            Q(`#editUserScope [value=${option.value}]`).show(visible);
+            if (!visible) option.selected = false;
+        });
     }
     
     // Ενημέρωση κατά τη φόρτωση της σελίδας
     updateRoleFields();
     // Ενημέρωση με κάθε αλλαγή του ρόλου
     Q('#editUserRole').on('change', updateRoleFields);
+    // Ενημέρωση scope options με κάθε αλλαγή οργανισμού
+    Q('#editUserOrganization').on('change', updateScopeOptions);
     
     // Form για επεξεργασία/δημιουργία χρήστη
     Q('#form').on('submit', async function(e) {

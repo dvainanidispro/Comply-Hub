@@ -127,7 +127,8 @@ let createAccessToken = (user, forMagicLink=false) => {
         name: user.name,
         role: user?.role??null,
         org: user?.organizationId??'any',
-        scope: user?.scope??[],
+        // Το scope θα είναι η τομή (κοινά στοιχεία) του user.scope και organization.scope
+        scope: (user?.scope ?? []).filter(s => (user?.organization?.scope ?? []).includes(s)),
         // customClaims: {  },  // name, email, username, roles, permissions
     }, jwtsecret, {expiresIn: forMagicLink ? linkExpirationTime : tokenExpirationTime});
 };

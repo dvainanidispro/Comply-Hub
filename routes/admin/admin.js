@@ -225,7 +225,8 @@ admin.put('/users/:id', async (req, res) => {
                 email: user.email,
                 name: user.name,
                 role: user.role,
-                active: user.active
+                active: user.active,
+                scope: user.scope,
             }
         });
     } catch (error) {
@@ -293,11 +294,13 @@ admin.delete('/users/:id', async (req, res) => {
 admin.get('/organizations', async (req, res) => {
     try {
         const organizations = await Models.Organization.findAll({
-            attributes: ['id', 'name', 'active'],
+            attributes: ['id', 'name', 'scope', 'active'],
+            order: [['id', 'ASC']],
         });
 
         res.render('admin/organizations', {
             organizations,
+            scopes,
             user: req.user,
             title: 'Διαχείριση Οργανισμών'
         });
@@ -314,6 +317,7 @@ admin.get('/organizations/new', (req, res) => {
     res.render('admin/single-organization', {
         isNew: true,
         orgDetails: {},
+        scopes,
         user: req.user,
         title: 'Νέος Οργανισμός'
     });
@@ -326,7 +330,7 @@ admin.get('/organizations/:id', async (req, res) => {
     try {
         const orgId = parseInt(req.params.id);
         const org = await Models.Organization.findByPk(orgId, {
-            attributes: ['id', 'name', 'active'],
+            attributes: ['id', 'name', 'scope', 'active'],
             raw: true
         });
 
@@ -337,6 +341,7 @@ admin.get('/organizations/:id', async (req, res) => {
         res.render('admin/single-organization', {
             isNew: false,
             orgDetails: org,
+            scopes,
             user: req.user,
             title: `Επεξεργασία Οργανισμού: ${org.name}`
         });
@@ -352,6 +357,7 @@ admin.get('/organizations/:id', async (req, res) => {
 admin.post('/organizations', async (req, res) => {
     try {
         const { name, active } = req.body;
+        const scope = req.body.scope ? [].concat(req.body.scope) : [];
 
         if (!name) {
             return res.status(400).json({ success: false, message: 'Το πεδίο Όνομα είναι υποχρεωτικό' });
@@ -364,6 +370,7 @@ admin.post('/organizations', async (req, res) => {
 
         const newOrg = await Models.Organization.create({
             name,
+            scope,
             active: active !== 'false' && active !== false,
         });
 
@@ -384,6 +391,7 @@ admin.put('/organizations/:id', async (req, res) => {
     try {
         const orgId = parseInt(req.params.id);
         const { name, active } = req.body;
+        const scope = req.body.scope ? [].concat(req.body.scope) : [];
 
         const org = await Models.Organization.findByPk(orgId);
         if (!org) {
@@ -401,6 +409,7 @@ admin.put('/organizations/:id', async (req, res) => {
 
         await org.update({
             name: name || org.name,
+            scope,
             active: active === 'true' || active === true,
         });
 

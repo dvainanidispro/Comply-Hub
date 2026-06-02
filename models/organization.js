@@ -9,6 +9,7 @@ const Organization = db.define('organization',
             autoIncrement: true
         },
         name: DataTypes.STRING,
+        scope: { type: DataTypes.ARRAY(DataTypes.STRING), defaultValue: [] }, 
         active: DataTypes.BOOLEAN,
     },
     {
