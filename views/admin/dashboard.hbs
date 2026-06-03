@@ -1,1 +1,58 @@
 <h1>To Dashboard του Κεντρικού Διαχειριστή</h1>
+
+<div class="row g-4 mt-3">
+
+{{!-- Κατανομή χρηστών ανά ρόλο --}}
+    <div class="col-md-12 col-xl-6">
+        <a class="card bg-indigo h-100 dashboard-card" href="/admin/users">
+            <div class="card-body px-4">
+                <div class="dashboard-top">
+                    <div>
+                        <h2 class="mb-0 display-4 fw-semibold">{{users.length}}</h2>
+                        <p class="mb-0">Ενεργοί χρήστες </p>
+                    </div>
+                    <div>
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="card-body pt-2 px-0">
+                <div class="row text-center gap-0">
+                    <div class="col">
+                        <h6 class="mb-1">Διαχειριστές</h6>
+                        <h3 class="mb-0">{{usersByRole.admin.length}}</h3>
+                    </div>
+                    <div class="col">
+                        <h6 class="mb-1">Κεντρικοί υπεύθυνοι</h6>
+                        <h3 class="mb-0">{{usersByRole.central.length}}</h3>
+                    </div>
+                    <div class="col">
+                        <h6 class="mb-1">Υπεύθυνοι Οργανισμών</h6>
+                        <h3 class="mb-0">{{usersByRole.manager.length}}</h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+
+    {{!-- Ενεργoί Οργανισμοί --}}
+    <div class="col-md-6 col-xl-3">
+        <a class="card bg-success h-100 dashboard-card" href="/admin/organizations">
+            <div class="card-body px-4">
+                <div class="dashboard-top">
+                    <div>
+                        <h2 class="mb-0 display-4 fw-semibold">{{organizations.length}}</h2>
+                        <p class="mb-0">Ενεργoί Οργανισμοί</p>
+                    </div>
+                    <div>
+                        <i class="bi bi-building"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+
+</div>
