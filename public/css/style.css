@@ -425,6 +425,10 @@
     .bg-blue-light{
         background-color: hsl(210, 100%, 86%) !important;
     }
+    .bg-green{
+        background-color: hsl(123, 50%, 43%) !important;
+        color: var(--bs-light) !important;
+    }
 
     a.text-primary, .btn-outline-primary, .btn-outline-primary i{
         color: #04c !important;

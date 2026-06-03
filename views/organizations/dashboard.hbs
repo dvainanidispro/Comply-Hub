@@ -1,1 +1,153 @@
-<h1>To Dashboard του Οργανισμού: {{org.name}}</h1>
+<h1>{{org.name}} - Dashboard</h1>
+
+<div class="row g-4 mt-2">
+
+    {{!-- NIS2 --}}
+    {{#if (scope "nis2")}}
+    <div class="col-md-10">
+        <div class="card h-100">
+            <div class="card-header">
+                <h2 class="mb-0 fw-semibold">
+                    <span><i class="bi bi-shield-shaded"></i></span>
+                    <span>NIS2</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-4">
+                        <a class="card bg-blue h-100 dashboard-card" href="/organization/frameworks/nis2/policies">
+                            <div class="card-body px-4">
+                                <div class="dashboard-top">
+                                    <div>
+                                        <h2 class="mb-0 display-4 fw-semibold">{{nis2.policies.active}}</h2>
+                                        <p class="mb-0">Ενεργές Πολιτικές</p>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="card-body pt-2 px-0">
+                                <div class="row text-center gap-0">
+                                    <div class="col">
+                                        <h6 class="mb-1">Προσχέδια</h6>
+                                        <h3 class="mb-0">{{nis2.policies.draft}}</h3>
+                                    </div>
+                                    <div class="col">
+                                        <h6 class="mb-1">Όλες</h6>
+                                        <h3 class="mb-0">{{nis2.policies.total}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a class="card bg-green h-100 dashboard-card" href="/organization/frameworks/nis2/procedures">
+                            <div class="card-body px-4">
+                                <div class="dashboard-top">
+                                    <div>
+                                        <h2 class="mb-0 display-4 fw-semibold">{{nis2.procedures.active}}</h2>
+                                        <p class="mb-0">Ενεργές Διαδικασίες</p>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="card-body pt-2 px-0">
+                                <div class="row text-center gap-0">
+                                    <div class="col">
+                                        <h6 class="mb-1">Προσχέδια</h6>
+                                        <h3 class="mb-0">{{nis2.procedures.draft}}</h3>
+                                    </div>
+                                    <div class="col">
+                                        <h6 class="mb-1">Όλες</h6>
+                                        <h3 class="mb-0">{{nis2.procedures.total}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+    {{!-- GDPR --}}
+    {{#if (scope "gdpr")}}
+    <div class="col-md-10">
+        <div class="card h-100">
+            <div class="card-header">
+                <h2 class="mb-0 fw-semibold">
+                    <span><i class="bi bi-person-square"></i></span>
+                    <span>GDPR</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-4">
+                        <a class="card bg-blue h-100 dashboard-card" href="/organization/frameworks/gdpr/policies">
+                            <div class="card-body px-4">
+                                <div class="dashboard-top">
+                                    <div>
+                                        <h2 class="mb-0 display-4 fw-semibold">{{gdpr.policies.active}}</h2>
+                                        <p class="mb-0">Ενεργές Πολιτικές</p>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="card-body pt-2 px-0">
+                                <div class="row text-center gap-0">
+                                    <div class="col">
+                                        <h6 class="mb-1">Προσχέδια</h6>
+                                        <h3 class="mb-0">{{gdpr.policies.draft}}</h3>
+                                    </div>
+                                    <div class="col">
+                                        <h6 class="mb-1">Όλες</h6>
+                                        <h3 class="mb-0">{{gdpr.policies.total}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a class="card bg-green h-100 dashboard-card" href="/organization/frameworks/gdpr/procedures">
+                            <div class="card-body px-4">
+                                <div class="dashboard-top">
+                                    <div>
+                                        <h2 class="mb-0 display-4 fw-semibold">{{gdpr.procedures.active}}</h2>
+                                        <p class="mb-0">Ενεργές Διαδικασίες</p>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="card-body pt-2 px-0">
+                                <div class="row text-center gap-0">
+                                    <div class="col">
+                                        <h6 class="mb-1">Προσχέδια</h6>
+                                        <h3 class="mb-0">{{gdpr.procedures.draft}}</h3>
+                                    </div>
+                                    <div class="col">
+                                        <h6 class="mb-1">Όλες</h6>
+                                        <h3 class="mb-0">{{gdpr.procedures.total}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+</div>

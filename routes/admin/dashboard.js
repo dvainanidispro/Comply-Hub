@@ -19,7 +19,9 @@ dashboard.get(['/', '/dashboard'],
             organizations,
             users,
             usersByRole
-        });
+        }
+        
+    );
 });
 
 
