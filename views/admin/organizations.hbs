@@ -20,9 +20,9 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th class="sortable">ID</th>
-                                    <th class="sortable">Όνομα</th>
+                                    <th class="sortable">Επωνυμία</th>
                                     <th class="sortable">Λειτουργίες</th>
-                                    <th class="sortable">Ενεργό</th>
+                                    <th class="sortable">Ενεργός</th>
                                     <th>Επεξεργασία</th>
                                 </tr>
                             </thead>
@@ -31,7 +31,11 @@
                                 <tr>
                                     <td>{{this.id}}</td>
                                     <td class="fw-semibold">{{this.name}}</td>
-                                    <td>{{this.scope}}</td>
+                                    <td>
+                                        {{join (labels this.scope)}}
+                                        {{!-- {{check (includes this.scope 'nis2') 'NIS2' ''}}
+                                        {{check (includes this.scope 'gdpr') 'GDPR' ''}} --}}
+                                    </td>
                                     <td>
                                         {{#if this.active}}
                                             <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>

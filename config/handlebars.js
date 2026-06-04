@@ -18,7 +18,7 @@ const handlebarsConfig = {
         eq: (a, b) => a == b, 
         and: (...args) => args.slice(0, -1).every(Boolean), // Handlebars 'and' helper
         /* Check if array includes a value: {{#if (includes array 'value')}} */
-        includes: (array, value) => Array.isArray(array) && array.includes(value),
+        includes: (array, value) => array.includes(value),
         /* example: {{check variable.length variable 'empty'}} */
         check: (condition, valueIfTrue, valueIfFalse) => condition ? valueIfTrue : valueIfFalse,
         /* example: {{or a b c}}, it needs c (Handlebars doesn't pass undefined). Use '' as third argument. */
@@ -35,7 +35,9 @@ const handlebarsConfig = {
         /* example: {{#each (array 1 2 3)}} */
         array: (...items) => items.slice(0, -1), // -1: Remove the Handlebars context object
         /* example {{join 'a' 'b' 'c'}} => a, b, c */
-        join: (...items) => items.slice(0, -1).filter(Boolean).join(', '),
+        // join: (...items) => items.slice(0, -1).filter(Boolean).join(', '),
+        /* example {{join ['a', 'b', 'c']}} => a, b, c */
+        join: (array) => array.filter(Boolean).join(', '),
         euro: (price) => new Intl.NumberFormat('el-GR', {style: 'currency', currency: 'EUR'}).format(price),
         time: (date) => {
             if (!date) return '';
@@ -133,12 +135,16 @@ const handlebarsConfig = {
             return labels[category]?.[value] ?? '';
         },
         /** Επιστρέφει array [{value, name}] για οποιαδήποτε κατηγορία labels (εκτός από functions), χρήσιμο για {{#each}} στα views.
-         * example: {{#each (labelEntries 'leaveType')}} */
+         * example: {{#each (labelEntries 'policyStatus')}} */
         labelEntries: (category) => {
             const map = labels[category];
             if (!map || typeof map === 'function') return [];
             return Object.entries(map).map(([value, name]) => ({ value, name }));
         },
+        /** Μαζική μετάφραση στοιχείων array με βάση το labels.general.
+         * Example: {{join (labels ['nis2','gdpr'])}}  => {{join ['NIS2', 'GDPR']}} */
+        labels: (array) => array.map(item=>labels.general[item] ?? item),
+        env: (variable) => process.env[variable] ?? '',
     }
 };
 
