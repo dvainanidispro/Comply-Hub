@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Models from '../../models/models.js';
+import Cache from '../../models/cache.js';
 import log from '../../lib/logger.js';
 
 const dashboard = Router();
@@ -19,6 +20,9 @@ const buildStats = (allPolicies, framework, type) => {
 dashboard.get(['/', '/dashboard'], 
     async(req, res) => {
         try {
+
+            const organization = (await Cache.map.Organization).get(req.org);
+
             const allPolicies = await Models.Policy.findAll({
                 where: { organizationId: req.org },
                 attributes: ['framework', 'type', 'status'],
@@ -28,6 +32,7 @@ dashboard.get(['/', '/dashboard'],
             res.render('organizations/dashboard', {
                 layout: 'main',
                 user: req.user,
+                organization,
                 nis2: {
                     policies: buildStats(allPolicies, 'NIS2', 'policy'),
                     procedures: buildStats(allPolicies, 'NIS2', 'procedure'),

@@ -3,7 +3,7 @@
 <div class="row g-4 mt-2">
 
     {{!-- NIS2 --}}
-    {{#if (scope "nis2")}}
+    {{#if (and (scope "nis2") (includes organization.scope "nis2"))}}
     <div class="col-md-10">
         <div class="card h-100">
             <div class="card-header">
@@ -77,7 +77,7 @@
     {{/if}}
 
     {{!-- GDPR --}}
-    {{#if (scope "gdpr")}}
+    {{#if (and (scope "gdpr") (includes organization.scope "gdpr"))}}
     <div class="col-md-10">
         <div class="card h-100">
             <div class="card-header">
