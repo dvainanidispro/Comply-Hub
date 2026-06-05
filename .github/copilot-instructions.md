@@ -44,11 +44,13 @@
 - Relationships and `sequelize.sync()` logic go into `models.js` not into each model file.
 - Export a unified `Models` object from `models.js` (e.g., `Models.User`, `Models.Organization`).
 - Τα indexes να δηλώνονται στο πεδίο `indexes` του model, όχι σε κάθε πεδίο ξεχωριστά. Μην ξεχνάς, όταν βάζεις σύνθετο index, να του δίνεις name, διότι σε κάθε `db.sync()` θα δημιουργείται επιπλέον duplicate index. 
-- Υπάρχει ένα "model" `Cache` με πρόσβαση μέσω `await Cache.table.ModelName` (επιστρέφει array με records), `await Cache.map.ModelName` (επιστρέφει `Map<id, record>` για γρήγορη αναζήτηση), και `Cache.refresh(modelName)` για ανανέωση του cache. Αν το model έχει πεδίο `active`, τότε επιστρέφονται μόνο τα active records. Χρησιμοποίησε το για δεδομένα που δεν αλλάζουν συχνά και εμφανίζονται σε πολλές σελίδες (πχ Departments, Users) για παράδειγμα ως dropdown lists. Μην χρησιμοποιείς cache στις σελίδες διαχείρισης των ίδιων των δεδομένων (πχ /admin/departments, /admin/users/) ώστε σε αυτές να εμφανίζονται και τα inactive records. Το `Cache` είναι το μόνο που γίνεται απευθείας import από το `models/cache.js` και όχι μέσω του `models/models.js`.
+- Υπάρχει ένα "model" `Cache` με πρόσβαση μέσω `await Cache.table.ModelName` (επιστρέφει array με records), `await Cache.map.ModelName` (επιστρέφει `Map<id, record>` για γρήγορη αναζήτηση), και `Cache.refresh(modelName)` για ανανέωση του cache. Αν το model έχει πεδίο `active`, τότε επιστρέφονται μόνο τα active records. Χρησιμοποίησε το για δεδομένα που δεν αλλάζουν συχνά και εμφανίζονται σε πολλές σελίδες (πχ Departments, Users) για παράδειγμα ως dropdown lists. Μην χρησιμοποιείς cache στις σελίδες διαχείρισης των ίδιων των δεδομένων (πχ /admin/departments, /admin/users/) ώστε σε αυτές να εμφανίζονται και τα inactive records. 
+- Υπάρχει ένα model `Setting` για αποθήκευση ρυθμίσεων ή άλλων παραμέτρων της εφαρμογής. Για αυτό κάνουμε χρήση του utility `Settings` που εξάγεται από το αρχείο `models/setting.js` με χρήση `await Settings.get('settingName')` και `await Settings.set('settingName', value)`.
+- Το `Cache` και το `Settings` γίνονται απευθείας import από τα αρχεία τους. Όλα τα άλλα models γίνονται import μέσω του `models/models.js`. 
 
 ## Storage
 - Χρήση `multer` για τη διαχείριση των ανεβάσματος αρχείων.
-- Αποθήκευση των αρχείων στον τοπικό δίσκο μέσα στο φάκελο `storage/`. H διαχείριση των αρχείων γίνεται μέσω του utility `Storage` από το `utils/storage.js`.
+- Αποθήκευση των αρχείων στον τοπικό δίσκο μέσα στο φάκελο `storage/`. H διαχείριση των αρχείων γίνεται μέσω του utility `Storage` από το `utils/storage.js`. To ut
 - Δεν υπάρχουν δημόσια προσβάσιμα αρχεία. Φρόντισε τα αρχεία να μην μπορούν να προσπελαστούν χωρίς authentication. 
 
 ## Coding Practices
