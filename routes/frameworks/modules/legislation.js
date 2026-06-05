@@ -15,8 +15,6 @@ import Storage from '../../../lib/storage.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-const decodeFilename = name => Buffer.from(name, 'latin1').toString('utf8');
-
 /**
  * Δημιουργεί router για διαχείριση νομοθεσίας ενός συγκεκριμένου framework.
  * @param {string} framework - Το αναγνωριστικό του framework (π.χ. 'NIS2', 'GDPR').
@@ -87,9 +85,7 @@ export function manageLegislationRouter(framework, label) {
 
             let storedFileName = null;
             if (req.file) {
-                const decodedName = decodeFilename(req.file.originalname);
-                await Storage.store(resourcePath, { ...req.file, originalname: decodedName });
-                storedFileName = decodedName;
+                storedFileName = await Storage.store(resourcePath, req.file);
             }
 
             await Models.Legislation.create({
@@ -137,9 +133,7 @@ export function manageLegislationRouter(framework, label) {
                 active: active === 'true' || active === true,
             };
             if (req.file) {
-                const decodedName = decodeFilename(req.file.originalname);
-                await Storage.store(resourcePath, { ...req.file, originalname: decodedName });
-                updateData.file = decodedName;
+                updateData.file = await Storage.store(resourcePath, req.file);
             } else if (req.body.clearFile === 'true') {
                 updateData.file = null;
             }

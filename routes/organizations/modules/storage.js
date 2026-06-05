@@ -83,9 +83,8 @@ export function manageStorageRouter(framework, resourceType, resourceParamName =
     router.post('/upload', upload.single('file'), async (req, res) => {
         try {
             const folderPath = resourcePath(req);
-            req.file.originalname = Buffer.from(req.file.originalname, 'latin1').toString('utf8');  // Σωστά ελληνικά ονόματα αρχείων
-            await Storage.store(folderPath, req.file);
-            log.info(`Ανέβηκε αρχείο στο: ${folderPath}`);
+            const storedFileName = await Storage.store(folderPath, req.file);
+            log.info(`Ανέβηκε αρχείο στο: ${folderPath}/${storedFileName}`);
             res.json({ success: true, message: 'Το αρχείο ανέβηκε επιτυχώς.' });
         } catch (error) {
             if (error?.code === Storage.errorCodes.duplicateFile) {
