@@ -799,6 +799,10 @@
         white-space: nowrap;
     } */
 
+    .fixed-rows{
+        table-layout: fixed;
+    }
+
 
     @media (width < 1580px) {
         .narrow-cell-xs{

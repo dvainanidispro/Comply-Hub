@@ -125,19 +125,19 @@
                     <p x-show="!loading && !files.length" class="text-muted small mb-3">Δεν υπάρχουν ανεβασμένα αρχεία.</p>
 
                     <div x-show="!loading && files.length > 0" class="mb-3">
-                        <table class="table table-sm table-hover">
+                        <table class="table table-sm fixed-rows table-hover">
                             <thead x-cloak x-show="files.length">
                                 <tr>
                                     <th>Αρχείο</th>
-                                    <th class="text-end">Μέγεθος</th>
-                                    <th class="text-end">Ανέβηκε</th>
-                                    <th class="text-end">Ενέργειες</th>
+                                    <th class="text-end" style="width: 10ch">Μέγεθος</th>
+                                    <th class="text-end" style="width: 15ch">Ανέβηκε</th>
+                                    <th class="text-end" style="width: 35ch">Ενέργειες</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="file in files" :key="file.name">
                                     <tr>
-                                        <td class="align-middle">
+                                        <td class="align-middle text-truncate" :title="file.name">
                                             <i class="bi bi-file-earmark me-1 text-muted"></i>
                                             <span x-text="file.name"></span>
                                         </td>
