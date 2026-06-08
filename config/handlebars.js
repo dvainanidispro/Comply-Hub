@@ -37,7 +37,7 @@ const handlebarsConfig = {
         /* example {{join 'a' 'b' 'c'}} => a, b, c */
         // join: (...items) => items.slice(0, -1).filter(Boolean).join(', '),
         /* example {{join ['a', 'b', 'c']}} => a, b, c */
-        join: (array) => array.filter(Boolean).join(', '),
+        join: (array) => (array??[]).filter(Boolean).join(', '),
         euro: (price) => new Intl.NumberFormat('el-GR', {style: 'currency', currency: 'EUR'}).format(price),
         time: (date) => {
             if (!date) return '';
@@ -143,7 +143,7 @@ const handlebarsConfig = {
         },
         /** Μαζική μετάφραση στοιχείων array με βάση το labels.general.
          * Example: {{join (labels ['nis2','gdpr'])}}  => {{join ['NIS2', 'GDPR']}} */
-        labels: (array) => array.map(item=>labels.general[item] ?? item),
+        labels: (array) => ((array??[]).map(item=>labels.general[item] ?? item)),
         env: (variable) => process.env[variable] ?? '',
     }
 };

@@ -138,7 +138,7 @@ admin.post('/users', async (req, res) => {
             role: role || 'user',
             organizationId: organizationId || null,
             active: active !== 'false' && active !== false,
-            scope,
+            scope: scope ?? [],
         });
         
         log.success(`Νέος χρήστης δημιουργήθηκε: ${newUser.email} (ID: ${newUser.id})`);
@@ -201,7 +201,7 @@ admin.put('/users/:id', async (req, res) => {
             name: name || user.name,
             role: role || user.role,
             organizationId: organizationId || null,
-            scope,
+            scope: scope ?? [],
         };
         
         if (active !== undefined) {

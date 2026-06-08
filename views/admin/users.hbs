@@ -24,6 +24,7 @@
                                     <th class="sortable">Email</th>
                                     <th class="sortable">Ρόλος</th>
                                     <th class="sortable">Οργανισμός</th>
+                                    <th class="sortable">Λειτουργίες</th>
                                     <th class="sortable">Ενεργός</th>
                                     {{!-- <th class="">Δημιουργία</th> --}}
                                     <th class="">Επεξεργασία</th>
@@ -49,6 +50,7 @@
                                         </span>
                                     </td>
                                     <td>{{or this.organization.name '-'}}</td>
+                                    <td>{{join (labels this.scope)}}</td>
                                     <td>
                                         {{#if this.active}}
                                             <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>
