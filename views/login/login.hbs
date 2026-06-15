@@ -18,8 +18,8 @@
                     <h1 class="text-center mb-4">ComplyHub</h1>
 					{{!-- <h2 class="card-title text-center mb-4">Είσοδος</h2> --}}
 					<form action="/login" method="POST" autocomplete="off">
-                        <wa-input class="my-3" label="E-mail" name="email"></wa-input>
-                        <wa-input class="my-3" label="Κωδικός πρόσβασης" type="password" name="password" password-toggle></wa-input>
+                        <wa-input class="my-3" label="E-mail" name="email" required></wa-input>
+                        <wa-input class="my-3" label="Κωδικός πρόσβασης" type="password" name="password" password-toggle required></wa-input>
 						<div class="mt-4 text-end">
                             <wa-button variant="brand" type="submit" >Είσοδος </wa-button>
                         </div>

@@ -6,28 +6,29 @@ import helmet from "helmet";
  * Defaults: https://www.npmjs.com/package/helmet
  */
 const SecurityHelmet = helmet({
-    contentSecurityPolicy: {
+    contentSecurityPolicy: false,
+    /*contentSecurityPolicy: {
         directives: {
             "default-src": ["'self'"],
-            "style-src": ["'self'", "https:", "'unsafe-inline'"],
-            "script-src": ["'self'", "www.gstatic.com", "ajax.googleapis.com", "cdn.jsdelivr.net", "cdn.sheetjs.com", "'unsafe-inline'", "'unsafe-eval'"], // 'unsafe-eval' for Alpine
+            "style-src": ["'self'", "https:", "'unsafe-inline'", "ka-f.webawesome.com"],
+            "script-src": ["'self'", "ka-f.webawesome.com", "www.gstatic.com", "ajax.googleapis.com", "cdn.jsdelivr.net", "cdn.sheetjs.com", "'unsafe-inline'", "'unsafe-eval'"], // 'unsafe-eval' for Alpine
             "script-src-attr": ["'unsafe-inline'"],     // 'none' prevent scripts in html attributes (onclick, img onerror, etc.)
             "img-src": ["*", "data:"],      // without "data:", we get a Bootstrap svg error
             upgradeInsecureRequests: [],
         },
-    },
+    },*/
     referrerPolicy: { policy: "same-origin" },    // strict-origin-when-cross-origin (default) |  same-origin
     xFrameOptions: { action: "deny" },               // X-Frame-Options, deny framing
-    crossOriginEmbedderPolicy: true,        // if true, everything on my page is CORS (crossorigin="anonymous")
+    // crossOriginEmbedderPolicy: true,        // if true, everything on my page is CORS (crossorigin="anonymous")
     // crossOriginResourcePolicy: { policy: "same-site" },  // CORP: same-site (default) | same-origin | cross-origin
-    // helmet also sets: Strict-Transport-Security, X-Content-Type-Options, X-XSS-Protection
+    // helmet also sets by default: Strict-Transport-Security, X-Content-Type-Options, X-XSS-Protection
 });
 
 /**
  * Custom middleware for additional security headers.
  */
 const SecurityHeaders = (req, res, next) => {
-    res.header('Permissions-Policy', "camera=(),microphone=(),fullscreen=*, clipboard-write=*");       // do not allow these with =()
+    res.header('Permissions-Policy', "camera=(),microphone=(),fullscreen=*, clipboard-write=*");       // do not allow those with =()
     // res.header('Access-Control-Allow-Origin', "*");             // The * is safe, unless you run it on an intranet
     return next();
 };

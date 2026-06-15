@@ -91,6 +91,7 @@ let validatePassword = async (password, hashedPassword) => {
 
 /** Ανακτά τον χρήστη από τη βάση δεδομένων με βάση το email */
 let dbUser = async (email) => {
+    if (!email) return null;
     let user = await Models.User.findOne({
         where: {email: email.toLowerCase(), active: true},
         // case sensitive! for case insensitive comparison use:
@@ -147,14 +148,14 @@ let renewAccessToken = async (oldDecodedToken) => {
 /** Ελέγχει το email και το password που πληκτρολόγησε ο χρήστης στη φόρμα και του στέλει το Access Token σε Cookie */
 let validateCredentials = async (req, res, next) => {
     let body = req.body;
-    let user = await getUserFromDatabaseByCredentials(body.email,body.password);
+    let user = await getUserFromDatabaseByCredentials(body?.email, body?.password);
     if (user) {
         /** To JWT Token που θα σταλεί στον χρήστη */
         let token = createAccessToken(user);
         res.cookie(cookieName, token, cookieOptions);
         req.user = user;
     } else {
-        log.warn(`Wrong email/password: ${body.email} ${body.password} `);
+        log.warn(`Wrong email/password: ${body?.email} ${body?.password} `);    //TODO: remove password from log
     }
     next();
 };

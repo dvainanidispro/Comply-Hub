@@ -7,7 +7,7 @@ import express from 'express';
 import handlebarsEngine from './config/handlebars.js';
 import cookieParser from 'cookie-parser';
 import log from './lib/logger.js';
-// import Security from "./config/security.js";
+import Security from "./config/security.js";
 
 const server = express();
 // server.set('trust proxy', 1);
@@ -20,7 +20,7 @@ server.use(express.static('public'));
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 server.use(cookieParser());
-// server.use(Security);
+server.use(Security);
 
 
 
