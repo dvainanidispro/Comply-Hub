@@ -550,6 +550,10 @@
     .modal.show .modal-dialog {
         animation: modal-slide-in 0.25s ease-out forwards;
     }
+
+    select[multiple] option:checked {
+        background-color: hsl(200, 100%, 80%);
+    }
     
     /* Cards */
     .card{
