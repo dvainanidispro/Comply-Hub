@@ -5,10 +5,18 @@
 
 ## Περιγραφή εφαρμογής
 Η εφαρμογή είναι ένα σύστημα διαχείρισης συμμόρφωσης για οργανισμούς. Οι χρήστες μπορούν να διαχειριστούν τα compliance frameworks που ακολουθούν, να δουν τα αντικείμενα συμμόρφωσης που τους αφορούν, και να ανεβάσουν αποδεικτικά στοιχεία για την εκπλήρωση των απαιτήσεων. Υπάρχει επίσης ένα σύστημα ρόλων και δικαιωμάτων για τον έλεγχο της πρόσβασης σε διάφορα μέρη της εφαρμογής.
+Τα frameworks που υποστηρίζονται προς το παρόν είναι το NIS2 και το GDPR, αλλά η εφαρμογή σχεδιάζεται ώστε να μπορεί να υποστηρίξει οποιοδήποτε framework με βάση ένα ευέλικτο data model.
 
-### Δυνατότητες
+### Δυνατότητες για τους οργανισμούς
 - Διαχείριση πολιτικών και διαδικασιών συμμόρφωσης.
-- Περιοδικά tasks για την υπενθύμιση των χρηστών για τις απαιτήσεις που πρέπει να εκπληρώσουν.
+- Ενημέρωση για τη σχετική νομοθεσία και κανονισμούς.
+- Περιοδική αξιολόγηση συμμόρφωσης με χρήση δεικτών απόδοσης (KPI).
+- Εργαλεία αυτοαξιολόγησης.
+- Τήρηση καταλόγου αγαθών.
+- Εκτίμηση κινδύνων. 
+<!-- - Αξιολόγηση συμμόρφωσης δραστηριοτήτων οργανισμού.  -->
+<!-- - Διαχείριση ελέγχων (Controls) -->
+<!-- - Περιοδικά tasks για την υπενθύμιση των χρηστών για τις απαιτήσεις που πρέπει να εκπληρώσουν. -->
 - Οι υπόλοιπες δυνατότητες θα καθορίζονται στην πορεία.
 
 ## Δικαιώματα Πρόσβασης
@@ -36,8 +44,7 @@
   - `services/` for scripts that run tasks, for example cron jobs, using `npm run <script>` commands. For a job, create a separate file (in `services` or `controllers`) with the function and import it into the script file. The script file should only execute the function. So, the function can be reused elsewhere if needed.
   - `storage/` for uploaded files if needed.
   - `public/storage/` for serving publicly available uploaded files if needed.
-
-
+  
 ## Database
 - Use `Sequelize` with `PostgreSQL`.
 - Define each model in a separate file in the `models/` folder.
@@ -68,6 +75,7 @@
 
 ## Code Formatting
 - Use semicolons at the end of statements.
+- In if statements, always use curly braces, even for single-line blocks. Especially, in small single-line if statements, you can put the whole block in the same line, but always use curly braces. For example, `if (condition) { doSomething(); }`.
 - Use four spaces for indentation.
 - Use trailing commas in multi-line objects and arrays.
 
@@ -102,4 +110,4 @@
 - Don't add routes or controller logic directly inside `server.js` for large apps.
 
 ## Αλλαγές
-Αν δεις ότι υλοποιούμε κάτι που αλλάζει τις παραπάνω οδηγίες (copilot-instructions.md), πες μου να τις αλλάξουμε για να είναι ενημερωμένες.
+Αν δεις ότι υλοποιούμε κάτι που αλλάζει τις παραπάνω οδηγίες (copilot-instructions.md), πες μου να τις αλλάξουμε για να είναι ενημερωμένες. 
