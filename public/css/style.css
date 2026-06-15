@@ -57,6 +57,7 @@
     html {
         scroll-behavior: smooth;
         scroll-padding-top: 3rem;
+        background-color: var(--bs-body-bg);
     }
 
 
@@ -328,6 +329,13 @@
 /****************      THEME LAYER      ******************/
 @layer theme {
 
+    .brand-name{
+        font-weight: 800;
+        color: var(--bs-heading-color);
+        .brand-accent{
+            color: var(--wa-color-brand-500);
+        }
+    }
 
     .bi {
         line-height: 1;
