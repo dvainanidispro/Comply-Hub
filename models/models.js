@@ -4,6 +4,9 @@ import { PolicyType } from "./policy_type.js";
 import { Policy } from "./policy.js";
 import { Legislation } from "./legislation.js";
 import { Setting } from "./setting.js";
+import { KpiTemplate } from "./kpi_template.js";
+import { Kpi } from "./kpi.js";
+
 import { db } from '../config/database.js';
 import log from '../lib/logger.js';
 
@@ -15,6 +18,9 @@ Organization.hasMany(User, { foreignKey: 'organizationId', as: 'organization' })
 
 Policy.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
 Organization.hasMany(Policy, { foreignKey: 'organizationId', as: 'policies' });
+
+Kpi.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+Organization.hasMany(Kpi, { foreignKey: 'organizationId', as: 'kpis' });
 
 Policy.belongsTo(PolicyType, { foreignKey: 'policyTypeId', as: 'policyType' });
 PolicyType.hasMany(Policy, { foreignKey: 'policyTypeId', as: 'policies' });
@@ -48,5 +54,7 @@ export default {
     PolicyType,
     Policy,
     Legislation,
+    KpiTemplate,
+    Kpi,
     Setting, // αν και κάνουμε χρήση του utility Settings
 };
