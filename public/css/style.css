@@ -437,6 +437,9 @@
         background-color: hsl(123, 50%, 43%) !important;
         color: var(--bs-light) !important;
     }
+    .bg-lavender-light{
+        background-color: hsl(240, 55%, 92%) !important;
+    }
 
     a.text-primary, .btn-outline-primary, .btn-outline-primary i{
         color: #04c !important;
@@ -698,6 +701,12 @@
         margin-left: 0.5rem;
     }
 
+    .input-group-text.input-symbol{
+        min-width: 5ch;
+        justify-content: center;
+        background-color: hsl(240, 67%, 96%);
+    }
+
 }
 /* Τέλος components layer */
 
@@ -762,6 +771,9 @@
     }
     .g-3{
         gap: 1rem;
+    }
+    .g-4{
+        gap: 1.5rem;
     }
 
     .shake-it{

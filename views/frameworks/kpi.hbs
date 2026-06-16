@@ -1,0 +1,389 @@
+<script>
+window.kpiTemplates = {{{objectify kpiTemplates}}};
+window.baseUrl = '{{baseUrl}}';
+</script>
+
+<div class="container-fluid" x-data="kpiApp()">
+
+    <!-- Πίνακας KPI templates -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        {{title}}
+                    </h1>
+                </div>
+                <div class="card-body d-flex flex-column gap-4 py-4">
+                    <template x-for="row in rows" :key="row.id">
+                        <div class="card " :class="!row.active ? 'bg-secondary-light' : 'bg-lavender-light'">
+                            <!-- Επικεφαλίδα KPI -->
+                            <div class="card-body pb-0" :class="!row.active ? 'text-muted' : ''">
+                                <h4 class="mb-0" x-text="row.code + ' | ' + row.name" :class="!row.active ? 'text-secondary' : ''"></h4>
+                            </div>
+                            <!-- Φόρμα πεδίων -->
+                            <div class="card-body d-flex g-4" :class="!row.active ? 'text-muted' : ''">
+                                <div class="flex-grow-1 d-flex flex-column gap-3">
+                                    <!-- Γραμμή 1: Κωδικός, Όνομα, Σειρά, Ενεργό -->
+                                    <div class="d-flex justify-content-between gap-3 align-items-stretch p-5">
+                                        <div style="width:15ch">
+                                            <label class="form-label small">Κωδικός</label>
+                                            <input type="text" class="form-control form-control-sm" x-model="row.code" required
+                                                :class="{ 'is-invalid': row._codeInvalid }"
+                                                @input="row._codeInvalid = false">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <label class="form-label small">Όνομα</label>
+                                            <input type="text" class="form-control form-control-sm" x-model="row.name" required
+                                                :class="{ 'is-invalid': row._nameInvalid }"
+                                                @input="row._nameInvalid = false">
+                                        </div>
+                                        <div style="width:8ch">
+                                            <label class="form-label small">Σειρά</label>
+                                            <input type="number" class="form-control form-control-sm" x-model="row.sequence">
+                                        </div>
+                                            <div class="d-flex flex-column align-items-center justify-content-around" style="width:7ch">
+                                                <label class="form-label small">Ενεργό</label>
+                                                <input type="checkbox" class="mb-1"
+                                                    :checked="row.active"
+                                                    @change="row.active = $event.target.checked">
+                                                {{!-- <div></div> --}}
+                                            </div>
+                                        </div>
+                                    <!-- Γραμμή 2: Περιγραφή, Υπεύθυνος, Πηγή -->
+                                    <div class="d-flex justify-content-between gap-3 align-items-stretch p-5">
+                                        <div class="flex-grow-1">
+                                            <label class="form-label small">Περιγραφή</label>
+                                            <input type="text" class="form-control form-control-sm" x-model="row.description">
+                                        </div>
+                                        <div style="width:35ch">
+                                            <label class="form-label small">Υπεύθυνος</label>
+                                            <input type="text" class="form-control form-control-sm" x-model="row.responsible">
+                                        </div>
+                                        <div style="width:35ch">
+                                            <label class="form-label small">Πηγή</label>
+                                            <input type="text" class="form-control form-control-sm" x-model="row.source">
+                                        </div>
+                                    </div>
+                                    <!-- Γραμμή 3: Συχνότητα συμπλήρωσης, Μονάδα μέτρησης, Τιμή βέλτιστου, Τιμή χειρότερου, Στόχος -->
+                                    <div class="d-flex justify-content-between gap-3 align-items-stretch p-5">
+                                        <div style="width:20%">
+                                            <label class="form-label small">Συχνότητα συμπλήρωσης</label>
+                                            <select class="form-select form-select-sm" x-model="row.frequency" required
+                                                :class="{ 'is-invalid': row._frequencyInvalid }"
+                                                @change="row._frequencyInvalid = false">
+                                                <option value=""></option>
+                                                <option value="yearly">Ετήσια</option>
+                                                <option value="semiannually">Εξαμηνιαία</option>
+                                                <option value="quarterly">Τριμηνιαία</option>
+                                                <option value="monthly">Μηνιαία</option>
+                                            </select>
+                                        </div>
+                                        <div style="width:20%">
+                                            <label class="form-label small">Μονάδα μέτρησης</label>
+                                            <select class="form-select form-select-sm" x-model="row.unit" required
+                                                :class="{ 'is-invalid': row._unitInvalid }"
+                                                @change="row._unitInvalid = false">
+                                                <option value=""></option>
+                                                <option value="amount">Πλήθος</option>
+                                                <option value="hours">Ώρες</option>
+                                                <option value="percentage">Ποσοστό</option>
+                                            </select>
+                                        </div>
+                                        <div style="width:20%">
+                                            <label class="form-label small">Τιμή βέλτιστου σενάριου</label>
+                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdBest" step="0.01" required
+                                                :class="{ 'is-invalid': row._thresholdBestInvalid }"
+                                                @input="row._thresholdBestInvalid = false">
+                                        </div>
+                                        <div style="width:20%">
+                                            <label class="form-label small">Τιμή χειρότερου σενάριου</label>
+                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdWorst" step="0.01" required
+                                                :class="{ 'is-invalid': row._thresholdWorstInvalid }"
+                                                @input="row._thresholdWorstInvalid = false">
+                                        </div>
+                                        <div style="width:20%">
+                                            <label class="form-label small">Στόχος</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-text input-symbol"  x-text="getSymbol(row.thresholdBest, row.thresholdWorst)"></div>
+                                                <input type="number" class="form-control form-control-sm" x-model="row.thresholdTarget" step="0.01" required
+                                                    :class="{ 'is-invalid': row._thresholdTargetInvalid }"
+                                                    @input="row._thresholdTargetInvalid = false">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Κουμπί αποθήκευσης -->
+                                <div class="center-content border-start ps-3">
+                                    <button class="btn btn-success btn-action" title="Αποθήκευση"
+                                        @click="saveRow(row)"
+                                        :disabled="row._saving">
+                                        <span x-show="!row._saving"><i class="bi bi-floppy"></i></span>
+                                        <span x-show="row._saving"><i class="bi bi-hourglass-split"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Προσθήκη νέου πρότυπου KPI -->
+    <div class="row my-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h5 mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Προσθήκη νέου πρότυπου KPI
+                    </h2>
+                </div>
+                <div class="card-body d-flex gap-4">
+                    <!-- Πεδία προς συμπλήρωση -->
+                    <div class="flex-grow-1 d-flex flex-column gap-3">
+                        <!-- Γραμμή 1: Κωδικός, Όνομα, Σειρά -->
+                        <div class="d-flex justify-content-between gap-3 align-items-stretch p-5">
+                            <div class="full-column" style="width:15ch">
+                                <label class="form-label small">Κωδικός</label>
+                                <input type="text" class="form-control form-control-sm" x-model="newRow.code" required
+                                    :class="{ 'is-invalid': newRow._codeInvalid }"
+                                    @input="newRow._codeInvalid = false">
+                            </div>
+                            <div class="full-column flex-grow-1" >
+                                <label class="form-label small">Όνομα</label>
+                                <input type="text" class="form-control form-control-sm" x-model="newRow.name" required
+                                    :class="{ 'is-invalid': newRow._nameInvalid }"
+                                    @input="newRow._nameInvalid = false">
+                            </div>
+                            <div class="full-column" style="width:8ch">
+                                <label class="form-label small">Σειρά</label>
+                                <input type="number" class="form-control form-control-sm" x-model="newRow.sequence">
+                            </div>
+                        </div>
+                        <!-- Γραμμή 2: Περιγραφή, Υπεύθυνος, Πηγή -->
+                        <div class="d-flex justify-content-between g-3 align-items-stretch p-5">
+                            <div class="full-column flex-grow-1">
+                                <label class="form-label small">Περιγραφή</label>
+                                <input type="text" class="form-control form-control-sm" x-model="newRow.description">
+                            </div>
+                            <div class="full-column" style="width:35ch">
+                                <label class="form-label small">Υπεύθυνος</label>
+                                <input type="text" class="form-control form-control-sm" x-model="newRow.responsible">
+                            </div>
+                            <div class="full-column" style="width:35ch">
+                                <label class="form-label small">Πηγή</label>
+                                <input type="text" class="form-control form-control-sm" x-model="newRow.source">
+                            </div>
+                        </div>
+                        <!-- Γραμμή 3: Συχνότητα, Μονάδα μέτρησης, Τιμή βέλτιστου σενάριου, Τιμή χειρότερου σενάριου, Στόχος -->
+                        <div class="d-flex justify-content-between g-3 align-items-stretch p-5">
+                            <div class="full-column" style="width:20%">
+                                <label class="form-label small ">Συχνότητα συμπλήρωσης</label>
+                                <select class="form-select form-select-sm" x-model="newRow.frequency" required
+                                    :class="{ 'is-invalid': newRow._frequencyInvalid }"
+                                    @change="newRow._frequencyInvalid = false">
+                                    <option value=""></option>
+                                    <option value="yearly">Ετήσια</option>
+                                    <option value="semiannually">Εξαμηνιαία</option>
+                                    <option value="quarterly">Τριμηνιαία</option>
+                                    <option value="monthly">Μηνιαία</option>
+                                </select>
+                            </div>
+                            <div class="full-column" style="width:20%">
+                                <label class="form-label small ">Μονάδα μέτρησης</label>
+                                <select class="form-select form-select-sm" x-model="newRow.unit" required
+                                    :class="{ 'is-invalid': newRow._unitInvalid }"
+                                    @change="newRow._unitInvalid = false">
+                                    <option value=""></option>
+                                    <option value="amount">Πλήθος</option>
+                                    <option value="hours">Ώρες</option>
+                                    <option value="percentage">Ποσοστό</option>
+                                </select>
+                            </div>
+                            <div class="full-column" style="width:20%">
+                                <label class="form-label small ">Τιμή βέλτιστου σενάριου</label>
+                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdBest" step="0.01" required
+                                    :class="{ 'is-invalid': newRow._thresholdBestInvalid }"
+                                    @input="newRow._thresholdBestInvalid = false">
+                            </div>
+                            <div class="full-column" style="width:20%">
+                                <label class="form-label small ">Τιμή χειρότερου σενάριου</label>
+                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdWorst" step="0.01" required
+                                    :class="{ 'is-invalid': newRow._thresholdWorstInvalid }"
+                                    @input="newRow._thresholdWorstInvalid = false">
+                            </div>
+                            <div class="full-column" style="width:20%">
+                                <label class="form-label small ">Στόχος</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-text input-symbol" x-text="getSymbol(newRow.thresholdBest, newRow.thresholdWorst)"></div>
+                                    <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdTarget" step="0.01" required
+                                        :class="{ 'is-invalid': newRow._thresholdTargetInvalid }"
+                                        @input="newRow._thresholdTargetInvalid = false">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Μήνυμα σφάλματος -->
+                        <div class="mt-2 text-danger small" x-show="newRow._error" x-text="newRow._error"></div>
+                    </div>
+                    <!-- Κουμπί προσθήκης -->
+                    <div class="center-content">
+                        <button class="btn btn-primary btn-action" @click="createRow()" :disabled="newRow._saving">
+                            <span x-show="!newRow._saving"><i class="bi bi-plus-circle"></i></span>
+                            <span x-show="newRow._saving"><i class="bi bi-hourglass-split"></i></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    window.dimtablesOptions = {
+        showTopBar: false,
+    };
+
+    function kpiApp() {
+        let baseUrl = window.baseUrl;
+
+        return {
+            rows: window.kpiTemplates.map(k => ({
+                ...k,
+                thresholdBest: k.thresholdBest ?? '',
+                thresholdWorst: k.thresholdWorst ?? '',
+                thresholdTarget: k.thresholdTarget ?? '',
+                _saving: false,
+                _codeInvalid: false,
+                _nameInvalid: false,
+                _frequencyInvalid: false,
+                _unitInvalid: false,
+                _thresholdBestInvalid: false,
+                _thresholdWorstInvalid: false,
+                _thresholdTargetInvalid: false,
+            })),
+            newRow: {
+                code: '', name: '', description: '', frequency: '', responsible: '', source: '', unit: '',
+                thresholdBest: '', thresholdWorst: '', thresholdTarget: '',
+                sequence: '', active: true,
+                _saving: false, _error: '',
+                _codeInvalid: false, _nameInvalid: false, _frequencyInvalid: false, _unitInvalid: false,
+                _thresholdBestInvalid: false, _thresholdWorstInvalid: false, _thresholdTargetInvalid: false,
+            },
+
+            async saveRow(row) {
+                if (!row.code?.trim()) row._codeInvalid = true;
+                if (!row.name?.trim()) row._nameInvalid = true;
+                if (!row.frequency) row._frequencyInvalid = true;
+                if (!row.unit) row._unitInvalid = true;
+                if (row.thresholdBest === '') row._thresholdBestInvalid = true;
+                if (row.thresholdWorst === '') row._thresholdWorstInvalid = true;
+                if (row.thresholdTarget === '') row._thresholdTargetInvalid = true;
+                if (row._codeInvalid || row._nameInvalid || row._frequencyInvalid || row._unitInvalid ||
+                    row._thresholdBestInvalid || row._thresholdWorstInvalid || row._thresholdTargetInvalid) return;
+                row._saving = true;
+                try {
+                    const res = await fetch(`${baseUrl}/${row.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            code: row.code,
+                            name: row.name,
+                            description: row.description,
+                            frequency: row.frequency,
+                            responsible: row.responsible,
+                            source: row.source,
+                            unit: row.unit,
+                            thresholdBest: row.thresholdBest !== '' ? row.thresholdBest : null,
+                            thresholdWorst: row.thresholdWorst !== '' ? row.thresholdWorst : null,
+                            thresholdTarget: row.thresholdTarget !== '' ? row.thresholdTarget : null,
+                            sequence: row.sequence !== '' ? row.sequence : null,
+                            active: row.active,
+                        }),
+                    });
+                    const data = await res.json();
+                    if (data.ok) {
+                        window.location.reload();
+                    } else {
+                        row._saving = false;
+                        alert(data.message || 'Σφάλμα κατά την αποθήκευση.');
+                    }
+                } catch (e) {
+                    row._saving = false;
+                    alert('Σφάλμα δικτύου.');
+                }
+            },
+
+            getSymbol(best, worst) {
+                if (best === '' || worst === '' || best === null || worst === null) return '';
+                return Number(best) > Number(worst) ? '\u2265' : '\u2264';
+            },
+
+            async createRow() {
+                if (!this.newRow.code?.trim()) this.newRow._codeInvalid = true;
+                if (!this.newRow.name?.trim()) this.newRow._nameInvalid = true;
+                if (!this.newRow.frequency) this.newRow._frequencyInvalid = true;
+                if (!this.newRow.unit) this.newRow._unitInvalid = true;
+                if (this.newRow.thresholdBest === '') this.newRow._thresholdBestInvalid = true;
+                if (this.newRow.thresholdWorst === '') this.newRow._thresholdWorstInvalid = true;
+                if (this.newRow.thresholdTarget === '') this.newRow._thresholdTargetInvalid = true;
+                if (this.newRow._codeInvalid || this.newRow._nameInvalid || this.newRow._frequencyInvalid || this.newRow._unitInvalid ||
+                    this.newRow._thresholdBestInvalid || this.newRow._thresholdWorstInvalid || this.newRow._thresholdTargetInvalid) return;
+                this.newRow._saving = true;
+                this.newRow._error = '';
+                try {
+                    const res = await fetch(baseUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            code: this.newRow.code,
+                            name: this.newRow.name,
+                            description: this.newRow.description,
+                            frequency: this.newRow.frequency,
+                            responsible: this.newRow.responsible,
+                            source: this.newRow.source,
+                            unit: this.newRow.unit,
+                            thresholdBest: this.newRow.thresholdBest !== '' ? this.newRow.thresholdBest : null,
+                            thresholdWorst: this.newRow.thresholdWorst !== '' ? this.newRow.thresholdWorst : null,
+                            thresholdTarget: this.newRow.thresholdTarget !== '' ? this.newRow.thresholdTarget : null,
+                            sequence: this.newRow.sequence !== '' ? this.newRow.sequence : null,
+                            active: true,
+                        }),
+                    });
+                    const data = await res.json();
+                    if (data.ok) {
+                        window.location.reload();
+                    } else {
+                        this.newRow._saving = false;
+                        this.newRow._error = data.message || 'Σφάλμα κατά την προσθήκη.';
+                    }
+                } catch (e) {
+                    this.newRow._saving = false;
+                    this.newRow._error = 'Σφάλμα δικτύου.';
+                }
+            },
+        };
+    }
+</script>
+
+<script type="module">
+    /* Έλεγχος για διπλότυπους κωδικούς */
+    const codeCount = new Map();
+    for (const k of window.kpiTemplates) {
+        if (!k.code) continue;
+        codeCount.set(k.code, (codeCount.get(k.code) ?? 0) + 1);
+    }
+    for (const [code, count] of codeCount) {
+        if (count > 1) Q.alert(`Υπάρχουν ${count} KPI templates με τον ίδιο κωδικό: ${code}`, 'OK');
+    }
+</script>
+
+<style>
+    :root {
+        --wa-tooltip-background-color: hsl(242, 36%, 42%);
+    }
+</style>

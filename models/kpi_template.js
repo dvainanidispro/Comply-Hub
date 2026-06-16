@@ -39,6 +39,7 @@ const KpiTemplate = db.define('kpi_template',
 		},
 		unit: {
 			type: DataTypes.STRING,
+            allowNull: false,
 			comment: 'Μονάδα μέτρησης, π.χ. ώρες, πλήθος, ποσοστό, κλπ.',
 		},
 		thresholdBest: {
