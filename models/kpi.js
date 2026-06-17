@@ -1,32 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { db } from '../config/database.js';
-
-/**
- * Επιστρέφει τους κανόνες αξιολόγησης από το αποθηκευμένο template snapshot.
- * @param {object} template - Το αποθηκευμένο template του KPI
- * @returns {{direction: string, multiplier: number, target: number}|null} Τα κριτήρια επιτυχίας ή null αν λείπουν thresholds
- */
-function getSuccessRule(template) {
-	const thresholdBest = template?.thresholdBest;
-	const thresholdWorst = template?.thresholdWorst;
-	const thresholdTarget = template?.thresholdTarget;
-
-	if (thresholdBest == null || thresholdWorst == null || thresholdTarget == null) {
-		return null;
-	}
-
-	return (Number(thresholdBest) > Number(thresholdWorst))
-		? {
-			direction: 'up',
-			multiplier: 1,
-			target: Number(thresholdTarget),
-		}
-		: {
-			direction: 'down',
-			multiplier: -1,
-			target: Number(thresholdTarget),
-		};
-}
+import { successRule } from './kpi_template.js';
+import { toNumber } from '../lib/utils.js';
 
 /**
  * Περιοδικές καταγραφές KPI ανά οργανισμό, με snapshot του template που ίσχυε όταν δημιουργήθηκαν.
@@ -74,38 +49,29 @@ const Kpi = db.define('kpi',
 			type: DataTypes.VIRTUAL,
 			comment: 'Επιστρέφει αν η τιμή του KPI καλύπτει το αποθηκευμένο thresholdTarget.',
 			get() {
-				if (!this.getDataValue('applicable')) {
-					return null;
-				}
+				if (!this.getDataValue('applicable')) { return null }
 
 				const value = this.getDataValue('value');
-				const successRule = getSuccessRule(this.getDataValue('template'));
-
-				if (value == null || !successRule) {
-					return null;
-				}
-
-				return successRule.direction === 'up'
-					? Number(value) >= successRule.target
-					: Number(value) <= successRule.target;
+                // Αν δεν έχει συμπληρωθεί, το θεωρούμε ανεπιτυχές. NOTE: Μπορεί να αλλάξει σε null (ακαθόριστο).
+				if (value == null) { return false }
+                
+                const rule = successRule(this.getDataValue('template'));
+				return rule.direction === 'up'
+					? Number(value) >= rule.target
+					: Number(value) <= rule.target;
 			},
 		},
 		deviation: {
 			type: DataTypes.VIRTUAL,
 			comment: 'Επιστρέφει την απόκλιση από τον στόχο, με θετική τιμή όταν το KPI κινείται προς τη σωστή κατεύθυνση.',
 			get() {
-				if (!this.getDataValue('applicable')) {
-					return null;
-				}
-
+                const applicable = this.getDataValue('applicable');
 				const value = this.getDataValue('value');
-				const successRule = getSuccessRule(this.getDataValue('template'));
-
-				if (value == null || !successRule) {
-					return null;
-				}
-
-				return Number(((Number(value) - successRule.target) * successRule.multiplier).toFixed(2));
+                const success = this.getDataValue('success');
+                if (!applicable || success || value == null) { return null }
+                
+                const rule = successRule(this.getDataValue('template'));
+				return toNumber( (value - rule.target) * rule.multiplier );
 			},
 		},
 		comments: {

@@ -2,6 +2,33 @@ import { DataTypes } from 'sequelize';
 import { db } from "../config/database.js";
 
 /**
+ * Επιστρέφει τα κριτήρια επιτυχίας ενός KPI template ή snapshot.
+ * @param {object} template - Το template ή snapshot που περιέχει thresholds και unit
+ * @returns {{direction: string, multiplier: number, target: number, symbol: string, criteria: string}} Τα κριτήρια επιτυχίας
+ */
+function successRule(template) {
+	const thresholdBest = Number(template.thresholdBest);
+	const thresholdWorst = Number(template.thresholdWorst);
+	const thresholdTarget = Number(template.thresholdTarget);
+
+	return (thresholdBest > thresholdWorst)
+		? {
+			direction: 'up',
+			multiplier: 1,
+			target: thresholdTarget,
+			symbol: '>=',
+			criteria: `${template.unit} >= ${template.thresholdTarget}`,
+		}
+		: {
+			direction: 'down',
+			multiplier: -1,
+			target: thresholdTarget,
+			symbol: '<=',
+			criteria: `${template.unit} <= ${template.thresholdTarget}`,
+		};
+}
+
+/**
  * Πρότυπα KPI από τα οποία δημιουργούνται KPI εγγραφές για οργανισμούς.
  */
 const KpiTemplate = db.define('kpi_template',
@@ -61,13 +88,12 @@ const KpiTemplate = db.define('kpi_template',
 			type: DataTypes.VIRTUAL,
 			comment: 'Επιστρέφει τα κριτήρια επιτυχίας.',
 			get() {
-				const thresholdBest = this.getDataValue('thresholdBest');
-				const thresholdWorst = this.getDataValue('thresholdWorst');
-				const thresholdTarget = this.getDataValue('thresholdTarget');
-                const unit = this.getDataValue('unit');
-				return ( Number(thresholdBest) > Number(thresholdWorst) ) 
-                    ? {direction:'up', multiplier: 1, symbol:'>=', criteria: `${unit} >= ${thresholdTarget}`} 
-                    : {direction:'down', multiplier: -1, symbol:'<=', criteria: `${unit} <= ${thresholdTarget}`};
+				return successRule({
+					thresholdBest: this.getDataValue('thresholdBest'),
+					thresholdWorst: this.getDataValue('thresholdWorst'),
+					thresholdTarget: this.getDataValue('thresholdTarget'),
+					unit: this.getDataValue('unit'),
+				});
 			},
 		},
 		sequence: {
@@ -92,4 +118,4 @@ const KpiTemplate = db.define('kpi_template',
 	}
 );
 
-export { KpiTemplate };
+export { KpiTemplate, successRule };

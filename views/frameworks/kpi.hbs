@@ -104,7 +104,7 @@ window.baseUrl = '{{baseUrl}}';
                                                 @input="row._thresholdWorstInvalid = false">
                                         </div>
                                         <div style="width:20%">
-                                            <label class="form-label small">Στόχος</label>
+                                            <label class="form-label small">Στόχος (κριτήριο επιτυχίας)</label>
                                             <div class="input-group input-group-sm">
                                                 <div class="input-group-text input-symbol"  x-text="getSymbol(row.thresholdBest, row.thresholdWorst)"></div>
                                                 <input type="number" class="form-control form-control-sm" x-model="row.thresholdTarget" step="0.01" required
@@ -216,7 +216,7 @@ window.baseUrl = '{{baseUrl}}';
                                     @input="newRow._thresholdWorstInvalid = false">
                             </div>
                             <div class="full-column" style="width:20%">
-                                <label class="form-label small ">Στόχος</label>
+                                <label class="form-label small ">Στόχος (κριτήριο επιτυχίας)</label>
                                 <div class="input-group input-group-sm">
                                     <div class="input-group-text input-symbol" x-text="getSymbol(newRow.thresholdBest, newRow.thresholdWorst)"></div>
                                     <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdTarget" step="0.01" required
