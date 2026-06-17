@@ -74,10 +74,9 @@ window.baseUrl = '{{baseUrl}}';
                                                 :class="{ 'is-invalid': row._frequencyInvalid }"
                                                 @change="row._frequencyInvalid = false">
                                                 <option value=""></option>
-                                                <option value="yearly">Ετήσια</option>
-                                                <option value="semiannually">Εξαμηνιαία</option>
-                                                <option value="quarterly">Τριμηνιαία</option>
-                                                <option value="monthly">Μηνιαία</option>
+                                                {{#each (labelEntries 'frequency')}}
+                                                <option value="{{this.value}}">{{this.name}}</option>
+                                                {{/each}}
                                             </select>
                                         </div>
                                         <div style="width:20%">
@@ -86,9 +85,9 @@ window.baseUrl = '{{baseUrl}}';
                                                 :class="{ 'is-invalid': row._unitInvalid }"
                                                 @change="row._unitInvalid = false">
                                                 <option value=""></option>
-                                                <option value="amount">Πλήθος</option>
-                                                <option value="hours">Ώρες</option>
-                                                <option value="percentage">Ποσοστό</option>
+                                                {{#each (labelEntries 'unit')}}
+                                                <option value="{{this.value}}">{{this.name}}</option>
+                                                {{/each}}
                                             </select>
                                         </div>
                                         <div style="width:20%">
@@ -186,10 +185,9 @@ window.baseUrl = '{{baseUrl}}';
                                     :class="{ 'is-invalid': newRow._frequencyInvalid }"
                                     @change="newRow._frequencyInvalid = false">
                                     <option value=""></option>
-                                    <option value="yearly">Ετήσια</option>
-                                    <option value="semiannually">Εξαμηνιαία</option>
-                                    <option value="quarterly">Τριμηνιαία</option>
-                                    <option value="monthly">Μηνιαία</option>
+                                    {{#each (labelEntries 'frequency')}}
+                                    <option value="{{this.value}}">{{this.name}}</option>
+                                    {{/each}}
                                 </select>
                             </div>
                             <div class="full-column" style="width:20%">
@@ -198,9 +196,9 @@ window.baseUrl = '{{baseUrl}}';
                                     :class="{ 'is-invalid': newRow._unitInvalid }"
                                     @change="newRow._unitInvalid = false">
                                     <option value=""></option>
-                                    <option value="amount">Πλήθος</option>
-                                    <option value="hours">Ώρες</option>
-                                    <option value="percentage">Ποσοστό</option>
+                                    {{#each (labelEntries 'unit')}}
+                                    <option value="{{this.value}}">{{this.name}}</option>
+                                    {{/each}}
                                 </select>
                             </div>
                             <div class="full-column" style="width:20%">
