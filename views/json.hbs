@@ -1,0 +1,19 @@
+<div class="row gap-20">
+	<div class="col-12">
+		<div class="layers bd bgc-white p-20">
+			<div class="layer w-100 mB-15">
+				<h1 class="h4 mB-5">{{or title 'Αποτέλεσμα'}}</h1>
+			</div>
+
+			<div class="layer w-100">
+				<pre class="bg-light bd bdrs-3 p-20 mB-0"><code>{{prettyJson result}}</code></pre>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+    window.result = {{{objectify result}}};
+    console.log(window.result);
+</script>

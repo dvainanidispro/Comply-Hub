@@ -31,6 +31,8 @@ const handlebarsConfig = {
         },
         /* example: <script> let obj = {{{objectify obj}}}; </script> */      
         objectify: (object) => JSON.stringify(object),  
+        // Χρησιμοποιείται στο json.hbs για όμορφη εμφάνιση JSON αντιείμενου κατά το development.
+        prettyJson: object => JSON.stringify(object, null, 4),
         inflect: (number, singular, plural) => number + ' ' + (number==1 ? singular : plural),
         /* example: {{#each (array 1 2 3)}} */
         array: (...items) => items.slice(0, -1), // -1: Remove the Handlebars context object

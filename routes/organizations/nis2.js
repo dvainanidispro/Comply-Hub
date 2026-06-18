@@ -2,6 +2,7 @@ import express from 'express';
 import { managePoliciesRouter } from './modules/policies.js';
 import { manageStorageRouter } from './modules/storage.js';
 import { legislationRouter } from './modules/legislation.js';
+import { kpiRouter } from './modules/kpi.js';
 
 const nis2 = express.Router();
 
@@ -17,5 +18,8 @@ nis2.use('/procedures', nis2Procedures);
 
 // NIS2 Legislation
 nis2.use('/legislation', legislationRouter('NIS2', 'NIS2 - Νομοθεσία'));
+
+// NIS2 KPI
+nis2.use('/kpi', kpiRouter('NIS2', 'NIS2 - KPI'));
 
 export default nis2;
