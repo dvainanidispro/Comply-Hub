@@ -51,6 +51,16 @@
                                 <div class="form-text">Τα frameworks που ακολουθεί ο οργανισμός. Πατήστε Ctrl/Shift για πολλαπλή επιλογή.</div>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label for="editOrgStartDate" class="form-label fw-bold">Ημερομηνία Έναρξης *</label>
+                                <input type="date" class="form-control" id="editOrgStartDate" name="startDate" value="{{orgDetails.startDate}}" required>
+                                <div class="form-text">Ημερομηνία έναρξης συμβολαίου</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editOrgEndDate" class="form-label fw-bold">Ημερομηνία Λήξης</label>
+                                <input type="date" class="form-control" id="editOrgEndDate" name="endDate" value="{{orgDetails.endDate}}">
+                                <div class="form-text">Ημερομηνία λήξης συμβολαίου (προαιρετική)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label for="editOrgActive" class="form-label fw-bold">Κατάσταση *</label>
                                 <select class="form-select" id="editOrgActive" name="active">
                                     <option value="true" {{#unless (eq orgDetails.active false)}}selected{{/unless}}>Ενεργός</option>

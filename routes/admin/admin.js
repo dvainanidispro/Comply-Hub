@@ -330,7 +330,7 @@ admin.get('/organizations/:id', async (req, res) => {
     try {
         const orgId = parseInt(req.params.id);
         const org = await Models.Organization.findByPk(orgId, {
-            attributes: ['id', 'name', 'scope', 'active'],
+            attributes: ['id', 'name', 'scope', 'active', 'startDate', 'endDate'],
             raw: true
         });
 
@@ -356,11 +356,14 @@ admin.get('/organizations/:id', async (req, res) => {
  */
 admin.post('/organizations', async (req, res) => {
     try {
-        const { name, active } = req.body;
+        const { name, active, startDate, endDate } = req.body;
         const scope = req.body.scope ? [].concat(req.body.scope) : [];
 
         if (!name) {
             return res.status(400).json({ success: false, message: 'Το πεδίο Όνομα είναι υποχρεωτικό' });
+        }
+        if (!startDate) {
+            return res.status(400).json({ success: false, message: 'Το πεδίο Ημερομηνία Έναρξης είναι υποχρεωτικό' });
         }
 
         const existing = await Models.Organization.findOne({ where: { name } });
@@ -372,6 +375,8 @@ admin.post('/organizations', async (req, res) => {
             name,
             scope,
             active: active !== 'false' && active !== false,
+            startDate,
+            endDate: endDate || null,
         });
 
         Cache.refresh('Organization');
@@ -390,7 +395,7 @@ admin.post('/organizations', async (req, res) => {
 admin.put('/organizations/:id', async (req, res) => {
     try {
         const orgId = parseInt(req.params.id);
-        const { name, active } = req.body;
+        const { name, active, startDate, endDate } = req.body;
         const scope = req.body.scope ? [].concat(req.body.scope) : [];
 
         const org = await Models.Organization.findByPk(orgId);
@@ -411,6 +416,8 @@ admin.put('/organizations/:id', async (req, res) => {
             name: name || org.name,
             scope,
             active: active === 'true' || active === true,
+            startDate: startDate || org.startDate,
+            endDate: endDate || null,
         });
 
         Cache.refresh('Organization');
@@ -442,6 +449,9 @@ admin.delete('/organizations/:id', async (req, res) => {
 
         res.json({ success: true, message: 'Ο οργανισμός διαγράφηκε επιτυχώς' });
     } catch (error) {
+        if (error instanceof ForeignKeyConstraintError) {
+            return res.status(400).json({ success: false, message: 'Είναι αδύνατη η διαγραφή του οργανισμού διότι συνδέεται με άλλες εγγραφές. Παρακαλώ, απενεργοποιήστε τον οργανισμό.' });
+        }
         log.error(`Σφάλμα κατά τη διαγραφή οργανισμού: ${error}`);
         res.status(500).json({ success: false, message: 'Σφάλμα κατά τη διαγραφή οργανισμού' });
     }
