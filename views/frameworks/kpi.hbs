@@ -92,13 +92,13 @@ window.baseUrl = '{{baseUrl}}';
                                         </div>
                                         <div style="width:20%">
                                             <label class="form-label small">Τιμή βέλτιστου σενάριου</label>
-                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdBest" step="0.01" required
+                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdBest" step="any" required
                                                 :class="{ 'is-invalid': row._thresholdBestInvalid }"
                                                 @input="row._thresholdBestInvalid = false">
                                         </div>
                                         <div style="width:20%">
                                             <label class="form-label small">Τιμή χειρότερου σενάριου</label>
-                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdWorst" step="0.01" required
+                                            <input type="number" class="form-control form-control-sm" x-model="row.thresholdWorst" step="any" required
                                                 :class="{ 'is-invalid': row._thresholdWorstInvalid }"
                                                 @input="row._thresholdWorstInvalid = false">
                                         </div>
@@ -106,7 +106,7 @@ window.baseUrl = '{{baseUrl}}';
                                             <label class="form-label small">Στόχος (κριτήριο επιτυχίας)</label>
                                             <div class="input-group input-group-sm">
                                                 <div class="input-group-text input-symbol"  x-text="getSymbol(row.thresholdBest, row.thresholdWorst)"></div>
-                                                <input type="number" class="form-control form-control-sm" x-model="row.thresholdTarget" step="0.01" required
+                                                <input type="number" class="form-control form-control-sm" x-model="row.thresholdTarget" step="any" required
                                                     :class="{ 'is-invalid': row._thresholdTargetInvalid }"
                                                     @input="row._thresholdTargetInvalid = false">
                                             </div>
@@ -203,13 +203,13 @@ window.baseUrl = '{{baseUrl}}';
                             </div>
                             <div class="full-column" style="width:20%">
                                 <label class="form-label small ">Τιμή βέλτιστου σενάριου</label>
-                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdBest" step="0.01" required
+                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdBest" step="any" required
                                     :class="{ 'is-invalid': newRow._thresholdBestInvalid }"
                                     @input="newRow._thresholdBestInvalid = false">
                             </div>
                             <div class="full-column" style="width:20%">
                                 <label class="form-label small ">Τιμή χειρότερου σενάριου</label>
-                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdWorst" step="0.01" required
+                                <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdWorst" step="any" required
                                     :class="{ 'is-invalid': newRow._thresholdWorstInvalid }"
                                     @input="newRow._thresholdWorstInvalid = false">
                             </div>
@@ -217,7 +217,7 @@ window.baseUrl = '{{baseUrl}}';
                                 <label class="form-label small ">Στόχος (κριτήριο επιτυχίας)</label>
                                 <div class="input-group input-group-sm">
                                     <div class="input-group-text input-symbol" x-text="getSymbol(newRow.thresholdBest, newRow.thresholdWorst)"></div>
-                                    <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdTarget" step="0.01" required
+                                    <input type="number" class="form-control form-control-sm" x-model="newRow.thresholdTarget" step="any" required
                                         :class="{ 'is-invalid': newRow._thresholdTargetInvalid }"
                                         @input="newRow._thresholdTargetInvalid = false">
                                 </div>
@@ -252,9 +252,9 @@ window.baseUrl = '{{baseUrl}}';
         return {
             rows: window.kpiTemplates.map(k => ({
                 ...k,
-                thresholdBest: k.thresholdBest ?? '',
-                thresholdWorst: k.thresholdWorst ?? '',
-                thresholdTarget: k.thresholdTarget ?? '',
+                thresholdBest: k.thresholdBest != null ? Number(k.thresholdBest) : '',
+                thresholdWorst: k.thresholdWorst != null ? Number(k.thresholdWorst) : '',
+                thresholdTarget: k.thresholdTarget != null ? Number(k.thresholdTarget) : '',
                 _saving: false,
                 _codeInvalid: false,
                 _nameInvalid: false,
