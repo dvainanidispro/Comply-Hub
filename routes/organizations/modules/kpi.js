@@ -1,6 +1,7 @@
 import express from 'express';
+import Cache from '../../../models/cache.js';
+import { expectedCurrentKpis, expectedKpisInRange } from '../../../lib/kpi.js';
 import jsonView from './json.js';
-import { expectedKpis } from '../../../lib/kpi.js';
 import log from '../../../lib/logger.js';
 
 /**
@@ -13,7 +14,8 @@ export function kpiRouter(framework, label) {
 	const kpi = express.Router();
 
 	kpi.get('/', async (req, res) => {
-        let result = await expectedKpis(req.org, framework);
+        // let result = await expectedCurrentKpis(req.org, framework);
+        let result = await expectedKpisInRange(req.org, framework, res.locals.org.startDate);
         res.render('json', { result });
     });
 

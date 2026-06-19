@@ -19,9 +19,15 @@ const org = async (req, res, next) => {
         }
         req.org = cookieOrg;
     }
-    
-    res.locals.org = {id: req.org, name: (await Cache.map.Organization).get(req.org)?.name || 'Οργανισμός'};
+
+    const organization = (await Cache.map.Organization).get(req.org);
+    res.locals.org = {
+        id: req.org, 
+        name: organization?.name || 'Οργανισμός',
+        startDate: organization?.startDate || null,
+    };
     res.locals.currentPath = req.originalUrl;
+    
     next();
 };
 
