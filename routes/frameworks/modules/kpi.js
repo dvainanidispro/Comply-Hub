@@ -8,6 +8,7 @@
 
 import express from 'express';
 import Models from '../../../models/models.js';
+import Cache from '../../../models/cache.js';
 import { UniqueConstraintError } from 'sequelize';
 import log from '../../../lib/logger.js';
 
@@ -67,6 +68,7 @@ export function manageKpiTemplatesRouter(framework, label) {
                 active: true,
             });
 
+            Cache.refresh('KpiTemplate');
             res.json({ ok: true });
         } catch (error) {
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
@@ -103,6 +105,7 @@ export function manageKpiTemplatesRouter(framework, label) {
                 active: active === 'true' || active === true,
             });
 
+            Cache.refresh('KpiTemplate');
             res.json({ ok: true });
         } catch (error) {
             if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
@@ -122,6 +125,7 @@ export function manageKpiTemplatesRouter(framework, label) {
             if (!template) { return res.status(404).json({ ok: false, message: 'Δεν βρέθηκε.' }); }
 
             await template.destroy();
+            Cache.refresh('KpiTemplate');
             res.json({ ok: true });
         } catch (error) {
             log.error(`${framework} KPI templates DELETE ${req.params.id} error: ${error}`);

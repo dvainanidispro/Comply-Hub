@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { db } from '../config/database.js';
-import { successRule } from './kpi_template.js';
+import { successRule } from '../lib/kpi.js';
 import { toNumber } from '../lib/utils.js';
 
 /**
@@ -52,8 +52,8 @@ const Kpi = db.define('kpi',
 				if (!this.getDataValue('applicable')) { return null }
 
 				const value = this.getDataValue('value');
-                // Αν δεν έχει συμπληρωθεί, το θεωρούμε ανεπιτυχές. NOTE: Μπορεί να αλλάξει σε null (ακαθόριστο).
-				if (value == null) { return false }
+                // Αν δεν έχει συμπληρωθεί, το θεωρούμε ακαθόριστο. NOTE: Μπορεί να αλλάξει σε null (ανεπιτυχές).
+				if (value == null) { return null }
                 
                 const rule = successRule(this.getDataValue('template'));
 				return rule.direction === 'up'

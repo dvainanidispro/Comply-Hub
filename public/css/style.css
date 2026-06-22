@@ -707,6 +707,11 @@
         background-color: hsl(240, 67%, 96%);
     }
 
+
+    .kpi-status-success  { border-left: 4px solid var(--bs-success); }
+    .kpi-status-danger   { border-left: 4px solid var(--bs-danger); }
+    .kpi-status-warning  { border-left: 4px solid var(--bs-warning); }
+
 }
 /* Τέλος components layer */
 

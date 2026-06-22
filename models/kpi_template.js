@@ -1,32 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { db } from "../config/database.js";
-
-/**
- * Επιστρέφει τα κριτήρια επιτυχίας ενός KPI template ή snapshot.
- * @param {object} template - Το template ή snapshot που περιέχει thresholds και unit
- * @returns {{direction: string, multiplier: number, target: number, symbol: string, criteria: string}} Τα κριτήρια επιτυχίας
- */
-function successRule(template) {
-	const thresholdBest = Number(template.thresholdBest);
-	const thresholdWorst = Number(template.thresholdWorst);
-	const thresholdTarget = Number(template.thresholdTarget);
-
-	return (thresholdBest > thresholdWorst)
-		? {
-			direction: 'up',
-			multiplier: 1,
-			target: thresholdTarget,
-			symbol: '>=',
-			criteria: `${template.unit} >= ${template.thresholdTarget}`,
-		}
-		: {
-			direction: 'down',
-			multiplier: -1,
-			target: thresholdTarget,
-			symbol: '<=',
-			criteria: `${template.unit} <= ${template.thresholdTarget}`,
-		};
-}
+import { successRule } from '../lib/kpi.js';
 
 /**
  * Πρότυπα KPI από τα οποία δημιουργούνται KPI εγγραφές για οργανισμούς.

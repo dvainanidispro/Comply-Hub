@@ -85,7 +85,7 @@ window.baseUrl = '{{baseUrl}}';
                                                 :class="{ 'is-invalid': row._unitInvalid }"
                                                 @change="row._unitInvalid = false">
                                                 <option value=""></option>
-                                                {{#each (labelEntries 'unit')}}
+                                                {{#each (labelEntries 'unitLabel')}}
                                                 <option value="{{this.value}}">{{this.name}}</option>
                                                 {{/each}}
                                             </select>
