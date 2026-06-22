@@ -7,6 +7,38 @@ import { currentPeriods } from '../../../lib/periods.js';
 import jsonView from './json.js';
 import log from '../../../lib/logger.js';
 
+
+
+// Συγχωνεύει τα αναμενόμενα KPI με τα υποβληθέντα από τη βάση.
+function mergeKpis(expectedKpis, submittedKpis) {
+    expectedKpis.forEach((k) => { k.submitted = false; });
+    submittedKpis.forEach((k) => { k.submitted = true; });
+
+    // Έχοντας αφετηρία τα ενεργά KPI Templates, τα αντικαθιστούμε με τα υποβληθέντα αν υπάρχουν.
+    const submittedMap = new Map(submittedKpis.map((k) => [`${k.period}:${k.code}`, k]));
+    const kpis = expectedKpis.map((e) => submittedMap.get(`${e.period}:${e.code}`) ?? e);
+
+    // Υποβληθέντα KPI των οποίων το template έχει καταργηθεί — δεν εμφανίζονται στα expected.
+    const expectedKeys = new Set(expectedKpis.map((k) => `${k.period}:${k.code}`));
+    submittedKpis.filter((k) => !expectedKeys.has(`${k.period}:${k.code}`)).forEach((k) => { k.deprecated = true; kpis.push(k); });
+
+    kpis.forEach((k) => {
+        switch (true) {
+            // περίπτωση που δεν εφαρμόζεται το KPI
+            case !k.applicable:       k.status = 'light'; break;
+            // Επιτυχία
+            case k.success === true:  k.status = 'success'; break;
+            // Αποτυχία
+            case k.success === false: k.status = 'danger'; break;
+            // Μη υποβλημένο, υποβλημένο KPI χωρίς τιμή, default περίπτωση
+            default:                  k.status = 'warning';
+        }
+    });
+    return kpis;
+}
+
+
+
 /**
  * Δημιουργεί router για development προβολή KPI δεδομένων οργανισμού.
  * @param {string} framework - Το αναγνωριστικό του framework.
@@ -26,13 +58,6 @@ export function kpiRouter(framework, label) {
             }).then((rows) => rows.map((k) => k.toJSON())),
         ]);
 
-        expectedKpis.forEach((kpi) => {
-            kpi.submitted = false;
-        });
-        submittedKpis.forEach((kpi) => {
-            kpi.submitted = true;
-        });
-
         // Random values for testing. TODO: Remove this after testing.
         expectedKpis.forEach((kpi) => {
             const roll = Math.random();
@@ -51,13 +76,14 @@ export function kpiRouter(framework, label) {
             kpi.success = rule.direction === 'up' ? kpi.value >= rule.target : kpi.value <= rule.target;
             kpi.deviation = kpi.success ? null : +((kpi.value - rule.target) * rule.multiplier).toFixed(2);
         });
+        // End of random values for testing.
 
-        const submittedKpiMap = new Map(submittedKpis.map((k) => [`${k.period}:${k.code}`, k]));  // μοναδικό κλειδί: period:code
-        const kpis = expectedKpis.map((expected) => submittedKpiMap.get(`${expected.period}:${expected.code}`) ?? expected);
-        kpis.forEach((k) => { k.status = k.success ? 'success' : (k.value != null ? 'danger' : 'warning'); });
+        const kpis = mergeKpis(expectedKpis, submittedKpis);
 
-        // res.render('json', { result: kpis });
-        res.render('organizations/kpi/kpi', { result: kpis });
+        res.render('organizations/kpi/kpi', { 
+            title: `${label}`,
+            kpis 
+        });
     });
 
 	return kpi;

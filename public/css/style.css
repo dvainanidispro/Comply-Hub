@@ -220,6 +220,8 @@
         padding: var(--btn-padding) !important;
     }
 
+    .kpi-card.bg-warning-subtle { background-color: hsl(60,80%,88%) !important; }
+
 
     /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο wa-avatar! */
     wa-avatar::part(initials) {         
@@ -707,6 +709,16 @@
         background-color: hsl(240, 67%, 96%);
     }
 
+    .kpi-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 17rem);
+        gap: 2rem;
+    }
+    .kpi-card{
+        height: 100%;
+        border-radius: 2rem;
+        border-width: 3px;
+    }
 
     .kpi-status-success  { border-left: 4px solid var(--bs-success); }
     .kpi-status-danger   { border-left: 4px solid var(--bs-danger); }
@@ -740,6 +752,13 @@
     .text-prewrap {
         white-space: pre-wrap !important;
     }
+    .text-balanced {
+        text-wrap: balance;
+    }
+    .text-pretty{
+        text-wrap: pretty;
+    }
+
     .larger{
         font-size: larger;
     }
