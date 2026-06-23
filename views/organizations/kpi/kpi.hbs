@@ -13,7 +13,7 @@
         <div class="card">
             <div class="card-header d-flex align-items-center gap-2">
                 <i class="bi bi-table"></i>
-                <h5 class="mb-0 fw-semibold">Σχέδιο 1 — Πίνακας</h5>
+                <h5 class="mb-0 fw-semibold">Σχέδιο 1 — Πίνακας - {{kpis.length}}</h5>
             </div>
             <div class="card-body">
                 {{> kpi/table kpis=kpis links=true }}
@@ -26,7 +26,7 @@
         <div class="card">
             <div class="card-header d-flex align-items-center gap-2">
                 <i class="bi bi-grid-3x3-gap"></i>
-                <h5 class="mb-0 fw-semibold">Σχέδιο 2 — Metric Cards</h5>
+                <h5 class="mb-0 fw-semibold">Σχέδιο 2 — Metric Cards - {{kpis.length}}</h5>
             </div>
             <div class="card-body">
                 {{> kpi/grid kpis=kpis links=true }}

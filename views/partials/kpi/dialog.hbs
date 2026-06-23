@@ -60,10 +60,10 @@
                 <input type="checkbox" id="kpi-not-applicable" class=""
                     :checked="!currentKpi.applicable"
                     @change="currentKpi.applicable = !$event.target.checked">
-                <div>
-                    <label class="form-check-label mb-0" for="kpi-not-applicable">Δεν εφαρμόζεται</label>
+                <label for="kpi-not-applicable">
+                    <div class="form-check-label mb-0" >Δεν εφαρμόζεται</div>
                     <div class="form-text mt-0">Ενεργοποιήστε αν δεν υπάρχουν δεδομένα ή το KPI δεν εφαρμόζεται</div>
-                </div>
+                </label>
             </div>
             
         </div>
@@ -75,7 +75,7 @@
 
         <div slot="footer" class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-secondary" @click="$el.closest('wa-dialog').open = false">Ακύρωση</button>
-            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            <button type="submit" class="btn btn-primary" :disabled="(currentKpi.value==null)&&(currentKpi.applicable)">Αποθήκευση</button>
         </div>
     </form>
 
