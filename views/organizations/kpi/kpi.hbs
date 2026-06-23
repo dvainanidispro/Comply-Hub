@@ -1,3 +1,9 @@
+<script>
+    window.kpis = {{{objectify kpis}}};
+    console.log('kpis:');
+    console.log(window.kpis);
+</script>
+
 
 
 <div class="row g-4 mt-2">
@@ -9,39 +15,8 @@
                 <i class="bi bi-table"></i>
                 <h5 class="mb-0 fw-semibold">Σχέδιο 1 — Πίνακας</h5>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Κωδικός</th>
-                            <th>Δείκτης</th>
-                            <th>Περίοδος</th>
-                            <th class="text-end">Τιμή</th>
-                            <th class="text-end">Στόχος</th>
-                            <th class="text-center">Κατάσταση</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each kpis}}
-                        <tr>
-                            <td><code>{{code}}</code></td>
-                            <td>{{template.name}}</td>
-                            <td><span class="badge bg-secondary">{{period}}</span></td>
-                            <td class="text-end fw-semibold text-{{status}}">
-                                {{#if value}}{{value}}{{label 'unit' template.unit}}{{else}}&mdash;{{/if}}
-                            </td>
-                            <td class="text-end text-muted">{{template.successRule.criteria}}{{label 'unit' template.unit}}</td>
-                            <td class="text-center">
-                                {{#if (eq status 'warning')}}
-                                    <span class="badge bg-warning text-dark">Εκκρεμεί</span>
-                                {{else}}
-                                    <span class="badge bg-{{status}}">{{#if success}}Επιτυχής{{else}}Αποτυχία{{/if}}</span>
-                                {{/if}}
-                            </td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
+            <div class="card-body">
+                {{> kpi/table kpis=kpis links=true }}
             </div>
         </div>
     </div>
@@ -54,15 +29,11 @@
                 <h5 class="mb-0 fw-semibold">Σχέδιο 2 — Metric Cards</h5>
             </div>
             <div class="card-body">
-                {{> kpi-grid kpis=kpis }}
+                {{> kpi/grid kpis=kpis links=true }}
             </div>
         </div>
     </div>
 
 </div>
 
-<script>
-    window.kpis = {{{objectify kpis}}};
-    console.log('kpis:');
-    console.log(window.kpis);
-</script>
+{{> kpi/dialog kpis=kpis }}

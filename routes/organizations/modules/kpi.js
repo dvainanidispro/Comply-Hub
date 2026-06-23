@@ -11,7 +11,10 @@ import log from '../../../lib/logger.js';
 
 // Συγχωνεύει τα αναμενόμενα KPI με τα υποβληθέντα από τη βάση.
 function mergeKpis(expectedKpis, submittedKpis) {
-    expectedKpis.forEach((k) => { k.submitted = false; });
+    expectedKpis.forEach((k) => { 
+        k.submitted = false; 
+        k.id = 0;
+    });
     submittedKpis.forEach((k) => { k.submitted = true; });
 
     // Έχοντας αφετηρία τα ενεργά KPI Templates, τα αντικαθιστούμε με τα υποβληθέντα αν υπάρχουν.
@@ -25,13 +28,13 @@ function mergeKpis(expectedKpis, submittedKpis) {
     kpis.forEach((k) => {
         switch (true) {
             // περίπτωση που δεν εφαρμόζεται το KPI
-            case !k.applicable:       k.status = 'light'; break;
+            case !k.applicable:       k.color = 'light'; break;
             // Επιτυχία
-            case k.success === true:  k.status = 'success'; break;
+            case k.success === true:  k.color = 'success'; break;
             // Αποτυχία
-            case k.success === false: k.status = 'danger'; break;
-            // Μη υποβλημένο, υποβλημένο KPI χωρίς τιμή, default περίπτωση
-            default:                  k.status = 'warning';
+            case k.success === false: k.color = 'danger'; break;
+            // Μη υποβλημένο, υποβληθέν KPI χωρίς τιμή, default περίπτωση
+            default:                  k.color = 'warning';
         }
     });
     return kpis;
@@ -40,7 +43,7 @@ function mergeKpis(expectedKpis, submittedKpis) {
 
 
 /**
- * Δημιουργεί router για development προβολή KPI δεδομένων οργανισμού.
+ * Δημιουργεί router για διαχείριση KPI δεδομένων οργανισμού.
  * @param {string} framework - Το αναγνωριστικό του framework.
  * @param {string} label - Τίτλος για το view.
  * @returns {express.Router}
@@ -84,6 +87,11 @@ export function kpiRouter(framework, label) {
             title: `${label}`,
             kpis 
         });
+    });
+
+    kpi.post('/', (req, res) => {
+        log.dev(`KPI POST: ${JSON.stringify(req.body)}`);
+        res.sendStatus(200);
     });
 
 	return kpi;

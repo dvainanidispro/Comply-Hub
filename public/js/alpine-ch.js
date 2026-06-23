@@ -4,7 +4,9 @@
 // Example of use: x-data="{speakers:$fetch('/api/speakers')}
 
 document.addEventListener('alpine:init', () => {
-    Alpine.store('unitLabel', {amount: '', hours: ' ώρες', percentage: ' %'});
+
+    Alpine.store('unitLabel', {amount: 'πλήθος', hours: 'ώρες', percentage: 'ποσοστό %'});
+    Alpine.store('unit', {amount: '', hours: ' ώρες', percentage: ' %'});
 
     Alpine.magic('fetch', () => (url, options = {}) => {
         let data = Alpine.reactive({});

@@ -1,0 +1,62 @@
+<wa-dialog id="kpi-dialog"
+    x-data="{
+        currentKpi: {},
+        async submitKpi() {
+            await fetch(window.location.href, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.currentKpi),
+            });
+            window.location.reload();
+        },
+    }"
+    @edit-kpi.window="
+        currentKpi = structuredClone(Alpine.raw($event.detail.object));
+        console.log('currentKpi:', currentKpi);
+        $el.open = true;
+        "
+    >
+
+    <div slot="label">
+        <h4 x-text="currentKpi.template?.name" class="text-balanced"></h4>
+        <h5 x-text="currentKpi.period" class="text-muted me-2"></h5>
+    </div>
+
+    <form @submit.prevent="submitKpi()" class="p-1">
+        <input type="hidden" x-model="currentKpi.id">
+        <input type="hidden" x-model="currentKpi.code">
+        <input type="hidden" x-model="currentKpi.period">
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold" x-text="`Τιμή - ${$store.unitLabel[currentKpi.template?.unit] ?? ''}`"></label>
+                <input type="number" class="form-control" x-model.number="currentKpi.value" step="any"
+                    :min="Math.min(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)"
+                    :max="Math.max(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)">
+                <div class="form-text" x-text="`Στόχος: ${currentKpi.template?.successRule?.criteria ?? ''} ${$store.unit[currentKpi.template?.unit] ?? ''}`"></div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check d-flex g-2 align-items-center">
+                <input type="checkbox" id="kpi-not-applicable" class=""
+                    :checked="!currentKpi.applicable"
+                    @change="currentKpi.applicable = !$event.target.checked">
+                <label class="form-check-label mb-0" for="kpi-not-applicable">Δεν εφαρμόζεται</label>
+            </div>
+            <div class="form-check form-text mt-0">Ενεργοποιήστε αν δεν υπάρχουν δεδομένα ή δεν εφαρμόζεται</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Σχόλια ή διορθωτικές ενέργειες</label>
+            <textarea class="form-control" x-model="currentKpi.comments" rows="3"></textarea>
+        </div>
+
+        <div slot="footer" class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" @click="$el.closest('wa-dialog').open = false">Ακύρωση</button>
+            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+        </div>
+    </form>
+
+</wa-dialog>
+

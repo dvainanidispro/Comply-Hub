@@ -1,0 +1,40 @@
+                <div x-data="{kpis: {{objectify kpis}} , links: {{links}} }">
+                    <table class="table dim-table auto-rows table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Κωδικός</th>
+                                <th>Περίοδος</th>
+                                <th>Δείκτης</th>
+                                <th class="text-end">Τιμή</th>
+                                <th class="text-end">Στόχος</th>
+                                <th class="text-center">Κατάσταση</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="kpi in kpis" :key="kpi.code">
+                            <tr :class="links ? 'hand' : ''"
+                                @click="links && $dispatch('edit-kpi', { object: kpi })"
+                                >
+
+                                <td><code x-text="kpi.code"></code></td>
+                                <td><span class="badge bg-secondary" x-text="kpi.period"></span></td>
+                                <td x-text="kpi.template.name"></td>
+                                <td class="text-end fw-semibold" :class="`text-${kpi.color}`"
+                                    x-text="kpi.value != null ? kpi.value.toLocaleString() + ($store.unit[kpi.template.unit] ?? '') : '—'">
+                                </td>
+                                <td class="text-end text-muted"
+                                    x-text="(kpi.template.successRule.criteria ?? '').toLocaleString() + ($store.unit[kpi.template.unit] ?? '')">
+                                </td>
+                                <td class="text-center">
+                                    <template x-if="kpi.color === 'warning'">
+                                        <span class="badge bg-warning text-dark">Εκκρεμεί</span>
+                                    </template>
+                                    <template x-if="kpi.color !== 'warning'">
+                                        <span class="badge" :class="`bg-${kpi.color}`" x-text="kpi.success ? 'Επιτυχία' : 'Αποτυχία'"></span>
+                                    </template>
+                                </td>
+                            </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
