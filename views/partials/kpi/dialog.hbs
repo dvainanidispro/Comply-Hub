@@ -19,7 +19,8 @@
 
     <div slot="label">
         <h4 x-text="currentKpi.template?.name" class="text-balanced"></h4>
-        <h5 x-text="currentKpi.period" class="text-muted me-2"></h5>
+        <h5 x-text="periodDescription(currentKpi.period)" class="text-muted me-2"></h5>
+        <hr class="my-1">
     </div>
 
     <form @submit.prevent="submitKpi()" class="p-1">
@@ -27,24 +28,44 @@
         <input type="hidden" x-model="currentKpi.code">
         <input type="hidden" x-model="currentKpi.period">
 
-        <div class="row mb-3">
-            <div class="col-md-4">
+        <p x-text="currentKpi.template?.description" class="text-pretty"></p>
+        <div class="row gap-2 ms-3 me-3 p-2">
+            <div class="col mb-3">
                 <label class="form-label fw-bold" x-text="`Τιμή - ${$store.unitLabel[currentKpi.template?.unit] ?? ''}`"></label>
-                <input type="number" class="form-control" x-model.number="currentKpi.value" step="any"
+                <input type="number" 
+                    class="form-control form-control-lg" step="any"
+                    x-model.number="currentKpi.value" 
+                    :disabled="!currentKpi.applicable"
                     :min="Math.min(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)"
                     :max="Math.max(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)">
                 <div class="form-text" x-text="`Στόχος: ${currentKpi.template?.successRule?.criteria ?? ''} ${$store.unit[currentKpi.template?.unit] ?? ''}`"></div>
             </div>
-        </div>
+            <div class="col text-center">
+                <label class="form-label fw-bold">Κατάσταση</label>
+                <div class="fw-bold" 
+                    :class="`text-${kpiSuccessStatus(currentKpi).color}`" 
+                    x-show="kpiSuccessStatus(currentKpi).value!=null"
+                    x-text="(kpiSuccessStatus(currentKpi).value ? 'Επιτυχία' : 'Αποτυχία')"
+                ></div>
+                <div class="col text-center" x-show="kpiSuccessStatus(currentKpi).deviation">
+                    Απόκλιση: <span class="fw-bold" 
+                        {{!-- :class="`text-${kpiSuccessStatus(currentKpi).color}`"  --}}
+                        x-text="kpiSuccessStatus(currentKpi)?.deviation?.toLocaleString() + ($store.unit[currentKpi.template?.unit])"
+                    ></span>
+                </div>
+            </div>
 
         <div class="mb-3">
-            <div class="form-check d-flex g-2 align-items-center">
+            <div class=" d-flex g-2 align-items-center">
                 <input type="checkbox" id="kpi-not-applicable" class=""
                     :checked="!currentKpi.applicable"
                     @change="currentKpi.applicable = !$event.target.checked">
-                <label class="form-check-label mb-0" for="kpi-not-applicable">Δεν εφαρμόζεται</label>
+                <div>
+                    <label class="form-check-label mb-0" for="kpi-not-applicable">Δεν εφαρμόζεται</label>
+                    <div class="form-text mt-0">Ενεργοποιήστε αν δεν υπάρχουν δεδομένα ή το KPI δεν εφαρμόζεται</div>
+                </div>
             </div>
-            <div class="form-check form-text mt-0">Ενεργοποιήστε αν δεν υπάρχουν δεδομένα ή δεν εφαρμόζεται</div>
+            
         </div>
 
         <div class="mb-3">

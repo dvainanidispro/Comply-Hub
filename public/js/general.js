@@ -139,7 +139,7 @@ function downloadTableAsExcel(tableID, filename = 'table.xlsx', sheetname = 'She
     XLSX.writeFile(wb, filename);
 }
 
-
+/** Υπολογίζει το άθροισμα των στοιχείων που ταιριάζουν με τον επιλεγμένο selector */
 function sumOfElements(selector,attribute=null) {
     const elements = Q(selector);
     let sum = 0;
