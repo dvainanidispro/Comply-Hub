@@ -2,12 +2,17 @@
     x-data="{
         currentKpi: {},
         async submitKpi() {
-            await fetch(window.location.href, {
+            const response = await fetch(window.location.href, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(this.currentKpi),
             });
-            window.location.reload();
+            Q('#kpi-dialog').open = false;
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                showErrorModal('Αποτυχία αποθήκευσης KPI. Παρακαλώ δοκιμάστε ξανά.');
+            }
         },
     }"
     @edit-kpi.window="

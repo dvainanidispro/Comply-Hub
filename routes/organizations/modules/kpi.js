@@ -81,26 +81,6 @@ export function kpiRouter(framework, label) {
 	kpi.get(['/','/current'], async (req, res) => {
         const [expectedKpis, submittedKpis, periods] = await gatherCurrentKpis(req.org, framework);
 
-        // Random values for testing. TODO: Remove this after testing.
-        expectedKpis.forEach((kpi) => {
-            const roll = Math.random();
-            if (roll < 0.35) { return; }  // ~35% ασυμπλήρωτα
-
-            const rule = successRule(kpi.template);
-            if (roll < 0.65) {
-                // ~30% επιτυχημένα: τιμή μεταξύ target και best
-                const spread = Math.abs(kpi.template.thresholdBest - rule.target);
-                kpi.value = +(rule.target + Math.random() * spread).toFixed(2);
-            } else {
-                // ~35% αποτυχημένα: τιμή μεταξύ worst και target
-                const spread = Math.abs(rule.target - kpi.template.thresholdWorst);
-                kpi.value = +(kpi.template.thresholdWorst + Math.random() * spread).toFixed(2);
-            }
-            kpi.success = rule.direction === 'up' ? kpi.value >= rule.target : kpi.value <= rule.target;
-            kpi.deviation = kpi.success ? null : +((kpi.value - rule.target) * rule.multiplier).toFixed(2);
-        });
-        // End of random values for testing.
-
         const kpis = mergeKpis(expectedKpis, submittedKpis);
         const pendingKpis = kpis.filter((k) => !k.submitted);
         // const deprecatedKpis = kpis.filter((k) => k.deprecated);
@@ -114,9 +94,40 @@ export function kpiRouter(framework, label) {
         });
     });
 
-    kpi.post('/', (req, res) => {
-        log.dev(`KPI POST: ${JSON.stringify(req.body)}`);
-        res.sendStatus(200);
+    kpi.post('/', async (req, res) => {
+        const { id, code, period, template, applicable, value, comments } = req.body;
+
+        try {
+            if (id == 0) {
+                // Δημιουργία νέου KPI. Τα μη υποβληθέντα KPI παίρνουν id=0 στην mergeKpis παραπάνω
+                await Models.Kpi.create({
+                    organizationId: req.org,
+                    framework,
+                    code,
+                    period,
+                    template,
+                    applicable: applicable ?? true,
+                    value: applicable ? (value ?? null) : null,
+                    comments: comments || null,
+                });
+                // Σημείωση. Η βάση αποτρέπει δημιουργία διπλότυπου KPI, απλώς δεν επιστρέφουμε το σφάλμα σον χρήστη.
+            } else {
+                // Ενημέρωση υπάρχοντος KPI
+                await Models.Kpi.update(
+                    {
+                        template,   // χρειάζεται για να μην προκύπτει sequelize error
+                        applicable: applicable ?? true,
+                        value: applicable ? (value ?? null) : null,
+                        comments: comments || null,
+                    },
+                    { where: { id, organizationId: req.org } },
+                );
+            }
+            res.sendStatus(200);
+        } catch (error) {
+            log.error(`KPI POST error: ${error.message}`);
+            res.sendStatus(500);
+        }
     });
 
     kpi.get(['/all', '/past'], async (req, res) => {

@@ -81,7 +81,6 @@ const Kpi = db.define('kpi',
 	},
 	{
 		tableName: 'kpis',
-		timestamps: false,
 		indexes: [
 			{
 				name: 'kpis_org_framework_period',
