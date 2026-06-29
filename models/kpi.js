@@ -49,13 +49,13 @@ const Kpi = db.define('kpi',
 			type: DataTypes.VIRTUAL,
 			comment: 'Επιστρέφει αν η τιμή του KPI καλύπτει το αποθηκευμένο thresholdTarget.',
 			get() {
-				if (!this.getDataValue('applicable')) { return null }
+				if (!this.get('applicable')) { return null }
 
-				const value = this.getDataValue('value');
+				const value = this.get('value');
                 // Αν δεν έχει συμπληρωθεί, το θεωρούμε ακαθόριστο. NOTE: Μπορεί να αλλάξει σε null (ανεπιτυχές).
 				if (value == null) { return null }
                 
-                const rule = successRule(this.getDataValue('template'));
+				const rule = successRule(this.get('template'));
 				return rule.direction === 'up'
 					? Number(value) >= rule.target
 					: Number(value) <= rule.target;
@@ -65,13 +65,11 @@ const Kpi = db.define('kpi',
 			type: DataTypes.VIRTUAL,
 			comment: 'Επιστρέφει την απόκλιση από τον στόχο, με θετική τιμή όταν το KPI κινείται προς τη σωστή κατεύθυνση.',
 			get() {
-                const applicable = this.getDataValue('applicable');
-				const value = this.getDataValue('value');
-                const success = this.getDataValue('success');
-                if (!applicable || success || value == null) { return null }
+				const value = this.get('value');
+                if (!this.get('applicable') || this.get('success') || value == null) { return null }
                 
-                const rule = successRule(this.getDataValue('template'));
-				return toNumber( (value - rule.target) * rule.multiplier );
+				const rule = successRule(this.get('template'));
+				return toNumber( Math.abs(value - rule.target) );
 			},
 		},
 		comments: {

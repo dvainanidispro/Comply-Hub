@@ -7,6 +7,7 @@
                                 <th>Δείκτης</th>
                                 <th class="text-end">Τιμή</th>
                                 <th class="text-end">Στόχος</th>
+                                <th class="text-end">Απόκλιση</th>
                                 <th class="text-center">Κατάσταση</th>
                             </tr>
                         </thead>
@@ -27,6 +28,9 @@
                                 </td>
                                 <td class="text-end text-muted"
                                     x-text="kpi.template?.successRule.criteria + ($store.unit[kpi.template?.unit])">
+                                </td>
+                                <td class="text-end fw-semibold" :class="`text-${kpi.color}`"
+                                    x-text="kpi.deviation ? number(kpi.deviation) + ($store.unit[kpi.template.unit]) : '—'">
                                 </td>
                                 <td class="text-center">
                                     <template x-if="kpi.color === 'warning'">

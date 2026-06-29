@@ -68,6 +68,6 @@ function kpiSuccessStatus(kpi) {
 
     return { value: success, 
         color: success ? 'success' : 'danger', 
-        deviation: success ? null : Number(kpi.value) - rule.target 
+        deviation: success ? null : Math.abs( Number(kpi.value) - rule.target )
     };
 }
