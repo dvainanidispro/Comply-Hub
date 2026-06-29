@@ -12,7 +12,7 @@
     }"
     @edit-kpi.window="
         currentKpi = structuredClone(Alpine.raw($event.detail.object));
-        console.log('currentKpi:', currentKpi);
+        {{!-- console.log('currentKpi:', currentKpi); --}}
         $el.open = true;
         "
     >

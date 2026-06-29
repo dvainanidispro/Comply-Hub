@@ -233,6 +233,10 @@
     wa-details::part(content) {
         background-color: var(--bs-body-bg);
     }
+    wa-tooltip{
+        text-wrap: balance;
+        text-align: center;
+    }
     
     /* Hide cloaked elements for Alpine.js */
     [x-cloak] { display: none !important; }

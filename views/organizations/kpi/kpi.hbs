@@ -1,35 +1,50 @@
 <script>
     window.kpis = {{{objectify kpis}}};
-    console.log('kpis:');
-    console.log(window.kpis);
+    console.debug('kpis:');
+    console.debug(window.kpis);
 </script>
 
 
 
 <div class="row g-4 mt-2">
 
-    {{!-- ===== ΣΧΕΔΙΟ 1: Compact Table ===== --}}
     <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex align-items-center gap-2">
-                <i class="bi bi-table"></i>
-                <h5 class="mb-0 fw-semibold">Σχέδιο 1 — Πίνακας - {{kpis.length}}</h5>
+            <div class="card-header d-flex align-items-center gap-2">       
+                <h1 class="mb-0 fw-semibold h3"><i class="bi bi-bar-chart me-2"></i>{{title}}</h1>
             </div>
             <div class="card-body">
-                {{> kpi/table kpis=kpis links=true }}
-            </div>
-        </div>
-    </div>
+                <wa-tab-group>
+                    <wa-tab panel="pending">Εκκρεμή</wa-tab>
+                    <wa-tab panel="current">Τρέχοντα</wa-tab>
+                    <wa-tab panel="past">Όλα</wa-tab>
 
-    {{!-- ===== ΣΧΕΔΙΟ 2: Metric Cards Grid ===== --}}
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex align-items-center gap-2">
-                <i class="bi bi-grid-3x3-gap"></i>
-                <h5 class="mb-0 fw-semibold">Σχέδιο 2 — Metric Cards - {{kpis.length}}</h5>
-            </div>
-            <div class="card-body">
-                {{> kpi/grid kpis=kpis links=true }}
+                    <wa-tab-panel name="pending" active>
+                        {{#if pendingKpis.length}}
+                        <wa-callout variant="warning">
+                            <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+                            <strong>Υπάρχουν {{pendingKpis.length}} εκκρεμή KPI</strong><br />
+                            Παρακαλώ, συμπληρώστε τα εκκρεμή KPI.
+                        </wa-callout>
+                        {{else}}
+                        <wa-callout variant="success">
+                            <wa-icon slot="icon" name="check-circle"></wa-icon>
+                            <strong>Δεν υπάρχουν εκκρεμή KPI</strong><br />
+                            Όλα τα KPI έχουν συμπληρωθεί.
+                        </wa-callout>
+                        {{/if}}
+                        {{> kpi/table kpis=pendingKpis links=true section="pending" }}
+                    </wa-tab-panel>
+                    <wa-tab-panel name="current">
+                        {{> kpi/grid kpis=kpis links=true section="current" }}
+                    </wa-tab-panel>
+                    <wa-tab-panel name="past">
+                        <p>Εδώ θα μπούν όλα τα KPI του οργανισμού σε πίνακα (λίστα) από την ημερομηνία ένταξής του στο σύστημα.</p>
+                        <bootstrap-spinner></bootstrap-spinner>
+                        {{> kpi/table kpis=[] links=true section="past" }}
+                    </wa-tab-panel>
+                </wa-tab-group>
+
             </div>
         </div>
     </div>
@@ -37,3 +52,12 @@
 </div>
 
 {{> kpi/dialog kpis=kpis }}
+
+
+
+
+<style>
+    :root {
+        --wa-tooltip-background-color: hsl(242, 36%, 42%);
+    }
+</style>
