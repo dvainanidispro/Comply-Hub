@@ -15,11 +15,11 @@
                     <div class="fw-semibold text-center text-balanced" :title="kpi.template?.name" x-text="kpi.template?.name"></div>
                 </div>
                 <div class="text-center my-auto py-2">
-                    <div class="display-5 fw-bold" :class="`text-${kpi.color}`" x-text="kpi.value != null ? kpi.value.toLocaleString() : '—'"></div>
+                    <div class="display-5 fw-bold" :class="`text-${kpi.color}`" x-text="number(kpi.value)"></div>
                     <div class="text-muted" x-text="$store.unit[kpi.template?.unit] ?? ''"></div>
                 </div>
                 <div class="mt-auto pt-2 border-top text-end">
-                    <div class="small text-muted">Στόχος: <strong x-text="(kpi.template?.successRule.criteria ?? '').toLocaleString()"></strong> <span x-text="$store.unit[kpi.template?.unit] ?? ''"></span></div>
+                    <div class="small text-muted">Στόχος: <strong x-text="kpi.template?.successRule.criteria"></strong> <span x-text="$store.unit[kpi.template?.unit] ?? ''"></span></div>
                 </div>
             </div>
         </div>

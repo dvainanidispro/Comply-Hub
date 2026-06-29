@@ -151,3 +151,13 @@ function sumOfElements(selector,attribute=null) {
     });
     return sum;
 }
+
+
+// Μορφές αριθμών. Χρησιμοποιούμε το Intl.NumberFormat γιατί είναι insufficient να καλείς πολλές φορές το toLocaleString().
+const numberFormatter = new Intl.NumberFormat('el-GR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+function number(value) {
+    if (value == null || isNaN(value)) { return '—'; }
+    return numberFormatter.format(value);
+}
+

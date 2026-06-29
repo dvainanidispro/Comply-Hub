@@ -15,11 +15,11 @@
             </div>
             <div class="card-body">
                 <wa-tab-group>
-                    <wa-tab panel="pending">Εκκρεμή</wa-tab>
-                    <wa-tab panel="current">Τρέχοντα</wa-tab>
+                    <wa-tab panel="pending" >Εκκρεμή</wa-tab>
+                    <wa-tab panel="current" {{#unless pendingKpis.length}}active{{/unless}}>Τρέχοντα</wa-tab>
                     <wa-tab panel="past">Όλα</wa-tab>
 
-                    <wa-tab-panel name="pending" active>
+                    <wa-tab-panel name="pending">
                         {{#if pendingKpis.length}}
                         <wa-callout variant="warning">
                             <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
@@ -35,7 +35,7 @@
                         {{/if}}
                         {{> kpi/table kpis=pendingKpis links=true section="pending" }}
                     </wa-tab-panel>
-                    <wa-tab-panel name="current">
+                    <wa-tab-panel name="current" >
                         {{> kpi/grid kpis=kpis links=true section="current" }}
                     </wa-tab-panel>
                     <wa-tab-panel name="past">

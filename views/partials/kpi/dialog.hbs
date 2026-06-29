@@ -43,7 +43,7 @@
                     :disabled="!currentKpi.applicable"
                     :min="Math.min(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)"
                     :max="Math.max(currentKpi.template?.thresholdWorst, currentKpi.template?.thresholdBest)">
-                <div class="form-text" x-text="`Στόχος: ${currentKpi.template?.successRule?.criteria ?? ''} ${$store.unit[currentKpi.template?.unit] ?? ''}`"></div>
+                <div class="form-text" x-text="`Στόχος: ${currentKpi.template?.successRule.criteria} ${$store.unit[currentKpi.template?.unit]}`"></div>
             </div>
             <div class="col text-center">
                 <label class="form-label fw-bold">Κατάσταση</label>

@@ -23,10 +23,10 @@
                                 </td>
                                 <td x-text="kpi.template?.name"></td>
                                 <td class="text-end fw-semibold" :class="`text-${kpi.color}`"
-                                    x-text="kpi.value != null ? kpi.value.toLocaleString() + ($store.unit[kpi.template?.unit] ?? '') : '—'">
+                                    x-text="kpi.value != null ? number(kpi.value) + ($store.unit[kpi.template.unit]) : '—'">
                                 </td>
                                 <td class="text-end text-muted"
-                                    x-text="(kpi.template?.successRule.criteria ?? '').toLocaleString() + ($store.unit[kpi.template?.unit] ?? '')">
+                                    x-text="kpi.template?.successRule.criteria + ($store.unit[kpi.template?.unit])">
                                 </td>
                                 <td class="text-center">
                                     <template x-if="kpi.color === 'warning'">
