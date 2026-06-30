@@ -1,4 +1,10 @@
-                <div x-data="{kpis: {{objectify kpis}} , links: {{links}}, section: '{{or section 'table'}}' }">
+                <div x-data="{
+                    kpis: {{objectify kpis}}, 
+                    links: {{links}}, 
+                    section: '{{or section 'table'}}' 
+                    }"
+                    x-init="{{init}}"
+                    >
                     <table class="table dim-table auto-rows table-hover mb-0">
                         <thead class="table-dark">
                             <tr>

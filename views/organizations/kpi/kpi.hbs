@@ -24,7 +24,7 @@
                         <wa-callout variant="warning">
                             <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
                             <strong>Υπάρχουν {{pendingKpis.length}} εκκρεμή KPI</strong><br />
-                            Παρακαλώ, συμπληρώστε τα εκκρεμή KPI.
+                            Παρακαλώ, συμπληρώστε τα εκκρεμή KPI κάνοντας κλικ πάνω τους.
                         </wa-callout>
                         {{else}}
                         <wa-callout variant="success">
@@ -39,9 +39,8 @@
                         {{> kpi/grid kpis=kpis links=true section="current" }}
                     </wa-tab-panel>
                     <wa-tab-panel name="past">
-                        <p>Εδώ θα μπούν όλα τα KPI του οργανισμού από την ημερομηνία ένταξής του στο σύστημα σε πίνακα (λίστα).</p>
-                        <bootstrap-spinner></bootstrap-spinner>
-                        {{> kpi/table kpis=[] links=true section="past" }}
+                        {{> kpi/table kpis=null links=true section="past" init="kpis=await Q.fetch(window.location.pathname+'/json/all')"}}
+                        {{!-- <bootstrap-spinner class="my-4"></bootstrap-spinner> --}}
                     </wa-tab-panel>
                 </wa-tab-group>
 
@@ -61,3 +60,8 @@
         --wa-tooltip-background-color: hsl(242, 36%, 42%);
     }
 </style>
+<script>
+    window.dimtablesOptions = {
+        pageInfoTemplate:' '
+    }
+</script>

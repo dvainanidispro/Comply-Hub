@@ -131,7 +131,7 @@ window.dimtables.defaultOptions = {
   function buildTopBar(table, opts) {
     const bar = document.createElement("div");
     bar.className = opts.showTopBar
-        ? "dim-table-bar d-flex justify-content-between align-items-center my-2"
+        ? "dim-table-bar d-flex justify-content-between align-items-center my-3"
         : "d-none";
 
     const left = document.createElement("div");

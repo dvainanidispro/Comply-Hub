@@ -4,6 +4,7 @@ import Models from '../../../models/models.js';
 import { expectedCurrentKpis, expectedKpisInRange } from '../../../lib/kpi.js';
 import { successRule } from '../../../models/kpi_template.js';
 import { currentPeriods, periodsInRange } from '../../../lib/periods.js';
+import { sortByField } from '../../../lib/utils.js';
 import jsonView from './json.js';
 import log from '../../../lib/logger.js';
 
@@ -36,7 +37,7 @@ async function gatherKpisInRange(org, framework, dateRange) {
 
 
 // Συγχωνεύει τα αναμενόμενα KPI με τα υποβληθέντα από τη βάση.
-function mergeKpis(expectedKpis, submittedKpis) {
+function mergeKpis(expectedKpis, submittedKpis, sortField=null) {
     expectedKpis.forEach((k) => { 
         k.submitted = false; 
         k.id = 0;
@@ -64,7 +65,7 @@ function mergeKpis(expectedKpis, submittedKpis) {
             default:                  k.color = 'warning';
         }
     });
-    return kpis;
+    return sortField ? sortByField(kpis, sortField, false) : kpis;
 }
 
 
@@ -145,6 +146,23 @@ export function kpiRouter(framework, label) {
             periods,
         });
     });
+
+    kpi.get('/json/current', async (req, res) => {
+        const [expectedKpis, submittedKpis, periods] = await gatherCurrentKpis(req.org, framework);
+
+        const kpis = mergeKpis(expectedKpis, submittedKpis);
+        res.json(kpis, periods);
+    });
+
+    kpi.get(['/json/past', '/json/all'], async (req, res) => {
+        const dateRange = [res.locals.org.startDate, new Date()];
+        const [expectedKpis, submittedKpis, periods] = await gatherKpisInRange(req.org, framework, dateRange);
+
+        const kpis = mergeKpis(expectedKpis, submittedKpis, 'period');
+        res.json(kpis);
+    });
+
+
 
 	return kpi;
 }
