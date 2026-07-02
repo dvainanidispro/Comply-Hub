@@ -23,14 +23,14 @@
                         {{#if pendingKpis.length}}
                         <wa-callout variant="warning">
                             <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-                            <strong>Υπάρχουν {{pendingKpis.length}} εκκρεμή KPI</strong><br />
-                            Παρακαλώ, συμπληρώστε τα εκκρεμή KPI κάνοντας κλικ πάνω τους.
+                            <strong>Σε εκρεμμότητα: {{inflect pendingKpis.length 'KPI' 'KPIs'}}</strong><br />
+                            Παρακαλώ, συμπληρώστε τα εκκρεμή KPIs κάνοντας κλικ πάνω τους.
                         </wa-callout>
                         {{else}}
                         <wa-callout variant="success">
                             <wa-icon slot="icon" name="check-circle"></wa-icon>
-                            <strong>Δεν υπάρχουν εκκρεμή KPI</strong><br />
-                            Όλα τα KPI έχουν συμπληρωθεί.
+                            <strong>Δεν υπάρχουν εκκρεμή KPIs</strong><br />
+                            Όλα τα KPIs έχουν συμπληρωθεί.
                         </wa-callout>
                         {{/if}}
                         {{> kpi/table kpis=pendingKpis links=true section="pending" }}

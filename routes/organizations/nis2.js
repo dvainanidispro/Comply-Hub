@@ -20,6 +20,6 @@ nis2.use('/procedures', nis2Procedures);
 nis2.use('/legislation', legislationRouter('NIS2', 'NIS2 - Νομοθεσία'));
 
 // NIS2 KPI
-nis2.use('/kpi', kpiRouter('NIS2', 'NIS2 - KPI'));
+nis2.use('/kpi', kpiRouter('NIS2', 'NIS2 - KPIs'));
 
 export default nis2;

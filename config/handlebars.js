@@ -7,9 +7,9 @@ const handlebarsConfig = {
     extname: '.hbs',    // extension for layouts (not views)
     layoutsDir: 'views/layouts',
     defaultLayout: 'main',
-    helpers: 'views',
     partialsDir: 'views/partials',
     runtimeOptions: {
+        // access "all" object properties and methods, useful for sequelize objects.
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true
     },
@@ -19,7 +19,7 @@ const handlebarsConfig = {
         and: (...args) => args.slice(0, -1).every(Boolean), // Handlebars 'and' helper
         /* Check if array includes a value: {{#if (includes array 'value')}} */
         includes: (array, value) => array.includes(value),
-        /* example: {{check variable.length variable 'empty'}} */
+        /* "ternary" operator. example: {{check variable.length variable 'empty'}} */
         check: (condition, valueIfTrue, valueIfFalse) => condition ? valueIfTrue : valueIfFalse,
         /* example: {{or a b c}}, it needs c (Handlebars doesn't pass undefined). Use '' as third argument. */
         or: (a, b, c) => a ?? b ?? c, 
@@ -33,7 +33,7 @@ const handlebarsConfig = {
         objectify: (object) => JSON.stringify(object),  
         // Χρησιμοποιείται στο json.hbs για όμορφη εμφάνιση JSON αντιείμενου κατά το development.
         prettyJson: object => JSON.stringify(object, null, 4),
-        inflect: (number, singular, plural) => number + ' ' + (number==1 ? singular : plural),
+        inflect: (number, singular, plural, showNumber = true) => (showNumber ? number + ' ' : '') + (number==1 ? singular : plural),
         /* example: {{#each (array 1 2 3)}} */
         array: (...items) => items.slice(0, -1), // -1: Remove the Handlebars context object
         /* example {{join 'a' 'b' 'c'}} => a, b, c */
