@@ -4,7 +4,7 @@
 
     {{!-- NIS2 --}}
     {{#if (and (scope "nis2") (includes organization.scope "nis2"))}}
-    <div class="col-md-10">
+    <div class="col-md-11">
         <div class="card h-100">
             <div class="card-header">
                 <h2 class="mb-0 fw-semibold">
@@ -13,8 +13,8 @@
                 </h2>
             </div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-4">
+                <div class="row gy-3">
+                    <div class="col-md-4">
                         <a class="card bg-blue h-100 dashboard-card" href="/organization/frameworks/nis2/policies">
                             <div class="card-body px-4">
                                 <div class="dashboard-top">
@@ -42,7 +42,7 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <a class="card bg-green h-100 dashboard-card" href="/organization/frameworks/nis2/procedures">
                             <div class="card-body px-4">
                                 <div class="dashboard-top">
@@ -70,6 +70,40 @@
                             </div>
                         </a>
                     </div>
+                    <div class="col-md-4">
+                        <a class="card bg-purple h-100 dashboard-card" href="/organization/frameworks/nis2/kpi">
+                            <div class="card-body px-4">
+                                <div class="dashboard-top">
+                                    <div>
+                                        <h2 class="mb-0 display-4 fw-semibold">{{nis2.kpis.success}}/{{nis2.kpis.applicable}}</h2>
+                                        <p class="mb-0">Τρέχοντα επιτυχημένα KPIs</p>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-bar-chart"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            {{#if nis2.kpis.pending}}
+                            <hr>
+                            <div class="card-body pt-2 px-0">
+                                <div class="row text-center gap-0">
+                                    {{!-- <div class="col">
+                                        <h6 class="mb-1">Επιτυχία</h6>
+                                        <h3 class="mb-0">{{nis2.kpis.success}}</h3>
+                                    </div> --}}
+                                    {{!-- <div class="col">
+                                        <h6 class="mb-1">Αποτυχία</h6>
+                                        <h3 class="mb-0">{{nis2.kpis.failed}}</h3>
+                                    </div> --}}
+                                    <div class="col">
+                                        <h6 class="mb-1">Σε εκκρεμότητα</h6>
+                                        <h3 class="mb-0">{{nis2.kpis.pending}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/if}}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,7 +112,7 @@
 
     {{!-- GDPR --}}
     {{#if (and (scope "gdpr") (includes organization.scope "gdpr"))}}
-    <div class="col-md-10">
+    <div class="col-md-11">
         <div class="card h-100">
             <div class="card-header">
                 <h2 class="mb-0 fw-semibold">
@@ -87,8 +121,8 @@
                 </h2>
             </div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-4">
+                <div class="row gy-3">
+                    <div class="col-md-4">
                         <a class="card bg-blue h-100 dashboard-card" href="/organization/frameworks/gdpr/policies">
                             <div class="card-body px-4">
                                 <div class="dashboard-top">
@@ -116,7 +150,7 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <a class="card bg-green h-100 dashboard-card" href="/organization/frameworks/gdpr/procedures">
                             <div class="card-body px-4">
                                 <div class="dashboard-top">

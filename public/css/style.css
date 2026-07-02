@@ -749,6 +749,13 @@
                 padding-top: 0.4rem;
                 text-align: right;
             }
+            .badge{
+                background-color: hsl(240, 67%, 96%);
+                color: var(--bs-dark);
+            }
+        }
+        .kpi-card.border-light{
+            --bs-light-rgb: 212, 212, 212;  /* border color */
         }
     }
 

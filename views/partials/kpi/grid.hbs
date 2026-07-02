@@ -7,7 +7,7 @@
 
             <div class="card-body">
                 <div class="kpi-card-header">
-                    <span class="badge bg-light text-dark border small" x-text="kpi.period" :id="`kpi-period-${section}-${kpi.code}`"></span>
+                    <span class="badge border small" x-text="kpi.period" :id="`kpi-period-${section}-${kpi.code}`"></span>
                     <wa-tooltip :for="`kpi-period-${section}-${kpi.code}`" x-text="periodDescription(kpi.period)"></wa-tooltip>
                     <code class="small text-muted" x-text="kpi.code"></code>
                 </div>

@@ -69,6 +69,19 @@ function mergeKpis(expectedKpis, submittedKpis, sortField=null) {
 }
 
 
+/**
+ * Επιστρέφει την αναφορά KPI της τρέχουσας περιόδου για έναν οργανισμό και framework.
+ * @param {number} org - Το id του οργανισμού.
+ * @param {string} framework - Το αναγνωριστικό του framework.
+ * @returns {Promise<object[]>}
+ */
+export async function currentKpiReport(org, framework) {
+    const [expectedKpis, submittedKpis, periods] = await gatherCurrentKpis(org, framework);
+    const kpis = mergeKpis(expectedKpis, submittedKpis);
+    return kpis;
+}
+
+
 
 /**
  * Δημιουργεί router για διαχείριση KPI δεδομένων οργανισμού.
@@ -81,8 +94,8 @@ export function kpiRouter(framework, label) {
 
 	kpi.get(['/','/current'], async (req, res) => {
         const [expectedKpis, submittedKpis, periods] = await gatherCurrentKpis(req.org, framework);
-
         const kpis = mergeKpis(expectedKpis, submittedKpis);
+
         const pendingKpis = kpis.filter((k) => !k.submitted);
         // const deprecatedKpis = kpis.filter((k) => k.deprecated);
 
@@ -131,25 +144,25 @@ export function kpiRouter(framework, label) {
         }
     });
 
-    kpi.get(['/all', '/past'], async (req, res) => {
-        const dateRange = [res.locals.org.startDate, new Date()];
-        const [expectedKpis, submittedKpis, periods] = await gatherKpisInRange(req.org, framework, dateRange);
+    // kpi.get(['/all', '/past'], async (req, res) => {
+    //     const dateRange = [res.locals.org.startDate, new Date()];
+    //     const [expectedKpis, submittedKpis, periods] = await gatherKpisInRange(req.org, framework, dateRange);
 
-        const kpis = mergeKpis(expectedKpis, submittedKpis);
-        const pendingKpis = kpis.filter((k) => !k.submitted);
+    //     const kpis = mergeKpis(expectedKpis, submittedKpis);
+    //     const pendingKpis = kpis.filter((k) => !k.submitted);
 
-        res.render('organizations/kpi/kpi', { 
-            title: `${label}`,
-            kpis,
-            pendingKpis,
-            framework,
-            periods,
-        });
-    });
+    //     res.render('organizations/kpi/kpi', { 
+    //         title: `${label}`,
+    //         kpis,
+    //         pendingKpis,
+    //         framework,
+    //         periods,
+    //     });
+    // });
 
+    
     kpi.get('/json/current', async (req, res) => {
         const [expectedKpis, submittedKpis, periods] = await gatherCurrentKpis(req.org, framework);
-
         const kpis = mergeKpis(expectedKpis, submittedKpis);
         res.json(kpis, periods);
     });
@@ -157,7 +170,6 @@ export function kpiRouter(framework, label) {
     kpi.get(['/json/past', '/json/all'], async (req, res) => {
         const dateRange = [res.locals.org.startDate, new Date()];
         const [expectedKpis, submittedKpis, periods] = await gatherKpisInRange(req.org, framework, dateRange);
-
         const kpis = mergeKpis(expectedKpis, submittedKpis, 'period');
         res.json(kpis);
     });
