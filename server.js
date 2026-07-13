@@ -80,7 +80,11 @@ server.get(['/status', '/health'], async (req, res) => {
 });
 
 
-//* Login routes (ελεύθερα)
+// Στατικά αρχεία (ελεύθερα)
+import staticMiddleware from './config/static.js';
+server.use(staticMiddleware);
+
+// Login routes (ελεύθερα)
 import loginRouter from './routes/login.js';
 server.use(loginRouter);
 
