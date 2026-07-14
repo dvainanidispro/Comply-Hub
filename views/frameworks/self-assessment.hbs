@@ -1,0 +1,93 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        {{framework}} - {{questionnaire.title}}
+                    </h1>
+                </div>
+                <div class="card-body">1
+                    <form id="form" x-data="{
+                        sectionsValid: true,
+                        answersValid: true,
+                        actionsValid: true,
+                        get formValid() { return this.sectionsValid && this.answersValid && this.actionsValid; }
+                    }" >
+                        <input type="hidden" name="id" value="{{questionnaire.id}}">
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="title" class="form-label fw-bold">Τίτλος <req-star></req-star></label>
+                                <input type="text" class="form-control" id="title" name="title" value="{{questionnaire.title}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="code" class="form-label fw-bold">Κωδικός</label>
+                                <input type="text" class="form-control" id="code" value="{{code}}" disabled>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label for="public" class="form-label fw-bold">Δημόσιο</label>
+                                <select class="form-select" id="public" name="public">
+                                     <option value="false" {{#unless questionnaire.public}}selected{{/unless}}>{{label 'questionnaire' 'publicFalse'}}</option>
+                                     <option value="true" {{#if questionnaire.public}}selected{{/if}}>{{label 'questionnaire' 'publicTrue'}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="active" class="form-label fw-bold">Ενεργό</label>
+                                <select class="form-select" id="active" name="active">
+                                    <option value="true" {{#if questionnaire.active}}selected{{/if}}>Ναι</option>
+                                    <option value="false" {{#unless questionnaire.active}}selected{{/unless}}>Όχι</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label fw-bold">Περιγραφή και οδηγίες</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{questionnaire.definition.description}}</textarea>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="sections" class="form-label fw-bold">Ενότητες και Ερωτήσεις (JSON)</label>
+                                <textarea class="form-control json" id="sections" name="sections" rows="30" @input="sectionsValid = isValidJSON($el.value)" :class="{'is-valid': sectionsValid, 'is-invalid': !sectionsValid}">{{objectify questionnaire.definition.sections}}</textarea>
+                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="answers" class="form-label fw-bold">Σετ Απαντήσεων (JSON)</label>
+                                <textarea class="form-control json" id="answers" name="answers" rows="20" @input="answersValid = isValidJSON($el.value)" :class="{'is-valid': answersValid, 'is-invalid': !answersValid}">{{objectify questionnaire.answers}}</textarea>
+                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="actions" class="form-label fw-bold">Ενέργειες (JSON)</label>
+                                <textarea class="form-control json" id="actions" name="actions" rows="6" @input="actionsValid = isValidJSON($el.value)" :class="{'is-valid': actionsValid, 'is-invalid': !actionsValid}">{{check questionnaire.definition.actions (objectify questionnaire.definition.actions) ''}}</textarea>
+                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon" :disabled="!formValid">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>Αποθήκευση</div>
+                                    </button>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+const baseUrl = '{{baseUrl}}';
+
+document.addEventListener('DOMContentLoaded', function() {
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        await submitData(data, baseUrl, 'POST');
+    });
+});
+</script>

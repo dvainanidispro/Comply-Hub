@@ -792,6 +792,9 @@
     .text-prewrap {
         white-space: pre-wrap !important;
     }
+    .json {
+        white-space: pre-wrap;
+    }
     .text-balanced {
         text-wrap: balance;
     }

@@ -1,4 +1,43 @@
 /**
+ * Ελέγχει αν ένα string είναι έγκυρο JSON. Ένα κενό string θεωρείται έγκυρο (καμία τιμή).
+ */
+function isValidJSON(text) {
+    if (!text?.trim().length) { return true; }
+
+    try {
+        JSON.parse(text);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Παρουσιάζει ένα JSON string με μορφοποιημένο τρόπο (indentation) για ευκολότερη ανάγνωση.
+ * Αν το string δεν είναι έγκυρο JSON, επιστρέφει το ίδιο string χωρίς αλλαγές.
+ */
+function formatJSON(text) {
+    if (!text?.trim().length) { return ''; }
+    try {
+        const obj = JSON.parse(text);
+        return JSON.stringify(obj, null, 4);
+    } catch {
+        return text;
+    }
+}
+
+// Στο φόρτωμα της σελίδας, όμορφαίνει όλα τα .json στοιχεία με το formatJSON.
+Q('.json').forEach(el => {
+    if (el.tagName === 'TEXTAREA') {
+        if (!isValidJSON(el.value)) { return }
+        el.value = formatJSON(el.value);
+    } else {
+        if (!isValidJSON(el.textContent)) { return }
+        el.textContent = formatJSON(el.textContent);
+    }
+});
+
+/**
  * Επιστρέφει τα αρχικά γράμματα (κεφαλαία) των πρώτων 3 λέξεων ενός string.
  */
 function createCodeFromName(name) {

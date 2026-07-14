@@ -17,8 +17,8 @@ server.set('view engine', 'hbs');
 server.set('views', 'views');
 
 server.use(express.static('public'));
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
+server.use(express.urlencoded({ extended: true, limit: '10mb' }));
+server.use(express.json({ limit: '10mb' }));
 server.use(cookieParser());
 server.use(Security);
 
