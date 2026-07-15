@@ -57,13 +57,13 @@ export function manageSelfAssessmentRouter(framework, label) {
     /* POST / - Ενημέρωση του ερωτηματολογίου αυτοαξιολόγησης */
     selfAssessment.post('/', async (req, res) => {
         try {
-            const { title, public: isPublic, active, description, sections, answers, actions } = req.body;
+            const { title, public: isPublic, active, description, content, answers, actions } = req.body;
 
             let parsedSections;
             let parsedAnswers;
             let parsedActions;
             try {
-                parsedSections = sections ? JSON.parse(sections) : [];
+                parsedSections = content ? JSON.parse(content) : [];
                 parsedAnswers = answers ? JSON.parse(answers) : null;
                 parsedActions = actions ? JSON.parse(actions) : undefined;
             } catch {
@@ -75,7 +75,7 @@ export function manageSelfAssessmentRouter(framework, label) {
                 title,
                 description: description || '',
                 actions: parsedActions,
-                sections: parsedSections,
+                content: parsedSections,
             };
 
             const [affected] = await Models.Questionnaire.update({

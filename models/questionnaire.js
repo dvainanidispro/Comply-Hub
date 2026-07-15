@@ -54,6 +54,13 @@ const Questionnaire = db.define('questionnaire',
             allowNull: true,
             comment: 'Ο πλήρης ορισμός του questionnaire όπως παράγεται από το Questionnaire.toJSON().',
         },
+        content: {
+            type: DataTypes.VIRTUAL,
+            get() {
+                const definition = this.getDataValue('definition');
+                return definition?.content || [];
+            }
+        },
         answers: {
             type: DataTypes.JSONB,
             allowNull: true,

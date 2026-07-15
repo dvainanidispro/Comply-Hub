@@ -3,6 +3,7 @@
  */
 function isValidJSON(text) {
     if (!text?.trim().length) { return true; }
+    if (invalidSequencesOf(text).length) { return false; }
 
     try {
         JSON.parse(text);
@@ -10,6 +11,12 @@ function isValidJSON(text) {
     } catch {
         return false;
     }
+}
+// Επιστρέφει τους απαγορευμένους χαρακτήρες ή που μπορεί να χαλάσουν κάποια JSON.parse ή άλλες JavaScript εκφράσεις.
+function invalidSequencesOf(text) {
+    if (!text?.trim().length) { return []; }
+    const invalidSequences = ['`', '${', '<script'];    // Δυστυχώς, θα ήθελα να βάλω και το \ ως '\\' αλλά υπάρχει στα ερωτηματολόγια. 
+    return invalidSequences.filter(seq => text.includes(seq));
 }
 
 /**

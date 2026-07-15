@@ -13,11 +13,11 @@
                         {{!-- sections: {{objectify questionnaire.definition.sections}},
                         answers: {{objectify questionnaire.answers}},
                         actions: {{check questionnaire.definition.actions (objectify questionnaire.definition.actions) 'null'}}, --}}
-                        sectionsValid: true,
+                        contentValid: true,
                         answersValid: true,
                         actionsValid: true,
-                        get formValid() { return this.sectionsValid && this.answersValid && this.actionsValid; },
-                        get validAnswers() { return window.validateAnswerSet(this.$refs.sections.value, this.$refs.answers.value); }
+                        get formValid() { return this.contentValid && this.answersValid && this.actionsValid; },
+                        get validAnswers() { return window.validateAnswerSet(this.$refs.content.value, this.$refs.answers.value); }
                     }" >
                         <input type="hidden" readonly name="id" value="{{questionnaire.id}}">
 
@@ -48,14 +48,16 @@
                                 <label for="description" class="form-label fw-bold">Περιγραφή και οδηγίες</label>
                                 <textarea class="form-control" id="description" name="description" rows="3">{{questionnaire.definition.description}}</textarea>
                             </div>
+
+                            <!-- JSON FIELDS -->
                             <div class="col-md-12 mb-3">
-                                <label for="sections" class="form-label fw-bold">Ενότητες και Ερωτήσεις (JSON)</label>
-                                <textarea class="form-control json" id="l" name="sections" x-ref="sections" rows="30" @input="sectionsValid = isValidJSON($el.value)" :class="sectionsValid?'is-valid':'is-invalid'">{{objectify questionnaire.definition.sections}}</textarea>
+                                <label for="content" class="form-label fw-bold">Περιεχόμενο - Ενότητες και Ερωτήσεις (JSON)</label>
+                                <textarea class="form-control json" id="content" name="content" x-ref="content" rows="30" @input="contentValid = isValidJSON($el.value)" :class="contentValid?'is-valid':'is-invalid'">{{objectify questionnaire.content}}</textarea>
                                 <div class="invalid-feedback">Μη έγκυρο JSON.</div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label for="answers" class="form-label fw-bold">Σετ Απαντήσεων (JSON)</label>
-                                <textarea class="form-control json" id="answers" name="answers" x-ref="answers" rows="20" @input="answersValid = isValidJSON($el.value);console.log(validAnswers)" :class="answersValid?'is-valid':'is-invalid'">{{objectify questionnaire.answers}}</textarea>
+                                <textarea class="form-control json" id="answers" name="answers" x-ref="answers" rows="20" @input="answersValid = isValidJSON($el.value)" :class="answersValid?'is-valid':'is-invalid'">{{objectify questionnaire.answers}}</textarea>
                                 <div class="invalid-feedback">Μη έγκυρο JSON.</div>
                                 {{!-- <div class="text-warning" x-show="!validAnswers" >🟠 Υπάρχουν ερωτήσεις του ερωτηματολόγιου χωρίς απαντήσεις!</div> --}}
                             </div>
