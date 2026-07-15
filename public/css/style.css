@@ -795,6 +795,14 @@
     .json {
         white-space: pre-wrap;
     }
+    /* Μετατόπιση του validation icon (is-valid/is-invalid) του Bootstrap πιο αριστερά,
+       ώστε να μην κρύβεται πίσω από το scrollbar στα textarea με πολλές γραμμές. */
+    textarea.form-control.is-valid,
+    textarea.form-control.is-invalid {
+        scrollbar-gutter: stable;
+        /* padding-right: calc(1.5em + 1.55rem); */
+        background-position: right 1.5rem top 0.5rem;
+    }
     .text-balanced {
         text-wrap: balance;
     }

@@ -14,7 +14,7 @@ import log from '../../../lib/logger.js';
 
 const codes = {
     'NIS2': 'cybersecurity-self-assessment',
-    // 'GDPR': 'not-defined-yet',
+    'GDPR': 'gdpr-self-assessment',
 }
 
 /**
