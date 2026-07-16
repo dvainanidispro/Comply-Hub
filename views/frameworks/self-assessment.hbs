@@ -9,16 +9,21 @@
                     </h1>
                 </div>
                 <div class="card-body">
-                    <form id="form" x-data="{
-                        {{!-- sections: {{objectify questionnaire.definition.sections}},
-                        answers: {{objectify questionnaire.answers}},
-                        actions: {{check questionnaire.definition.actions (objectify questionnaire.definition.actions) 'null'}}, --}}
-                        contentValid: true,
-                        answersValid: true,
-                        actionsValid: true,
-                        get formValid() { return this.contentValid && this.answersValid && this.actionsValid; },
-                        get validAnswers() { return window.validateAnswerSet(this.$refs.content.value, this.$refs.answers.value); }
-                    }" >
+                    <form id="form" 
+                        x-data="{
+                            content: null, answers: null, actions: null,
+                            get valid() {
+                                return {
+                                    content: isValidJSON(this.content),
+                                    answers: isValidJSON(this.answers),
+                                    actions: isValidJSON(this.actions),
+                                    get form() { return this.content && this.answers && this.actions },
+                                    get answerSet() { return window.validateAnswerSet($refs.content.value, $refs.answers.value); },
+                                };
+                            }
+                        }" 
+                        x-init="content = $refs.content.value; answers = $refs.answers.value; actions = $refs.actions.value"
+                    >
                         <input type="hidden" readonly name="id" value="{{questionnaire.id}}">
 
                         <div class="row">
@@ -52,26 +57,42 @@
                             <!-- JSON FIELDS -->
                             <div class="col-md-12 mb-3">
                                 <label for="content" class="form-label fw-bold">Περιεχόμενο - Ενότητες και Ερωτήσεις (JSON)</label>
-                                <textarea class="form-control json" id="content" name="content" x-ref="content" rows="30" @input="contentValid = isValidJSON($el.value)" :class="contentValid?'is-valid':'is-invalid'">{{objectify questionnaire.content}}</textarea>
-                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
+                                <textarea class="form-control json" id="content" name="content" x-ref="content" rows="30" @input="content = $el.value" :class="valid.content?'is-valid':'is-invalid'">{{objectify questionnaire.content}}</textarea>
+                                <div>
+                                    <span class="invalid-feedback">Μη έγκυρο JSON.</span>
+                                    <span x-cloak x-show="invalidSequencesOf(content).length" class="text-danger">Μη έγκυροι χαρακτήρες: <span x-text="invalidSequencesOf(content)"></span></span>
+
+                                </div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label for="answers" class="form-label fw-bold">Σετ Απαντήσεων (JSON)</label>
-                                <textarea class="form-control json" id="answers" name="answers" x-ref="answers" rows="20" @input="answersValid = isValidJSON($el.value)" :class="answersValid?'is-valid':'is-invalid'">{{objectify questionnaire.answers}}</textarea>
-                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
-                                {{!-- <div class="text-warning" x-show="!validAnswers" >🟠 Υπάρχουν ερωτήσεις του ερωτηματολόγιου χωρίς απαντήσεις!</div> --}}
+                                <textarea class="form-control json" id="answers" name="answers" x-ref="answers" rows="20" @input="answers = $el.value" :class="valid.answers?'is-valid':'is-invalid'">{{objectify questionnaire.answers}}</textarea>
+                                <div>
+                                    <span class="invalid-feedback">Μη έγκυρο JSON.</span>
+                                    <span x-cloak x-show="invalidSequencesOf(answers).length" class="text-danger">Μη έγκυροι χαρακτήρες: <span x-text="invalidSequencesOf(answers)"></span></span>
+                                </div>
+                                <div class="text-warning" x-show="!valid.answerSet" >🟠 Υπάρχουν ερωτήσεις του ερωτηματολόγιου χωρίς απαντήσεις!</div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label for="actions" class="form-label fw-bold">Ενέργειες (JSON)</label>
-                                <textarea class="form-control json" id="actions" name="actions" x-ref="actions" rows="6" @input="actionsValid = isValidJSON($el.value)" :class="actionsValid?'is-valid':'is-invalid'">{{check questionnaire.definition.actions (objectify questionnaire.definition.actions) ''}}</textarea>
-                                <div class="invalid-feedback">Μη έγκυρο JSON.</div>
+                                <textarea class="form-control json" id="actions" name="actions" x-ref="actions" rows="6" 
+                                    @input="actions = $el.value" :class="valid.actions?'is-valid':'is-invalid'"
+                                    placeholder="(Αφήστε κενό για τα default κουμπιά)"
+                                    >
+                                        {{check questionnaire.definition.actions (objectify questionnaire.definition.actions) ''}}
+                                </textarea>
+                                <div>
+                                    <span class="invalid-feedback">Μη έγκυρο JSON.</span>
+                                    <span x-cloak x-show="invalidSequencesOf(actions).length" class="text-danger">Μη έγκυροι χαρακτήρες: <span x-text="invalidSequencesOf(actions)"></span></span>
+                                </div>
                             </div>
+                            <!-- ΤΕΛΟΣ JSON FIELDS -->
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="d-flex g-2">
-                                    <button type="submit" class="btn btn-success btn-icon" :disabled="!formValid">
+                                    <button type="submit" class="btn btn-success btn-icon" :disabled="!valid.form">
                                         <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
                                         <div>Αποθήκευση</div>
                                     </button>
