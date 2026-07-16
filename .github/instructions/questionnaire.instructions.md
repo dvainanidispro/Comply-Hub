@@ -49,6 +49,12 @@ paste σε textarea:
 2. **`cybersecurityQuestionnaire`** — object με ενότητες/ερωτήσεις:
    - top-level **`code`** (όχι id) — το domain αναγνωριστικό, βλ.
      «Ονοματολογία αναγνωριστικών» παρακάτω.
+   - top-level **`content`** — το πραγματικό περιεχόμενο: array από plain
+     section objects με τα `questions` τους. Χρησιμοποίησέ το σε νέα
+     definitions, imports και exports. ΜΗ χρησιμοποιείς `sections` σε νέο
+     definition. Το `sections` είναι η εσωτερική αναπαράσταση του
+     `Questionnaire` με instances `Section`. Ο constructor το δέχεται ακόμη
+     ως legacy alias εισόδου, αλλά αν δοθούν και τα δύο υπερισχύει το `content`.
    - `answers` = **STRING** (π.χ. `"YesNo"`) — ποτέ αναφορά σε αντικείμενο,
      αφού ερωτήσεις και απαντήσεις δηλώνονται/αποθηκεύονται ανεξάρτητα.
    - `required` υπάρχει σε κάθε ερώτηση (προς το παρόν παντού `true`).
@@ -242,6 +248,11 @@ constructor του `Response` ΔΕΝ ελέγχει το data)· για response
 
 Κλάσεις: `Questionnaire` → `Section[]` → `Question[]`, συν `Response`.
 Όλες χτίζονται από plain JSON-συμβατά αντικείμενα (ο constructor δέχεται defs).
+Το public `definition.content` είναι array από plain section objects, ενώ το
+`questionnaire.sections` είναι το εσωτερικό array από `Section` instances.
+Το `questionnaire.content` δίνει facade ως νέο array από plain JSON-compatible
+objects. Προς το παρόν το `Questionnaire.toJSON()` γράφει `sections` για
+συμβατότητα με τα υπάρχοντα persisted definitions.
 
 ### Ονοματολογία αναγνωριστικών: `code` vs `id` (κλειδωμένη)
 
@@ -303,7 +314,7 @@ actions: {
 | `comment` | `"text"` / `"textarea"` / false | μόνο choice — δηλώνει πεδίο σχολίου & τύπο input (default false) |
 | `files` | boolean (default false) | μόνο choice — δηλώνει upload αρχείων (το entry κρατά `files: [filenames]`) |
 | `tags` | string[] | π.χ. `["policies"]` για υπο-scores |
-| `validation` | string | hint για HTML φόρμα σε type text (`"email"`, `"number"`…) |
+| `validation` | string | hint για HTML φόρμα σε type text (`"email"`, `"number"`…). Αν δεν υπάρχει, τότε χρησιμοποιείται `<textarea>`. |
 | `questions` | Question[] | μόνο type group (π.χ. 3.10 → 3.10.1…) |
 
 - **choice**: βαθμολογείται (`score = weight × value`).

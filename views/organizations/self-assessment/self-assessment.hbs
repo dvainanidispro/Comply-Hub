@@ -1,1 +1,396 @@
-<h1>{{title}}</h1>
+<script>
+    /* Raw δεδομένα (JSONB-ready) του ερωτηματολογίου/response — μέσω objectify.
+     * Απλό <script> (ΟΧΙ type="module"/defer) ώστε να εκτελεστεί ΠΡΙΝ αρχικοποιηθεί
+     * το Alpine (που φορτώνεται deferred στο layout). Η ένωση σε instances
+     * (Questionnaire/Response) γίνεται μέσα στο selfAssessmentForm() παρακάτω — αυτή
+     * καλείται ΑΠΟ το Alpine, οπότε το /js/questionnaire.js (προηγείται στο layout)
+     * έχει ήδη φορτωθεί και η κλάση Questionnaire είναι διαθέσιμη ως global. */
+    window.questionnaireRecord = {{{objectify questionnaire}}};
+    window.responseData = {{{objectify (check response response.data null)}}};
+    window.showQuestionScoreBadge = true;
+    window.showOptionScore = true;
+</script>
+
+<script>
+    /* Οι ερωτήσεις μιας ενότητας ως ΕΠΙΠΕΔΗ λίστα [{q, depth}] — το depth δίνει την
+     * εσοχή των υπο-ερωτήσεων (type:"group"), ώστε το x-for να μη χρειάζεται αναδρομή. */
+    function flattenQuestions(section) {
+        const rows = [];
+        (function walk(questions, depth) {
+            for (const q of questions) {
+                rows.push({ q, depth });
+                walk(q.questions, depth + 1);
+            }
+        })(section.questions, 0);
+        return rows;
+    }
+
+    /**
+     * x-data της φόρμας αυτοαξιολόγησης — καλείται από το Alpine κατά την αρχικοποίηση.
+     * Χτίζει τα window.questionnaire/window.response (instances του πυρήνα questionnaire.js)
+     * και επιστρέφει ένα ακυκλικό αντικείμενο για το Alpine· το `response` μένει σε closure
+     * (έχει κυκλικές αναφορές — δεν μπαίνει στο x-data, βλ. οδηγίες ερωτηματολογίων).
+     */
+    function selfAssessmentForm() {
+        const questionnaire = new Questionnaire(window.questionnaireRecord.definition, { templates: window.questionnaireRecord.answers });
+        const data = Alpine.reactive(window.responseData || { questionnaire: questionnaire.code, answers: {} });
+        const response = questionnaire.createResponse(data);
+
+        window.questionnaire = questionnaire;
+        window.response = response;
+
+        /* Τιμές των choice ερωτήσεων ΕΚΤΟΣ του response.data, ειδικά για x-model στα
+         * <select> — το Alpine δεν επιλέγει σωστά ένα :value όταν τα <option> του
+         * render-άρονται δυναμικά (x-for)· το x-model λύνει το πρόβλημα, αλλά χρειάζεται
+         * assignable path, όχι κλήση συνάρτησης — γι' αυτό το ξεχωριστό reactive object,
+         * αρχικοποιημένο από τις ήδη αποθηκευμένες απαντήσεις. */
+        const values = Alpine.reactive({});
+        for (const q of questionnaire.allQuestions()) {
+            if (q.type === "choice") values[q.id] = response.entry(q.id)?.answerId ?? 0;
+        }
+
+        return {
+            questionnaire,
+            actions: questionnaire.actions,
+            sections: questionnaire.sections.map((s) => ({
+                id: s.id,
+                title: s.title,
+                description: s.description,
+                rows: flattenQuestions(s),
+            })),
+
+            showQuestionScoreBadge,
+            showOptionScore,
+
+            problems: [],
+            saving: false,
+            values,
+
+            /* ---- Εγγραφή απάντησης choice ερώτησης — ενημερώνει response ΚΑΙ values ---- */
+            setChoice(q, answerId) {
+                response.answer(q.id, Number(answerId));
+                this.values[q.id] = Number(answerId);
+            },
+
+            /* ---- Ανάγνωση απαντήσεων (για τα bindings) ---- */
+            textOf(q) {
+                const e = response.entry(q.id);
+                return (e && e.text) || "";
+            },
+            commentOf(q) {
+                const e = response.entry(q.id);
+                return (e && e.comment) || "";
+            },
+            filesOf(q) {
+                const e = response.entry(q.id);
+                return (e && e.files) || [];
+            },
+            optionLabel(opt) {
+                return (!opt.value || !showOptionScore) ? opt.label : `${opt.label} (${opt.value})`;
+            },
+            hasScore(q) {
+                return response.scoreOf(q.id) !== null;
+            },
+            scoreBadge(q) {
+                const score = response.scoreOf(q.id);
+                return (score === null ? "-" : score) + " / " + q.maxScore;
+            },
+            isProblem(id) {
+                return this.problems.some((p) => p.id === id);
+            },
+
+            /* ---- Εγγραφή απαντήσεων — πάντα μέσω του Response API ---- */
+            setText(q, value) {
+                response.setText(q.id, value);
+            },
+            setComment(q, value) {
+                response.setComment(q.id, value);
+            },
+            setFiles(q, fileList) {
+                response.setFiles(q.id, Array.from(fileList).map((f) => f.name));
+            },
+
+            /* ---- Κατάσταση & αποτελέσματα (ζωντανά) ---- */
+            flags() {
+                const s = response.status;
+                return [
+                    { label: "Ξεκίνησε η συμπλήρωση", ok: s.isStarted() },
+                    { label: "Καλύπτονται οι υποχρεωτικές ερωτήσεις", ok: s.isCompleted() },
+                    { label: "Οι απαντήσεις είναι έγκυρες", ok: s.isPartiallyValidated() },
+                    { label: "Έτοιμο για οριστική υποβολή", ok: s.isValidated() },
+                ];
+            },
+            overall() {
+                return response.results.all();
+            },
+            perSection() {
+                return response.results.bySection();
+            },
+            pct(x) {
+                return x === null ? "—" : x.toFixed(1) + "%";
+            },
+            /* Ποσοστό βάσει της ΜΕΓΙΣΤΗΣ δυνατής βαθμολογίας (score/maxScoreTotal),
+             * σε αντίθεση με το stats.percentage (score/maxScore μόνο απαντημένων). */
+            pctOfMax(stats) {
+                return stats.maxScoreTotal > 0 ? this.pct((stats.score / stats.maxScoreTotal) * 100) : "—";
+            },
+
+            /* ---- Ενέργειες φόρμας (save/submit, δυναμικά από questionnaire.actions) ---- */
+            async doAction(name) {
+                const action = this.actions[name];
+                if (name === "submit") {
+                    this.problems = response.status.validate();
+                } else if (name === "save") {
+                    this.problems = response.status.validate().filter((p) => p.kind === "invalid");
+                } else {
+                    this.problems = [];
+                }
+                if (this.problems.length) { return; }
+
+                this.saving = true;
+                const baseUrl = window.location.pathname.replace(/\/fill$/, "").replace(/\/$/, "");
+                await submitData(
+                    { data: response.toJSON(), questionnaireSnapshot: window.questionnaireRecord },
+                    baseUrl + action.path,
+                    "POST"
+                );
+                this.saving = false;
+            },
+        };
+    }
+</script>
+
+<div class="d-flex align-items-center gap-2 mb-1">
+    <h1 class="mb-0">{{title}}</h1>
+    {{#if response}}
+    <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
+    {{#if response.approvedAt}}<span class="badge bg-success">Εγκεκριμένο</span>{{/if}}
+    {{/if}}
+</div>
+
+<div class="row g-4 mt-2" x-data="selfAssessmentForm()" x-cloak>
+
+    <!-- ============================ ΦΟΡΜΑ ============================ -->
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-body">
+                <p class="text-muted" x-show="questionnaire.description" x-text="questionnaire.description"></p>
+
+                <form @submit.prevent>
+                    <template x-for="section in sections" :key="section.id">
+                        <section class="mb-4">
+                            <h2 class="h5 border-bottom pb-2 mt-4">
+                                <span x-text="section.id"></span>. <span x-text="section.title"></span>
+                            </h2>
+                            <p class="form-text" x-show="section.description" x-text="section.description"></p>
+
+                            <template x-for="row in section.rows" :key="row.q.id">
+                                <div :style="'margin-left:' + row.depth * 1.5 + 'rem'">
+
+                                    <!-- type:"group" — επικεφαλίδα, δεν απαντιέται -->
+                                    <template x-if="row.q.type === 'group'">
+                                        <div class="mt-3 mb-2">
+                                            <h3 class="h6 fw-bold mb-1">
+                                                <span x-text="row.q.id"></span>. <span x-text="row.q.text"></span>
+                                            </h3>
+                                            <div class="form-text" x-show="row.q.description" x-text="row.q.description"></div>
+                                        </div>
+                                    </template>
+
+                                    <!-- type:"choice" — επιλογή από AnswerSet, βαθμολογείται -->
+                                    <template x-if="row.q.type === 'choice'">
+                                        <div class="card mb-2" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                            <div class="card-body py-2">
+                                                <label class="form-label mb-1" :for="'q-' + row.q.id">
+                                                    <strong x-text="row.q.id"></strong>.
+                                                    <span x-text="row.q.text"></span>
+                                                    <req-star x-show="row.q.required"></req-star>
+                                                </label>
+                                                <div class="form-text mt-0 mb-1" x-show="row.q.description" x-text="row.q.description"></div>
+
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-md">
+                                                        <select
+                                                            class="form-select form-select-sm"
+                                                            :id="'q-' + row.q.id"
+                                                            :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                            @change="setChoice(row.q, $event.target.value)"
+                                                        >
+                                                            <template x-for="opt in row.q.answers.options" :key="opt.id">
+                                                                <option :value="opt.id" :selected="opt.id === values[row.q.id]" x-text="optionLabel(opt)"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div x-show="showQuestionScoreBadge" class="col-md-auto">
+                                                        <span
+                                                            class="badge"
+                                                            :class="hasScore(row.q) ? 'bg-success' : 'bg-secondary'"
+                                                            x-text="'Βαθμολογία: ' + scoreBadge(row.q)"
+                                                        ></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Δηλωτικό comment ("text"|"textarea") -->
+                                                <template x-if="row.q.comment === 'text'">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control form-control-sm mt-2"
+                                                        placeholder="Παρατηρήσεις"
+                                                        :value="commentOf(row.q)"
+                                                        @input="setComment(row.q, $event.target.value)"
+                                                    />
+                                                </template>
+                                                <template x-if="row.q.comment === 'textarea'">
+                                                    <textarea
+                                                        class="form-control form-control-sm mt-2"
+                                                        rows="2"
+                                                        placeholder="Παρατηρήσεις"
+                                                        :value="commentOf(row.q)"
+                                                        @input="setComment(row.q, $event.target.value)"
+                                                    ></textarea>
+                                                </template>
+
+                                                <!-- Δηλωτικό files:true — κρατάμε μόνο τα ονόματα αρχείων -->
+                                                <template x-if="row.q.files">
+                                                    <div class="mt-2">
+                                                        <input
+                                                            type="file"
+                                                            multiple
+                                                            class="form-control form-control-sm"
+                                                            @change="setFiles(row.q, $event.target.files)"
+                                                        />
+                                                        <div class="form-text" x-show="filesOf(row.q).length"
+                                                             x-text="'Αρχεία: ' + filesOf(row.q).join(', ')"></div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- type:"text" — ελεύθερο κείμενο, δεν βαθμολογείται -->
+                                    <template x-if="row.q.type === 'text'">
+                                        <div class="card mb-2" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                            <div class="card-body py-2">
+                                                <label class="form-label mb-1" :for="'q-' + row.q.id">
+                                                    <strong x-text="row.q.id"></strong>.
+                                                    <span x-text="row.q.text"></span>
+                                                    <req-star x-show="row.q.required"></req-star>
+                                                </label>
+                                                <div class="form-text mt-0 mb-1" x-show="row.q.description" x-text="row.q.description"></div>
+
+                                                <template x-if="row.q.validation">
+                                                    <input
+                                                        class="form-control form-control-sm"
+                                                        :id="'q-' + row.q.id"
+                                                        :type="row.q.validation ?? 'text'"
+                                                        :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                        :value="textOf(row.q)"
+                                                        @input="setText(row.q, $event.target.value)"
+                                                    />
+                                                </template>
+                                                <template x-if="!row.q.validation">
+                                                    <textarea
+                                                        class="form-control form-control-sm"
+                                                        :id="'q-' + row.q.id"
+                                                        rows="3"
+                                                        :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                        :value="textOf(row.q)"
+                                                        @input="setText(row.q, $event.target.value)"
+                                                    ></textarea>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                </div>
+                            </template>
+                        </section>
+                    </template>
+
+                    <!-- Προβλήματα validation (required/invalid) -->
+                    <div class="alert alert-danger" x-show="problems.length">
+                        <strong>Υπάρχουν προβλήματα:</strong>
+                        <ul class="mb-0 mt-1">
+                            <template x-for="p in problems" :key="p.id + p.kind">
+                                <li><code x-text="p.id"></code> — <span x-text="p.reason"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <!-- Κουμπιά ενεργειών — δυναμικά από το questionnaire.actions -->
+                    <div class="d-flex gap-2 my-4">
+                        <template x-for="(action, name) in actions" :key="name">
+                            <button
+                                type="button"
+                                class="btn btn-icon"
+                                :class="'btn-' + (action.color || 'outline-secondary')"
+                                :disabled="saving"
+                                @click="doAction(name)"
+                            >
+                                <bootstrap-icon :icon="name === 'submit' ? 'send-fill' : 'save2-fill'"></bootstrap-icon>
+                                <div x-text="action.text"></div>
+                            </button>
+                        </template>
+                        <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ΖΩΝΤΑΝΗ ΚΑΤΑΣΤΑΣΗ & ΑΠΟΤΕΛΕΣΜΑΤΑ ================= -->
+    <div class="col-lg-10">
+        <div class="sticky-lg-top" style="top: 1rem">
+
+            <div class="card mb-3">
+                <div class="card-header py-2">Κατάσταση</div>
+                <ul class="list-group list-group-flush">
+                    <template x-for="f in flags()" :key="f.label">
+                        <li class="list-group-item py-1 d-flex justify-content-between align-items-center">
+                            <small x-text="f.label"></small>
+                            <span class="badge" :class="f.ok ? 'text-bg-success' : 'text-bg-secondary'"
+                                  x-text="f.ok ? 'Ναι' : 'Όχι'"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header py-2">Συνολική Βαθμολογία</div>
+                <div class="card-body py-2">
+                    <table class="table table-sm small mb-0">
+                        <tbody>
+                            <tr><td>Πρόοδος</td><td class="text-end" x-text="overall().answered + ' / ' + overall().scorable"></td></tr>
+                            <tr><td>Βαθμολογία</td><td class="text-end" x-text="overall().score"></td></tr>
+                            <tr><td>Μέγιστη δυνατή βαθμολογία</td><td class="text-end" x-text="overall().maxScoreTotal"></td></tr>
+                            <tr><td>Αξιολόγηση</td><td class="text-end fw-bold fs-5 text-primary" x-text="pctOfMax(overall())"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header py-2">Ανά Ενότητα</div>
+                <div class="card-body py-2">
+                    <table class="table table-sm small mb-0">
+                        <thead>
+                            <tr><th></th><th class="text-end">Βαθμολογία</th><th class="text-end">Μέγιστο</th><th class="text-end">% Ενότητας</th></tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="s in perSection()" :key="s.id">
+                                <tr>
+                                    <td :title="s.title" x-text="s.id"></td>
+                                    <td class="text-end" x-text="s.score"></td>
+                                    <td class="text-end" x-text="s.maxScoreTotal"></td>
+                                    <td class="text-end" x-text="pctOfMax(s)"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

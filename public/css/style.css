@@ -89,7 +89,10 @@
         opacity: 0.3;
     }
 
-    .table td{min-width: 18ch}
+    .table td{
+        min-width: 18ch;
+        vertical-align: middle;
+    }
 
 }
 
@@ -218,6 +221,10 @@
 
     :is(.gap-2, .gap-3)  > .btn:not(.btn-reset):not(.btn-action) {
         padding: var(--btn-padding) !important;
+    }
+
+    .badge{
+        padding: 0.5em 0.8em !important;
     }
 
     .kpi-card.bg-warning-subtle { background-color: hsl(60,80%,88%) !important; }
