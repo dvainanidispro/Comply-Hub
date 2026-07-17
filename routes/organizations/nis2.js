@@ -24,6 +24,6 @@ nis2.use('/legislation', legislationRouter('NIS2', 'NIS2 - Νομοθεσία'))
 nis2.use('/kpi', kpiRouter('NIS2', 'NIS2 - KPIs'));
 
 // NIS2 Self-Assessment
-nis2.use('/self-assessment', selfAssessmentRouter('NIS2', 'NIS2 - Αυτοαξιολόγηση'));
+nis2.use('/self-assessment', selfAssessmentRouter('NIS2', 'NIS2 - Εργαλείο Αυτοαξιολόγησης'));
 
 export default nis2;

@@ -3,7 +3,7 @@
  *
  * Χρήση:
  *   import { selfAssessmentRouter } from './modules/self-assessment.js';
- *   nis2.use('/self-assessment', selfAssessmentRouter('NIS2', 'NIS2 - Αυτοαξιολόγηση'));
+ *   nis2.use('/self-assessment', selfAssessmentRouter('NIS2', 'NIS2 - Εργαλείο Αυτοαξιολόγησης'));
  */
 
 import express from 'express';
@@ -63,7 +63,9 @@ export function selfAssessmentRouter(framework, title) {
                 title,
                 framework,
                 code,
-                questionnaire: response?.questionnaireSnapshot ?? questionnaire,
+                questionnaire: response?.questionnaireSnapshot?.status === 'submitted'
+                    ? response.questionnaireSnapshot
+                    : questionnaire,
                 response,
             });
         } catch (error) {

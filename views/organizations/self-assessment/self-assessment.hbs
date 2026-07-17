@@ -12,19 +12,6 @@
 </script>
 
 <script>
-    /* Οι ερωτήσεις μιας ενότητας ως ΕΠΙΠΕΔΗ λίστα [{q, depth}] — το depth δίνει την
-     * εσοχή των υπο-ερωτήσεων (type:"group"), ώστε το x-for να μη χρειάζεται αναδρομή. */
-    function flattenQuestions(section) {
-        const rows = [];
-        (function walk(questions, depth) {
-            for (const q of questions) {
-                rows.push({ q, depth });
-                walk(q.questions, depth + 1);
-            }
-        })(section.questions, 0);
-        return rows;
-    }
-
     /**
      * x-data της φόρμας αυτοαξιολόγησης — καλείται από το Alpine κατά την αρχικοποίηση.
      * Χτίζει τα window.questionnaire/window.response (instances του πυρήνα questionnaire.js)
@@ -35,6 +22,17 @@
         const questionnaire = new Questionnaire(window.questionnaireRecord.definition, { templates: window.questionnaireRecord.answers });
         const data = Alpine.reactive(window.responseData || { questionnaire: questionnaire.code, answers: {} });
         const response = questionnaire.createResponse(data);
+
+        function pendingAnswers() {
+            const maxAnswersShown = 5;
+            const pending = response.status.pendingAnswers();
+            if (pending.length === 0) { return "—" }
+            if (pending.length > maxAnswersShown) {
+                return pending.slice(0, maxAnswersShown).join(', ') + ` ...`;
+            } else {
+                return pending.join(', ');
+            }
+        }
 
         window.questionnaire = questionnaire;
         window.response = response;
@@ -56,11 +54,11 @@
                 id: s.id,
                 title: s.title,
                 description: s.description,
-                rows: flattenQuestions(s),
+                rows: s.flattenQuestions(),
             })),
 
-            showQuestionScoreBadge,
-            showOptionScore,
+            showQuestionScoreBadge: window?.showQuestionScoreBadge??false,
+            showOptionScore: window.showOptionScore ??= false,  // "διπλή" ανάθεση σε περίπτωση undefined
 
             problems: [],
             saving: false,
@@ -86,7 +84,7 @@
                 return (e && e.files) || [];
             },
             optionLabel(opt) {
-                return (!opt.value || !showOptionScore) ? opt.label : `${opt.label} (${opt.value})`;
+                return (opt.value==null || !showOptionScore) ? opt.label : `${opt.label} (${opt.value})`;
             },
             hasScore(q) {
                 return response.scoreOf(q.id) !== null;
@@ -115,8 +113,9 @@
                 const s = response.status;
                 return [
                     { label: "Ξεκίνησε η συμπλήρωση", ok: s.isStarted() },
+                    { label: "Οι απαντήσεις που δόθηκαν είναι έγκυρες", ok: s.isPartiallyValidated() },
                     { label: "Καλύπτονται οι υποχρεωτικές ερωτήσεις", ok: s.isCompleted() },
-                    { label: "Οι απαντήσεις είναι έγκυρες", ok: s.isPartiallyValidated() },
+                    { label: "Υποχρεωτικές ερωτήσεις που δεν έχουν απαντηθεί", text: pendingAnswers() },
                     { label: "Έτοιμο για οριστική υποβολή", ok: s.isValidated() },
                 ];
             },
@@ -125,6 +124,9 @@
             },
             perSection() {
                 return response.results.bySection();
+            },
+            perTag() {
+                return response.results.byTag();
             },
             pct(x) {
                 return x === null ? "—" : x.toFixed(1) + "%";
@@ -160,27 +162,34 @@
     }
 </script>
 
-<div class="d-flex align-items-center gap-2 mb-1">
-    <h1 class="mb-0">{{title}}</h1>
-    {{#if response}}
-    <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
-    {{#if response.approvedAt}}<span class="badge bg-success">Εγκεκριμένο</span>{{/if}}
-    {{/if}}
-</div>
-
 <div class="row g-4 mt-2" x-data="selfAssessmentForm()" x-cloak>
 
     <!-- ============================ ΦΟΡΜΑ ============================ -->
     <div class="col-lg-10">
         <div class="card">
+            <div class="card-header d-flex align-items-center g-2">
+                <h1 class="card-title h3 mb-0">{{title}}</h1>
+                {{#if response}}
+                <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
+                {{#if response.approvedAt}}<span class="badge bg-success">Εγκεκριμένο</span>{{/if}}
+                {{/if}}
+            </div>
             <div class="card-body">
-                <p class="text-muted" x-show="questionnaire.description" x-text="questionnaire.description"></p>
+                <p class="text-muted" x-show="true" x-text="questionnaire.description"></p>
 
                 <form @submit.prevent>
-                    <template x-for="section in sections" :key="section.id">
-                        <section class="mb-4">
+                    <wa-tab-group>
+                        <template x-for="section in sections" :key="section.id">
+                            <wa-tab :panel="'section-' + section.id">
+                                <span x-text="section.id"></span>.&nbsp;<span x-text="section.title"></span>
+                            </wa-tab>
+                        </template>
+
+                        <template x-for="section in sections" :key="section.id">
+                            <wa-tab-panel :name="'section-' + section.id">
+                                <section class="mb-4">
                             <h2 class="h5 border-bottom pb-2 mt-4">
-                                <span x-text="section.id"></span>. <span x-text="section.title"></span>
+                                <span x-text="section.id"></span>.&nbsp;<span x-text="section.title"></span>
                             </h2>
                             <p class="form-text" x-show="section.description" x-text="section.description"></p>
 
@@ -199,7 +208,7 @@
 
                                     <!-- type:"choice" — επιλογή από AnswerSet, βαθμολογείται -->
                                     <template x-if="row.q.type === 'choice'">
-                                        <div class="card mb-2" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                        <div class="card mb-2 bg-lavender-light" :class="isProblem(row.q.id) ? 'border-danger' : ''">
                                             <div class="card-body py-2">
                                                 <label class="form-label mb-1" :for="'q-' + row.q.id">
                                                     <strong x-text="row.q.id"></strong>.
@@ -304,8 +313,10 @@
 
                                 </div>
                             </template>
-                        </section>
-                    </template>
+                                </section>
+                            </wa-tab-panel>
+                        </template>
+                    </wa-tab-group>
 
                     <!-- Προβλήματα validation (required/invalid) -->
                     <div class="alert alert-danger" x-show="problems.length">
@@ -318,7 +329,7 @@
                     </div>
 
                     <!-- Κουμπιά ενεργειών — δυναμικά από το questionnaire.actions -->
-                    <div class="d-flex gap-2 my-4">
+                    <div class="d-flex g-2 my-4">
                         <template x-for="(action, name) in actions" :key="name">
                             <button
                                 type="button"
@@ -339,7 +350,7 @@
     </div>
 
     <!-- ================= ΖΩΝΤΑΝΗ ΚΑΤΑΣΤΑΣΗ & ΑΠΟΤΕΛΕΣΜΑΤΑ ================= -->
-    <div class="col-lg-10">
+    <div x-cloak class="col-lg-10">
         <div class="sticky-lg-top" style="top: 1rem">
 
             <div class="card mb-3">
@@ -348,8 +359,14 @@
                     <template x-for="f in flags()" :key="f.label">
                         <li class="list-group-item py-1 d-flex justify-content-between align-items-center">
                             <small x-text="f.label"></small>
-                            <span class="badge" :class="f.ok ? 'text-bg-success' : 'text-bg-secondary'"
-                                  x-text="f.ok ? 'Ναι' : 'Όχι'"></span>
+                            <template x-if="f.text">
+                                <span class="badge bg-info"
+                                      x-text="f.text"></span>
+                            </template>
+                            <template x-if="!f.text && f.ok!=null">
+                                <span class="badge" :class="f.ok ? 'bg-success' : 'bg-secondary'"
+                                      x-text="f.ok ? 'Ναι' : 'Όχι'"></span>
+                            </template>
                         </li>
                     </template>
                 </ul>
@@ -360,7 +377,7 @@
                 <div class="card-body py-2">
                     <table class="table table-sm small mb-0">
                         <tbody>
-                            <tr><td>Πρόοδος</td><td class="text-end" x-text="overall().answered + ' / ' + overall().scorable"></td></tr>
+                            <tr><td>Πρόοδος</td><td class="text-end" x-text="overall().answered + ' / ' + overall().scorable + ' (' + Math.ceil(overall().answered / overall().scorable * 100) + '%)'"></td></tr>
                             <tr><td>Βαθμολογία</td><td class="text-end" x-text="overall().score"></td></tr>
                             <tr><td>Μέγιστη δυνατή βαθμολογία</td><td class="text-end" x-text="overall().maxScoreTotal"></td></tr>
                             <tr><td>Αξιολόγηση</td><td class="text-end fw-bold fs-5 text-primary" x-text="pctOfMax(overall())"></td></tr>
@@ -383,6 +400,27 @@
                                     <td class="text-end" x-text="s.score"></td>
                                     <td class="text-end" x-text="s.maxScoreTotal"></td>
                                     <td class="text-end" x-text="pctOfMax(s)"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3" x-show="perTag().length">
+                <div class="card-header py-2">Ανά Tag</div>
+                <div class="card-body py-2">
+                    <table class="table table-sm small mb-0">
+                        <thead>
+                            <tr><th></th><th class="text-end">Βαθμολογία</th><th class="text-end">Μέγιστο</th><th class="text-end">% Tag</th></tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="t in perTag()" :key="t.tag">
+                                <tr>
+                                    <td x-text="t.tag"></td>
+                                    <td class="text-end" x-text="t.score"></td>
+                                    <td class="text-end" x-text="t.maxScoreTotal"></td>
+                                    <td class="text-end" x-text="pctOfMax(t)"></td>
                                 </tr>
                             </template>
                         </tbody>

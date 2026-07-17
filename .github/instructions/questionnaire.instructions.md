@@ -119,6 +119,9 @@ r.status.isStarted()            // ≥1 ΠΡΑΓΜΑΤΙΚΗ απάντηση: c
                                 // Όχι id:0, ΟΧΙ entry μόνο με comment/files
 r.status.isCompleted()          // ΚΑΛΥΨΗ: όλες οι required απαντημένες 
                                 // (με πραγματική απάντηση, πχ id≠0 ή text μη κενό)
+r.status.pendingAnswers()       // flat array με τα ids των required που ΔΕΝ έχουν
+                                // απαντηθεί ακόμη (χωρίς sections), με τη σειρά του
+                                // ερωτηματολογίου. Κενό array ⟺ isCompleted()
 r.status.isPartiallyValidated() // ΟΡΘΟΤΗΤΑ: οι απαντήσεις ανήκουν στις επιτρεπτές
                                 // επιλογές του set (το id:0 ΠΑΝΤΑ επιτρεπτό — υπάρχει
                                 // σε κάθε set). ΜΟΝΟ αυτό — όχι έλεγχος μορφής/τύπων.
@@ -254,6 +257,14 @@ constructor του `Response` ΔΕΝ ελέγχει το data)· για response
 objects. Προς το παρόν το `Questionnaire.toJSON()` γράφει `sections` για
 συμβατότητα με τα υπάρχοντα persisted definitions.
 
+Διάσχιση ερωτήσεων μιας ενότητας (`Section`) — ίδια σειρά (depth-first, όπως
+στον ορισμό) και στις δύο:
+
+- `section.allQuestions()` — generator με ΟΛΕΣ τις ερωτήσεις (groups + παιδιά).
+- `section.flattenQuestions()` — επίπεδη λίστα `[{q, depth}]` για render της
+  φόρμας (το depth δίνει την εσοχή των υπο-ερωτήσεων των groups) — έτοιμη για
+  `x-for` του Alpine χωρίς αναδρομικά templates (βλ. συμβάσεις μετατροπέα).
+
 ### Ονοματολογία αναγνωριστικών: `code` vs `id` (κλειδωμένη)
 
 - Το ερωτηματολόγιο έχει **`code`** (string, π.χ.
@@ -345,8 +356,10 @@ API — top-level μόνο εγγραφή & core, τα υπόλοιπα στα n
   Οργανισμού — μόνο αν η ερώτηση δηλώνει `comment`), `setFiles` (ονόματα
   αρχείων — μόνο αν δηλώνει `files:true`), `entry`, `isAnswered`, `scoreOf`,
   `toJSON()`.
-- `.status`: `isStarted()`, `isCompleted()`, `isPartiallyValidated()`,
-  `validate()` (→ `[{id, kind, reason}]`), `isValidated()`.
+- `.status`: `isStarted()`, `isCompleted()`, `pendingAnswers()` (→ flat array
+  ids αναπάντητων required, με τη σειρά του ερωτηματολογίου),
+  `isPartiallyValidated()`, `validate()` (→ `[{id, kind, reason}]`),
+  `isValidated()`.
 - `.results`: `all()`, `bySection()`, `byTag()`.
 
 Τα stats (`results()` κ.λπ.) επιστρέφουν: `score`, `maxScore` (μόνο
@@ -392,8 +405,9 @@ css/js), Bootstrap 5.3.8 (μόνο CSS) + Alpine.js 3.x από CDN. Ανοίγε
    ΟΡΙΣΜΟΣ (Questionnaire/Section/Question/AnswerSet) είναι ακυκλικός και
    μπαίνει άφοβα.
 3. **Groups χωρίς αναδρομικά templates**: οι ερωτήσεις κάθε ενότητας
-   γίνονται επίπεδη λίστα `[{q, depth}]` (helper `flattenQuestions`) — το
-   depth δίνει την εσοχή των υπο-ερωτήσεων.
+   γίνονται επίπεδη λίστα `[{q, depth}]` με τη μέθοδο του πυρήνα
+   `section.flattenQuestions()` (κλάση `Section`) — το depth δίνει την
+   εσοχή των υπο-ερωτήσεων. ΜΗΝ ξαναγράφεις τοπικό helper στον μετατροπέα.
 4. **Reset ΕΠΙΤΟΠΟΥ** (delete των keys του `data.answers` μέσω του proxy),
    ΟΧΙ νέο Response — τα υπάρχοντα bindings παρακολουθούν το παλιό proxy
    και δεν θα έβλεπαν την αντικατάσταση.
