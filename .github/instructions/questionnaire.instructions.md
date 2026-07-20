@@ -13,26 +13,19 @@ applyTo: "**/*questionnaire*,**/*questionaire*"
 
 - Κράτα το `questionnaire.js` ως γενικό, επαναχρησιμοποιήσιμο πυρήνα χωρίς questionnaire-specific data.
 - To `questionnaire.js` είναι αρχείο που χρησιμοποιείται και στο node.js αλλά και σερβίρεται στον browser ως αρχείο JavaScript (ως ES6 module). 
-- Βάλε τα δεδομένα κάθε ερωτηματολογίου σε ξεχωριστό αρχείο τύπου `cybersecurity.js`.
+- Βάλε τα δεδομένα κάθε ερωτηματολογίου σε ξεχωριστό αρχείο τύπου `cybersecurity.js`, `vendor-assessment.js` ή στη βάση δεδομένων.
 - Χτίζε πάντα το questionnaire από καθαρό JSON definition + ξεχωριστά answer templates.
 - Θεώρησε το `id: 0` / `value: null` ως το μοναδικό sentinel για `not answered`.
 - Μην προσθέτεις validation τύπων στον πυρήνα· το `validation` είναι hint μόνο για client-side HTML form validation.
 - Για submit έλεγχε `response.status.isValidated()`· το draft save επιτρέπεται και χωρίς πλήρη κάλυψη.
-- Στο Alpine, κάνε reactive το plain `response.data`, όχι το `Response` instance.
+- Στο Alpine, κάνε reactive το plain `response.data`, όχι το `Response` instance. Ως παράδειγμα χρήσης σε view, δες το `views\organizations\self-assessment\self-assessment.hbs`.
 
 ## Οργάνωση αρχείων (κλειδωμένη)
 
 | Αρχείο | Ρόλος |
 |--------|-------|
 | `questionnaire.js` | **Επαναχρησιμοποιήσιμος πυρήνας** — ΟΛΕΣ οι κλάσεις: `AnswerSet`, `NOT_ANSWERED`, `DEFAULT_ACTIONS`, `buildAnswerTemplates()`, `Questionnaire`, `Section`, `Question`, `Response` (+ εσωτερικές `ResponseStatus`, `ResponseResults` — τα namespaces `.status`/`.results`). Κανένα δεδομένο συγκεκριμένου ερωτηματολογίου. Μεταφέρεται αυτούσιο σε άλλα projects. |
-| `cybersecurity.js` | **Δεδομένα + ένωση** του ερωτηματολογίου κυβερνοασφάλειας. Exports: `{ cybersecurity, cybersecurityAnswers, cybersecurityQuestionnaire }`. |
-| `cybersecurity.html` | **Demo φόρμα** (πρώτος μετατροπέας σε HTML) — ΕΝΑ αρχείο, Bootstrap 5.3.8 + Alpine.js 3.x από CDN. Στόχος: επαλήθευση ότι το σύστημα λειτουργεί, όχι ομορφιά. Βλ. ενότητα «Demo φόρμα». |
-
-
-- Κάθε νέο ερωτηματολόγιο = νέο αρχείο σαν το `cybersecurity.js`, πάνω στον
-  ίδιο πυρήνα.
-- Φόρτωση σε browser: πρώτα `questionnaire.js` (ορίζει globals), μετά το αρχείο
-  του ερωτηματολογίου. Σε Node: απλό `require`.
+| `public/js/questionnaire-form.js` | **Alpine adapter** (ComplyHub) — η κοινή x-data factory `questionnaireForm(record, responseData, config?)` για ΟΛΑ τα views με φόρμα ερωτηματολογίου. Φορτώνεται στο layout (μετά το alpine-ch.js, πριν το Alpine). Βλ. «Κοινή factory» παρακάτω. |
 
 ## Ροή δεδομένων (κλειδωμένη): καθαρό JSON → κλάσεις
 
@@ -386,6 +379,30 @@ css/js), Bootstrap 5.3.8 (μόνο CSS) + Alpine.js 3.x από CDN. Ανοίγε
 σκέτο (file://) — δεν χρειάζεται server. Σειρά φόρτωσης: `questionnaire.js`
 → `cybersecurity.js` → inline `<script>` προετοιμασίας → Alpine (defer,
 ΤΕΛΕΥΤΑΙΟ). Η λογική ζει στο inline script — τα x-* μένουν απλά bindings.
+
+### Κοινή factory — `public/js/questionnaire-form.js` (ComplyHub)
+
+Στο ComplyHub οι παρακάτω συμβάσεις υλοποιούνται ΜΙΑ φορά, στην κοινή
+factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
+τα views ΔΕΝ ξαναγράφουν τη λογική:
+
+- `questionnaireRecord`: το record από τη βάση (`.definition` + `.answers`) —
+  στέλνεται και ως `questionnaireSnapshot` στα POST των actions.
+- `responseData`: το αποθηκευμένο plain data του response, ή `null` για νέο.
+- `config` (όλα προαιρετικά, με defaults): `showQuestionScoreBadge` (false),
+  `showOptionScore` (false), `maxAnswersShown` (5), `baseUrl` (default: το
+  τρέχον path χωρίς κατάληξη `/fill`).
+- Χρήση: `x-data="questionnaireForm(rec, data, {…})"` — ή με spread για
+  view-specific extras: `x-data="{ ...questionnaireForm(rec, data), … }"`.
+  Πολλά ερωτηματολόγια στην ίδια σελίδα = πολλές κλήσεις.
+- Παρέχει: `sections` (flattened rows ανά ενότητα), read/write helpers
+  (`setChoice`/`setText`/`setComment`/`setFiles`, `textOf`/`commentOf`/
+  `filesOf`/`optionLabel`/`hasScore`/`scoreBadge`), validation state
+  (`problems`/`isProblem`), status/results (`flags`/`overall`/`perSection`/
+  `perTag`/`pct`/`pctOfMax`) και `doAction` (save/submit από τα
+  `questionnaire.actions`). Το αν θα γίνουν tabs οι ενότητες είναι θέμα
+  markup του view — η factory δεν αλλάζει.
+- Debug: εκθέτει `window.questionnaire`/`window.response` (last-one-wins).
 
 ### ΚΛΕΙΔΩΜΕΝΕΣ συμβάσεις για κάθε Alpine μετατροπέα
 

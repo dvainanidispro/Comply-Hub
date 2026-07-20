@@ -1,13 +1,12 @@
 
-// This is a simple Alpine.js plugin that adds a `fetch` magic property to Alpine.js components.
 // Load this script just before Alpine.js to use it.
-// Example of use: x-data="{speakers:$fetch('/api/speakers')}
 
 document.addEventListener('alpine:init', () => {
 
     Alpine.store('unitLabel', {amount: 'πλήθος', hours: 'ώρες', percentage: 'ποσοστό %'});
     Alpine.store('unit', {amount: '', hours: ' ώρες', percentage: ' %'});
 
+    // Example of use: x-data="{elements:$fetch('/api/elements')}
     Alpine.magic('fetch', () => (url, options = {}) => {
         let data = Alpine.reactive({});
         
