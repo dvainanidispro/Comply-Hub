@@ -1,0 +1,57 @@
+<script>
+    /* Raw δεδομένα (JSONB-ready) του ερωτηματολογίου/response — μέσω objectify.
+     * Χρησιμοποιούνται μόνο για να βγει η "Κατάσταση αυτοαξιολόγησης" (response.status)
+     * με την ίδια κοινή factory questionnaireForm() που χρησιμοποιεί και η sa-form. */
+    window.questionnaireRecord = {{{objectify questionnaire}}};
+    window.responseData = {{{objectify (check response response.data null)}}};
+</script>
+
+<div class="row g-4 mt-2" x-data="questionnaireForm(window.questionnaireRecord, window.responseData)" x-cloak>
+
+    <div class="col-lg-10">
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center g-2">
+                <h1 class="card-title h3 mb-0">{{title}}</h1>
+                {{#if response}}
+                <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
+                {{#if response.approvedAt}}<span class="badge bg-success">{{label 'status' 'approved'}}</span>{{/if}}
+                {{/if}}
+            </div>
+            <div class="card-body">
+                <p class="text-muted" x-text="questionnaire.description"></p>
+
+{{!-- 
+                <h2 class="h6">Κατάσταση αυτοαξιολόγησης</h2>
+                <ul class="list-group list-group-flush mb-3">
+                    <template x-for="f in flags()" :key="f.label">
+                        <li class="list-group-item py-1 d-flex justify-content-between align-items-center">
+                            <small x-text="f.label"></small>
+                            <template x-if="f.text">
+                                <span class="badge bg-info" x-text="f.text"></span>
+                            </template>
+                            <template x-if="!f.text && f.ok!=null">
+                                <span class="badge" :class="f.ok ? 'bg-success' : 'bg-secondary'"
+                                      x-text="f.ok ? 'Ναι' : 'Όχι'"></span>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+                 --}}
+
+                <a href="{{formUrl}}" class="btn btn-icon btn-primary">
+                    <bootstrap-icon icon="pencil-fill"></bootstrap-icon>
+                    <div>Είσοδος στη φόρμα αυτοαξιολόγησης</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">Αποτελέσματα</div>
+            <div class="card-body">
+                <!-- TODO: αποτελέσματα αυτοαξιολόγησης -->
+                <p>Εδώ θα εμφανίζονται τα αποτελέσματα της αυτοαξιολόγησης (Dashboard).</p>
+            </div>
+        </div>
+    </div>
+
+</div>

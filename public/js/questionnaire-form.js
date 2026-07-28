@@ -32,7 +32,7 @@
  *   showOptionScore         boolean (false)  το value δίπλα στο label των options
  *   maxAnswersShown         number  (5)      πόσα ids αναπάντητων δείχνει το flag
  *   baseUrl                 string  (null)   βάση των action paths· default το
- *                                            τρέχον path (αφαιρεί το /fill αν υπάρχει)
+ *                                            τρέχον path (αφαιρεί το /form ή /fill αν υπάρχει)
  */
 function questionnaireForm(questionnaireRecord, responseData = null, config = {}) {
     const {
@@ -174,7 +174,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
             if (this.problems.length) { return; }
 
             this.saving = true;
-            const url = (baseUrl ?? window.location.pathname.replace(/\/fill$/, "").replace(/\/$/, "")) + action.path;
+            const url = (baseUrl ?? window.location.pathname.replace(/\/(form|fill)$/, "")) + action.path;
             await submitData(
                 { data: response.toJSON(), questionnaireSnapshot: questionnaireRecord },
                 url,

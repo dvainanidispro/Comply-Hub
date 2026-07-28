@@ -20,7 +20,7 @@
                 <h1 class="card-title h3 mb-0">{{title}}</h1>
                 {{#if response}}
                 <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
-                {{#if response.approvedAt}}<span class="badge bg-success">Εγκεκριμένο</span>{{/if}}
+                {{#if response.approvedAt}}<span class="badge bg-success">{{label 'status' 'approved'}}</span>{{/if}}
                 {{/if}}
             </div>
             <div class="card-body">
@@ -187,7 +187,6 @@
                                 :disabled="saving"
                                 @click="doAction(name)"
                             >
-                                <bootstrap-icon :icon="name === 'submit' ? 'send-fill' : 'save2-fill'"></bootstrap-icon>
                                 <div x-text="action.text"></div>
                             </button>
                         </template>

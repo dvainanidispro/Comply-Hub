@@ -54,12 +54,14 @@ export function selfAssessmentRouter(framework, title) {
     const router = express.Router();
     const code = codes[framework];
 
-    /* GET /, /fill - Φόρμα συμπλήρωσης του ερωτηματολογίου αυτοαξιολόγησης */
-    router.get(['/', '/fill'], async (req, res) => {
+    /* GET / - Ενδιάμεση οθόνη επισκόπησης (κατάσταση + αποτελέσματα)
+     * GET /form, /fill - Φόρμα συμπλήρωσης του ερωτηματολογίου αυτοαξιολόγησης */
+    router.get(['/', '/form', '/fill'], async (req, res) => {
         try {
             const { questionnaire, response } = await fetchQuestionnaireWithResponse(framework, code, req.org);
+            const view = (req.path === '/') ? 'sa-overview' : 'sa-form';
 
-            res.render('organizations/self-assessment/self-assessment', {
+            res.render(`organizations/self-assessment/${view}`, {
                 title,
                 framework,
                 code,
@@ -67,6 +69,7 @@ export function selfAssessmentRouter(framework, title) {
                     ? response.questionnaireSnapshot
                     : questionnaire,
                 response,
+                formUrl: `${req.baseUrl}/form`,
             });
         } catch (error) {
             log.error(`Error fetching self-assessment questionnaire for framework ${framework}: ${error.message}`);
