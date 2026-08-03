@@ -32,7 +32,8 @@
  *   showOptionScore         boolean (false)  το value δίπλα στο label των options
  *   maxAnswersShown         number  (5)      πόσα ids αναπάντητων δείχνει το flag
  *   baseUrl                 string  (null)   βάση των action paths· default το
- *                                            τρέχον path (αφαιρεί το /form ή /fill αν υπάρχει)
+ *                                            τρέχον path (αφαιρεί το /form ή /fill αν υπάρχει).
+ *   Η δεσμευμένη action cancel δεν χρησιμοποιεί path: εκτελεί history.back().
  */
 function questionnaireForm(questionnaireRecord, responseData = null, config = {}) {
     const {
@@ -161,9 +162,13 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
             return stats.maxScoreTotal > 0 ? this.pct((stats.score / stats.maxScoreTotal) * 100) : "—";
         },
 
-        /* ---- Ενέργειες φόρμας (save/submit, δυναμικά από questionnaire.actions) ---- */
+        /* ---- Ενέργειες φόρμας (cancel/save/submit, δυναμικά από questionnaire.actions) ---- */
         async doAction(name) {
             const action = this.actions[name];
+            if (name === "cancel") {
+                window.history.back();
+                return;
+            }
             if (name === "submit") {
                 this.problems = response.status.validate();
             } else if (name === "save") {

@@ -279,24 +279,28 @@ objects. Προς το παρόν το `Questionnaire.toJSON()` γράφει `se
 
 ```js
 actions: {
+  cancel: { text: "Ακύρωση",                   color: "secondary" },
   save:   { path: "/save",   text: "Προσωρινή Αποθήκευση", color: "secondary" },
   submit: { path: "/submit", text: "Οριστική υποβολή",     color: "primary" },
 }
 ```
 
-- Κάθε κλειδί = μία ενέργεια/κουμπί: `path` (endpoint που χτυπά η φόρμα),
-  `text` (λεκτικό κουμπιού), `color` (Bootstrap variant). **Κανένα validation
-  περιεχομένου** — κάθε ενέργεια μπορεί να έχει όποια keys χρειάζεται η φόρμα,
-  και επιπλέον αυτών (π.χ. `icon`, `confirm`).
+- Κάθε κλειδί = μία ενέργεια/κουμπί: συνήθως `path` (endpoint που χτυπά η
+  φόρμα), `text` (λεκτικό κουμπιού), `color` (Bootstrap variant). Η δεσμευμένη
+  action `cancel` δεν χρειάζεται `path`: εκτελεί `history.back()` στον browser,
+  χωρίς validation ή POST. **Κανένα validation περιεχομένου** — κάθε ενέργεια
+  μπορεί να έχει όποια keys χρειάζεται η φόρμα, και επιπλέον αυτών (π.χ. `icon`,
+  `confirm`).
 - **Απόφαση — ζει στο `def`**, όχι στο δεύτερο όρισμα (`opts`): είναι δηλωτικό
   περιεχόμενο της φόρμας (όπως τα `validation`/`comment`/`files`) και
   αποθηκεύεται μαζί με τον ορισμό στην JSONB — η ανασύσταση από την PostgreSQL
   δίνει τα ίδια κουμπιά χωρίς τρίτο αποθηκευμένο αντικείμενο. Το `opts` μένει
   για ό,τι δηλώνεται/αποθηκεύεται ανεξάρτητα (templates).
 - **Όλα-ή-τίποτα (κλειδωμένο)**: αν το `actions` λείψει, ισχύει ΟΛΟΚΛΗΡΟ το
-  default (`DEFAULT_ACTIONS` του πυρήνα: save + submit, όπως παραπάνω). Αν
-  δοθεί, χρησιμοποιείται ΩΣ ΕΧΕΙ — **χωρίς merge ανά κλειδί**: `actions` μόνο
-  με `submit` σημαίνει φόρμα ΧΩΡΙΣ κουμπί save. Κενό object = κανένα κουμπί.
+  default (`DEFAULT_ACTIONS` του πυρήνα: cancel + save + submit, όπως
+  παραπάνω). Αν δοθεί, χρησιμοποιείται ΩΣ ΕΧΕΙ — **χωρίς merge ανά κλειδί**:
+  `actions` μόνο με `submit` σημαίνει φόρμα ΧΩΡΙΣ κουμπιά cancel/save. Κενό
+  object = κανένα κουμπί.
 - Επεκτάσιμο: ελεύθερα ονόματα ενεργειών (π.χ. `print`, `export`) — η φόρμα
   render-άρει ένα κουμπί ανά entry, με τη σειρά δήλωσης των κλειδιών.
 - Το resolved αντικείμενο είναι διαθέσιμο ως `questionnaire.actions`. Το
@@ -399,7 +403,7 @@ factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
   (`setChoice`/`setText`/`setComment`/`setFiles`, `textOf`/`commentOf`/
   `filesOf`/`optionLabel`/`hasScore`/`scoreBadge`), validation state
   (`problems`/`isProblem`), status/results (`flags`/`overall`/`perSection`/
-  `perTag`/`pct`/`pctOfMax`) και `doAction` (save/submit από τα
+  `perTag`/`pct`/`pctOfMax`) και `doAction` (cancel/save/submit από τα
   `questionnaire.actions`). Το αν θα γίνουν tabs οι ενότητες είναι θέμα
   markup του view — η factory δεν αλλάζει.
 - Debug: εκθέτει `window.questionnaire`/`window.response` (last-one-wins).
@@ -432,9 +436,10 @@ factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
    το φυσικό default του browser· τα κουμπιά ενεργειών βγαίνουν δυναμικά από
    το `questionnaire.actions` (`x-for="(action, name) in actions"`).
 
-Συμπεριφορά ενεργειών στο demo: κανένα πραγματικό POST — εμφανίζεται το
-payload που ΘΑ στελνόταν στο `action.path`. Μόνο το submit απαιτεί
-`isValidated()` — το draft save επιτρέπεται σε κάθε κατάσταση.
+Συμπεριφορά ενεργειών στο demo: το `cancel` εκτελεί browser back χωρίς
+validation ή POST. Οι υπόλοιπες ενέργειες δεν κάνουν πραγματικό POST —
+εμφανίζεται το payload που ΘΑ στελνόταν στο `action.path`. Μόνο το submit
+απαιτεί `isValidated()` — το draft save επιτρέπεται σε κάθε κατάσταση.
 
 Επαληθευμένο σε browser (Chromium, 2026-07-10, με τις 19 ενότητες):
 1683/1683 με μέγιστες απαντήσεις (234 ερωτήσεις), tag policies 240/240,

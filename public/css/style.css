@@ -245,6 +245,9 @@
         text-wrap: balance;
         text-align: center;
     }
+    /* wa-tab-group::part(scroll-button-end){
+        --wa-color-on-quiet: crimson;
+    } */
     
     /* Hide cloaked elements for Alpine.js */
     [x-cloak] { display: none !important; }
