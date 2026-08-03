@@ -57,9 +57,36 @@ function createCodeFromName(name) {
         .join('');
 }
 
-// Ορίζουμε τα αρχικά για όλα τα sl-avatar στοιχεία στη σελίδα από το name τους.
-Q("wa-avatar").forEach(el => {
-    el.setAttribute('initials', createCodeFromName(el.getAttribute('name') || ''));
+/** 
+ * Φέρνει το gravatar image του χρήστη με βάση το email του 
+ * Αποθηκεύει το αποτέλεσμα στο sessionStorage (URL ή '' - κενό string)
+ * */
+async function getGravatarUrl(email, size = 48) {
+    const properEmail = email.trim().toLowerCase();
+    const emailBytes = new TextEncoder().encode(properEmail);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', emailBytes);
+    const hash = Array.from(new Uint8Array(hashBuffer), byte => byte.toString(16).padStart(2, '0')).join('');
+    const avatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404&r=g`;
+
+    let avatar = null;
+    const gravatarKey = `gravatar`;                     //NOTE: Για πολλούς χρήστες, `gravatar-${properEmail}` πχ
+    avatar = sessionStorage.getItem(gravatarKey);       // Το αποθηκευμένο gravatar είναι URL ή '' (κενό string) ή null
+    if (avatar != null) { return avatar; }              // Προσοχή: όχι if (!avatar) λόγω περίπτωσης ''
+    const gravatarResponse = await fetch(avatarUrl, { method: 'HEAD' });        // status: 2xx ή 404
+    avatar = gravatarResponse.ok ? avatarUrl : '';
+
+    sessionStorage.setItem(gravatarKey, avatar);
+    return avatar;
+}
+
+// Ορίζουμε την εικόνα του προφίλ από το Gravatar, αλλιώς, τα αρχικά για όλα τα sl-avatar στοιχεία στη σελίδα από το name τους.
+Q("wa-avatar").forEach(async function(el) {
+    const avatar = await getGravatarUrl(el.getAttribute('email'));
+    if (avatar) {
+        el.setAttribute('image', avatar);
+    } else {
+        el.setAttribute('initials', createCodeFromName(el.getAttribute('name') || ''));
+    }
 });
 
 

@@ -57,13 +57,20 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="userPassword" class="form-label fw-bold">Νέο Password</label>
-                                <input type="password" class="form-control" id="userPassword" name="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$" title="Το password πρέπει να περιέχει τουλάχιστον 8 χαρακτήρες, ένα γράμμα, έναν αριθμό και ένα σύμβολο.">
+                                <input type="password" class="form-control" id="userPassword" name="password" autocomplete="new-password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$" title="Το password πρέπει να περιέχει τουλάχιστον 8 χαρακτήρες, ένα γράμμα, έναν αριθμό και ένα σύμβολο.">
                                 <div class="form-text text-muted">Να παραμείνει κενό αν δεν επιθυμείτε την αλλαγή του</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="confirmPassword" class="form-label fw-bold">Επιβεβαίωση Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" autocomplete="new-password">
                                 <div class="form-text text-muted">Επαναλάβετε το νέο password για επιβεβαίωση σε περίπτωση αλλαγής</div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="confirmPassword" class="form-label fw-bold">Εικόνα προφίλ</label>
+                                <div class="form-text text-muted">
+                                    Μπορείτε να προσθέσετε ή να αλλάξετε την εικόνα προφίλ σας στο λογαριασμό σας στο <a href="https://gravatar.com" target="_blank">Gravatar</a> με το ίδιο email.
+                                    (Μετά από ενημέρωση του προφίλ σας στο Gravatar πατήστε <button type="button" class="show-as-link align-baseline" id="refreshGravatar">εδώ</button> για ανανέωση της εικόνας σας)
+                                    </div>
                             </div>
                         </div>
                         
@@ -153,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('profileForm');
     const passwordField = document.getElementById('userPassword');
     const confirmPasswordField = document.getElementById('confirmPassword');
+    const refreshGravatarButton = document.getElementById('refreshGravatar');
     
     // Έλεγχος ομοιότητας passwords κατά την πληκτρολόγηση και υποβολή
     function checkPasswordMatch() {
@@ -190,5 +198,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     passwordField.addEventListener('input', checkPasswordMatch);
     confirmPasswordField.addEventListener('input', checkPasswordMatch);
+
+    refreshGravatarButton.addEventListener('click', function() {
+        sessionStorage.removeItem('gravatar');
+        window.location.reload();
+    });
 });
 </script>

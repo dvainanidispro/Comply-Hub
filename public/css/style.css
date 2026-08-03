@@ -28,6 +28,7 @@
         --bs-warning-rgb: 235, 152, 0;
         /* --bs-btn-bg: hsl(39, 100%, 36%); */
         --bs-pink: hsl(332, 100%, 60%);
+        --link-color: navy;
 
         --card-gradient: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
 
@@ -79,7 +80,7 @@
     }
 
     a{
-        color: navy;
+        color: var(--link-color);
     }
 
     /* h3,h4,h5,p{margin-bottom: revert;} */
@@ -358,11 +359,21 @@
         line-height: 1;
     }
 
-    .btn:not(.btn-reset):not(.btn-action) {
+    button.show-as-link{
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--link-color);
+        /* text-decoration: underline; */
+        cursor: pointer;
+        vertical-align: baseline;
+    }
+
+    .btn:not(.btn-reset):not(.btn-action):not(.btn-link) {
         padding: var(--btn-padding) !important;
         min-width: 3rem;
     }
-    :is(.btn, .btn:focus, .btn:active, .btn:hover):not([class*="btn-outline"]){
+    :is(.btn, .btn:focus, .btn:active, .btn:hover):not([class*="btn-outline"],[class*="btn-link"]){
         color: var(--bs-light) !important;
     }
     .btn:is([class^="btn-outline-"], [class*=" btn-outline-"]):not(:disabled):is(:hover, :focus) {
