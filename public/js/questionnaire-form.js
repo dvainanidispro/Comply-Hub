@@ -47,8 +47,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
     const data = Alpine.reactive(responseData || { questionnaire: questionnaire.code, answers: {} });
     const response = questionnaire.createResponse(data);
 
-    /* Debug διευκόλυνση για την κονσόλα — με πολλές φόρμες στη σελίδα
-     * επικρατεί η τελευταία (last-one-wins). */
+    // Debug διευκόλυνση για την κονσόλα — με πολλές φόρμες στη σελίδα - επικρατεί η τελευταία (last-one-wins). 
     window.questionnaire = questionnaire;
     window.response = response;
 
@@ -72,7 +71,11 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
         if (q.type === "choice") values[q.id] = response.entry(q.id)?.answerId ?? 0;
     }
 
-    return {
+    //# Το αντικείμενο που στέλνεται στο x-data
+    /**
+     * Το αντικείμενο που στέλνεται στο x-data.
+     */
+    const xData = {
         questionnaire,
         actions: questionnaire.actions,
         sections: questionnaire.sections.map((s) => ({
@@ -81,6 +84,10 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
             description: s.description,
             rows: s.flattenQuestions(),
         })),
+
+        // response,    
+        // ΠΡΟΣΟΧΗ: Αν μπει εδώ το response, θα κάνει κυκλική αναφορά. Η λύση είναι να γίνει non enumerable property (παρακάτω) 
+        // ώστε να μην προσπελαύνεται κατά την αρχικοποίηση του alpine state, αλλά να λειτουργεί αν κληθεί.
 
         showQuestionScoreBadge,
         showOptionScore,
@@ -188,4 +195,12 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
             this.saving = false;
         },
     };
+
+    Object.defineProperty(xData, 'response', {
+        value: response,
+        enumerable: false,
+        configurable: true,
+    });
+
+    return xData;
 }

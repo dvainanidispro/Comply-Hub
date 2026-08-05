@@ -20,6 +20,13 @@
             <div class="card-body">
                 <p class="text-muted" x-text="questionnaire.description"></p>
 
+                {{#if response}}
+                <h2 class="h6">Κατάσταση συμπλήρωσης ερωτηματολόγιου</h2>
+                <div class="my-3 reserve-space">
+                    <wa-progress-bar value="0" :value="response.results.all().progressPercent" id="progress" x-text="`${response.results.all().progressPercent}%`">0</wa-progress-bar>
+                </div>
+                {{/if}}
+
 {{!-- 
                 <h2 class="h6">Κατάσταση αυτοαξιολόγησης</h2>
                 <ul class="list-group list-group-flush mb-3">
@@ -55,3 +62,7 @@
     </div>
 
 </div>
+
+<script type="module">
+
+</script>

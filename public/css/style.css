@@ -797,6 +797,11 @@
 /****************      UTILITIES LAYER      ******************/
 @layer utilities {
 
+    .reserve-space {
+        --height: 1rem;
+        display: block;
+        min-height: var(--height);
+    }
 
     .center-contents, .center-content{
         display: grid;
