@@ -325,3 +325,56 @@ class DimUpload extends HTMLElement {
 }
 window.customElements.define('dim-upload', DimUpload);
 
+/**
+ * Χρήση: <gravatar-image email="user@example.com" label="User avatar" default="initials" name="User Name"></gravatar-image>
+ */
+class GravatarImage extends HTMLElement {
+    #initialized = false;
+
+    connectedCallback() {
+            if (this.#initialized) { return }
+            this.#initialized = true;
+        this.render();
+    }
+
+    async render() {
+        const email = (this.getAttribute('email') ?? '').trim().toLowerCase();
+        const hash = await this.sha256(email);
+
+        const url = new URL(`https://www.gravatar.com/avatar/${hash}`);
+
+        const parameters = [
+            'size',
+            'default',
+            'forcedefault',
+            'rating',
+            'initials',
+            'name',
+        ];
+
+        for (const parameter of parameters) {
+            if (!this.hasAttribute(parameter)) { continue }
+            const value = this.getAttribute(parameter).trim();
+            if (value !== '') {
+                url.searchParams.set(parameter, value);
+            }
+        }
+
+        const image = document.createElement('img');
+        image.src = url.toString();
+        image.alt = this.getAttribute('label') || 'Gravatar image';
+        image.classList.add('gravatar-image');
+
+        this.replaceChildren(image);
+    }
+
+    async sha256(value) {
+        const data = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+
+        return Array.from(new Uint8Array(digest))
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
+    }
+}
+window.customElements.define('gravatar-image', GravatarImage);

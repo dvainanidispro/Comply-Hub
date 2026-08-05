@@ -727,6 +727,7 @@
     .avatar{
         width: 3rem;
         margin-left: 0.5rem;
+        img { border-radius: 50%; }
     }
 
     .input-group-text.input-symbol{

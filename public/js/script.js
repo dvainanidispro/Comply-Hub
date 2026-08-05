@@ -57,10 +57,12 @@ function createCodeFromName(name) {
         .join('');
 }
 
+
 /** 
  * Φέρνει το gravatar image του χρήστη με βάση το email του 
  * Αποθηκεύει το αποτέλεσμα στο sessionStorage (URL ή '' - κενό string)
  * */
+/*
 async function getGravatarUrl(email, size = 48) {
     const properEmail = email.trim().toLowerCase();
     const emailBytes = new TextEncoder().encode(properEmail);
@@ -79,6 +81,7 @@ async function getGravatarUrl(email, size = 48) {
     return avatar;
 }
 
+/*
 // Ορίζουμε την εικόνα του προφίλ από το Gravatar, αλλιώς, τα αρχικά για όλα τα sl-avatar στοιχεία στη σελίδα από το name τους.
 Q("wa-avatar").forEach(async function(el) {
     const avatar = await getGravatarUrl(el.getAttribute('email'));
@@ -88,7 +91,7 @@ Q("wa-avatar").forEach(async function(el) {
         el.setAttribute('initials', createCodeFromName(el.getAttribute('name') || ''));
     }
 });
-
+*/
 
 /** Παράγει φιλική περιγραφή για ένα period name */ 
 function periodDescription(name='') {

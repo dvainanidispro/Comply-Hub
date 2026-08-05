@@ -68,8 +68,7 @@
                             <div class="col-12 mb-3">
                                 <label for="confirmPassword" class="form-label fw-bold">Εικόνα προφίλ</label>
                                 <div class="form-text text-muted">
-                                    Μπορείτε να προσθέσετε ή να αλλάξετε την εικόνα προφίλ σας στο λογαριασμό σας στο <a href="https://gravatar.com" target="_blank">Gravatar</a> με το ίδιο email.
-                                    (Μετά από ενημέρωση του προφίλ σας στο Gravatar πατήστε <button type="button" class="show-as-link align-baseline" id="refreshGravatar">εδώ</button> για ανανέωση της εικόνας σας)
+                                    Μπορείτε να προσθέσετε ή να αλλάξετε την εικόνα του προφίλ σας στο λογαριασμό σας στο <a href="https://gravatar.com" target="_blank">Gravatar</a> με το ίδιο email.
                                     </div>
                             </div>
                         </div>
@@ -160,7 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('profileForm');
     const passwordField = document.getElementById('userPassword');
     const confirmPasswordField = document.getElementById('confirmPassword');
-    const refreshGravatarButton = document.getElementById('refreshGravatar');
     
     // Έλεγχος ομοιότητας passwords κατά την πληκτρολόγηση και υποβολή
     function checkPasswordMatch() {
@@ -199,9 +197,5 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordField.addEventListener('input', checkPasswordMatch);
     confirmPasswordField.addEventListener('input', checkPasswordMatch);
 
-    refreshGravatarButton.addEventListener('click', function() {
-        sessionStorage.removeItem('gravatar');
-        window.location.reload();
-    });
 });
 </script>
