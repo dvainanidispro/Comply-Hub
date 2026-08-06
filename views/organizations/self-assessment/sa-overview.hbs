@@ -23,7 +23,7 @@
                 {{#if response}}
                 <h2 class="h6">Κατάσταση συμπλήρωσης ερωτηματολόγιου</h2>
                 <div class="my-3 reserve-space">
-                    <wa-progress-bar value="0" :value="response.results.all().progressPercent" id="progress" x-text="`${response.results.all().progressPercent}%`">0</wa-progress-bar>
+                    <wa-progress-bar :value="Math.max(5, response.results.all().progressPercent)" id="progress" x-text="`${response.results.all().progressPercent}%`">0</wa-progress-bar>
                 </div>
                 {{/if}}
 

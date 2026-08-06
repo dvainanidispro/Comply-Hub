@@ -1,0 +1,183 @@
+    <!-- ============================ ΦΟΡΜΑ ============================ -->
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header d-flex align-items-center g-2">
+                <h1 class="card-title h3 mb-0">{{title}}</h1>
+                {{#if response}}
+                <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
+                {{#if response.approvedAt}}<span class="badge bg-success">{{label 'status' 'approved'}}</span>{{/if}}
+                {{/if}}
+            </div>
+            <div class="card-body">
+                <p class="text-muted" x-show="true" x-text="questionnaire.description"></p>
+
+                <form @submit.prevent>
+                    <wa-tab-group>
+                        <template x-for="section in sections" :key="section.id">
+                            <wa-tab :panel="'section-' + section.id">
+                                <span x-text="section.id"></span>.&nbsp;<span x-text="section.title"></span>
+                            </wa-tab>
+                        </template>
+
+                        <template x-for="section in sections" :key="section.id">
+                            <wa-tab-panel :name="'section-' + section.id">
+                                <section class="mb-4">
+                            <h2 class="h5 border-bottom pb-2 mt-4">
+                                <span x-text="section.id"></span>.&nbsp;<span x-text="section.title"></span>
+                            </h2>
+                            <p class="form-text" x-show="section.description" x-text="section.description"></p>
+
+                            <template x-for="row in section.rows" :key="row.q.id">
+                                <div :style="'margin-left:' + row.depth * 1.5 + 'rem'">
+
+                                    <!-- type:"group" — επικεφαλίδα, δεν απαντιέται -->
+                                    <template x-if="row.q.type === 'group'">
+                                        <div class="mt-3 mb-2">
+                                            <h3 class="h6 fw-bold mb-1">
+                                                <span x-text="row.q.id"></span>. <span x-text="row.q.text"></span>
+                                            </h3>
+                                            <div class="form-text" x-show="row.q.description" x-text="row.q.description"></div>
+                                        </div>
+                                    </template>
+
+                                    <!-- type:"choice" — επιλογή από AnswerSet, βαθμολογείται -->
+                                    <template x-if="row.q.type === 'choice'">
+                                        <div class="card mb-2 bg-lavender-light" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                            <div class="card-body py-2">
+                                                <label class="form-label mb-1" :for="'q-' + row.q.id">
+                                                    <strong x-text="row.q.id"></strong>.
+                                                    <span x-text="row.q.text"></span>
+                                                    <req-star x-show="row.q.required"></req-star>
+                                                </label>
+                                                <div class="form-text mt-0 mb-1" x-show="row.q.description" x-text="row.q.description"></div>
+
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-md">
+                                                        <select
+                                                            class="form-select form-select-sm"
+                                                            :id="'q-' + row.q.id"
+                                                            :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                            @change="setChoice(row.q, $event.target.value)"
+                                                        >
+                                                            <template x-for="opt in row.q.answers.options" :key="opt.id">
+                                                                <option :value="opt.id" :selected="opt.id === values[row.q.id]" x-text="optionLabel(opt)"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div x-show="showQuestionScoreBadge" class="col-md-auto">
+                                                        <span
+                                                            class="badge"
+                                                            :class="hasScore(row.q) ? 'bg-success' : 'bg-secondary'"
+                                                            x-text="'Βαθμολογία: ' + scoreBadge(row.q)"
+                                                        ></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Δηλωτικό comment ("text"|"textarea") -->
+                                                <template x-if="row.q.comment === 'text'">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control form-control-sm mt-2"
+                                                        placeholder="Παρατηρήσεις"
+                                                        :value="commentOf(row.q)"
+                                                        @input="setComment(row.q, $event.target.value)"
+                                                    />
+                                                </template>
+                                                <template x-if="row.q.comment === 'textarea'">
+                                                    <textarea
+                                                        class="form-control form-control-sm mt-2"
+                                                        rows="2"
+                                                        placeholder="Παρατηρήσεις"
+                                                        :value="commentOf(row.q)"
+                                                        @input="setComment(row.q, $event.target.value)"
+                                                    ></textarea>
+                                                </template>
+
+                                                <!-- Δηλωτικό files:true — κρατάμε μόνο τα ονόματα αρχείων -->
+                                                <template x-if="row.q.files">
+                                                    <div class="mt-2">
+                                                        <input
+                                                            type="file"
+                                                            multiple
+                                                            class="form-control form-control-sm"
+                                                            @change="setFiles(row.q, $event.target.files)"
+                                                        />
+                                                        <div class="form-text" x-show="filesOf(row.q).length"
+                                                             x-text="'Αρχεία: ' + filesOf(row.q).join(', ')"></div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- type:"text" — ελεύθερο κείμενο, δεν βαθμολογείται -->
+                                    <template x-if="row.q.type === 'text'">
+                                        <div class="card mb-2" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                            <div class="card-body py-2">
+                                                <label class="form-label mb-1" :for="'q-' + row.q.id">
+                                                    <strong x-text="row.q.id"></strong>.
+                                                    <span x-text="row.q.text"></span>
+                                                    <req-star x-show="row.q.required"></req-star>
+                                                </label>
+                                                <div class="form-text mt-0 mb-1" x-show="row.q.description" x-text="row.q.description"></div>
+
+                                                <template x-if="row.q.validation">
+                                                    <input
+                                                        class="form-control form-control-sm"
+                                                        :id="'q-' + row.q.id"
+                                                        :type="row.q.validation ?? 'text'"
+                                                        :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                        :value="textOf(row.q)"
+                                                        @input="setText(row.q, $event.target.value)"
+                                                    />
+                                                </template>
+                                                <template x-if="!row.q.validation">
+                                                    <textarea
+                                                        class="form-control form-control-sm"
+                                                        :id="'q-' + row.q.id"
+                                                        rows="3"
+                                                        :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                        :value="textOf(row.q)"
+                                                        @input="setText(row.q, $event.target.value)"
+                                                    ></textarea>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                </div>
+                            </template>
+                                </section>
+                            </wa-tab-panel>
+                        </template>
+                    </wa-tab-group>
+
+                    <!-- Προβλήματα validation (required/invalid) -->
+                    <div class="alert alert-danger" x-show="problems.length">
+                        <strong>Υπάρχουν προβλήματα:</strong>
+                        <ul class="mb-0 mt-1">
+                            <template x-for="p in problems" :key="p.id + p.kind">
+                                <li><code x-text="p.id"></code> — <span x-text="p.reason"></span></li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <!-- Κουμπιά ενεργειών — δυναμικά από το questionnaire.actions -->
+                    <div class="d-flex g-2 my-4">
+                        <template x-for="(action, name) in actions" :key="name">
+                            <button
+                                type="button"
+                                class="btn btn-icon"
+                                :class="'btn-' + (action.color || 'outline-secondary')"
+                                :disabled="saving"
+                                @click="doAction(name)"
+                            >
+                                <div x-text="action.text"></div>
+                            </button>
+                        </template>
+                        <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
