@@ -13,18 +13,22 @@ applyTo: "**/*questionnaire*,**/*questionaire*"
 
 - Κράτα το `questionnaire.js` ως γενικό, επαναχρησιμοποιήσιμο πυρήνα χωρίς questionnaire-specific data.
 - To `questionnaire.js` είναι αρχείο που χρησιμοποιείται και στο node.js αλλά και σερβίρεται στον browser ως αρχείο JavaScript (ως ES6 module). 
+- Το module κάνει default export ολόκληρη την κλάση: `import Questionnaire from "./questionnaire.js"`. Μην χρησιμοποιείς named import `{ Questionnaire }`.
+- Χρησιμοποίησε τα δημόσια static μέλη `Questionnaire.validateAnswerSet`, `Questionnaire.defaultActions` και `Questionnaire.filterOutPrivate` — όχι ξεχωριστά imports ή globals.
 - Βάλε τα δεδομένα κάθε ερωτηματολογίου σε ξεχωριστό αρχείο τύπου `cybersecurity.js`, `vendor-assessment.js` ή στη βάση δεδομένων.
 - Χτίζε πάντα το questionnaire από καθαρό JSON definition + ξεχωριστά answer templates.
 - Θεώρησε το `id: 0` / `value: null` ως το μοναδικό sentinel για `not answered`.
 - Μην προσθέτεις validation τύπων στον πυρήνα· το `validation` είναι hint μόνο για client-side HTML form validation.
 - Για submit έλεγχε `response.status.isValidated()`· το draft save επιτρέπεται και χωρίς πλήρη κάλυψη.
 - Στο Alpine, κάνε reactive το plain `response.data`, όχι το `Response` instance. Ως παράδειγμα χρήσης σε view, δες το `views\organizations\self-assessment\self-assessment.hbs`.
+- Το προαιρετικό boolean `private` σε ενότητες και ερωτήσεις έχει default `false` και αποτελεί κανόνα ορατότητας του backend, όχι του front-end.
+- Όταν ο χρήστης δεν πρέπει να βλέπει private περιεχόμενο, το backend στέλνει φιλτραρισμένο definition και αντίστοιχα φιλτραρισμένο response. Η φόρμα και τα στατιστικά λειτουργούν πάνω σε αυτά σαν οι private ερωτήσεις να μην υπήρξαν ποτέ.
 
 ## Οργάνωση αρχείων (κλειδωμένη)
 
 | Αρχείο | Ρόλος |
 |--------|-------|
-| `questionnaire.js` | **Επαναχρησιμοποιήσιμος πυρήνας** — ΟΛΕΣ οι κλάσεις: `AnswerSet`, `NOT_ANSWERED`, `DEFAULT_ACTIONS`, `buildAnswerTemplates()`, `Questionnaire`, `Section`, `Question`, `Response` (+ εσωτερικές `ResponseStatus`, `ResponseResults` — τα namespaces `.status`/`.results`). Κανένα δεδομένο συγκεκριμένου ερωτηματολογίου. Μεταφέρεται αυτούσιο σε άλλα projects. |
+| `questionnaire.js` | **Επαναχρησιμοποιήσιμος πυρήνας** — default export μόνο η `Questionnaire`. Οι υπόλοιπες κλάσεις και helpers (`AnswerSet`, `Section`, `Question`, `Response`, `ResponseStatus`, `ResponseResults`, sentinel και builders) είναι εσωτερικά στοιχεία του module. Τα δημόσια utilities εκτίθενται ως static μέλη της `Questionnaire`. Κανένα δεδομένο συγκεκριμένου ερωτηματολογίου. Μεταφέρεται αυτούσιο σε άλλα projects. |
 | `public/js/questionnaire-form.js` | **Alpine adapter** (ComplyHub) — η κοινή x-data factory `questionnaireForm(record, responseData, config?)` για ΟΛΑ τα views με φόρμα ερωτηματολογίου. Φορτώνεται στο layout (μετά το alpine-ch.js, πριν το Alpine). Βλ. «Κοινή factory» παρακάτω. |
 
 ## Ροή δεδομένων (κλειδωμένη): καθαρό JSON → κλάσεις
@@ -56,6 +60,56 @@ paste σε textarea:
      `{name: options}` και χτίζει το registry από AnswerSets.
    - Το resolved registry είναι διαθέσιμο ως `questionnaire.templates`.
    - Άγνωστο string στο `answers` μιας ερώτησης → σφάλμα στην κατασκευή.
+
+### Ιδιωτικότητα (`private`) — ευθύνη του backend
+
+- Κάθε ενότητα και κάθε ερώτηση μπορεί να έχει προαιρετικό boolean `private`.
+  Αν το πεδίο λείπει, θεωρείται `false`.
+- Ενότητα με `private: true` κάνει ιδιωτικό όλο το περιεχόμενό της. Αν μια
+  ερώτηση ή ένα group είναι private, είναι ιδιωτικό και όλο το περιεχόμενο
+  που βρίσκεται κάτω από αυτό. Το `private: false` σε παιδί δεν αναιρεί την
+  ιδιωτικότητα ιδιωτικού γονέα.
+- Η απόφαση αν θα εμφανιστούν όλα ή μόνο τα μη ιδιωτικά στοιχεία λαμβάνεται
+  αποκλειστικά στο backend. Όταν δεν επιτρέπεται η προβολή private περιεχομένου,
+  το backend το αφαιρεί αναδρομικά από το definition **πριν** το στείλει στον
+  browser. Η απόκρυψη μόνο με JavaScript ή CSS δεν αποτελεί έλεγχο πρόσβασης.
+- Μαζί με το definition, το backend φιλτράρει και το αποθηκευμένο
+  `response.data.answers`, ώστε να μη σταλούν απαντήσεις private ερωτήσεων και
+  να μη θεωρηθούν από το `Response` απαντήσεις σε άγνωστα IDs.
+- Για αυτό το φιλτράρισμα χρησιμοποίησε τη static μέθοδο:
+
+  ```js
+  const {
+    filteredSectionsArray,
+    filteredAnswersObj,
+  } = Questionnaire.filterOutPrivate(sectionsArray, response.data.answers);
+  ```
+
+  Το `sectionsArray` είναι το plain array ενοτήτων (π.χ. το `definition.content`)
+  και το `answersObj` είναι μόνο το object `response.data.answers`, με κλειδιά
+  τα IDs των ερωτήσεων — όχι JSON strings και όχι ολόκληρο το response.
+- Η `filterOutPrivate()` δημιουργεί νέα sections, questions και answer entries,
+  χωρίς να μεταβάλλει ή να επιστρέφει κοινές nested αναφορές με τα αρχικά
+  δεδομένα. Αφαιρεί αναδρομικά private sections/questions/groups, θεωρεί private
+  ολόκληρο το υποδέντρο private γονέα και κρατά answers μόνο για τις ορατές,
+  απαντήσιμες ερωτήσεις. Άγνωστα answer IDs και entries για groups δεν περνούν.
+- Αν το `private` υπάρχει με τιμή που δεν είναι boolean ή οι παράμετροι δεν
+  έχουν την αναμενόμενη μορφή array/object, η μέθοδος αποτυγχάνει με `TypeError`
+  αντί να κινδυνεύσει να εμφανίσει περιεχόμενο με ασαφή ιδιωτικότητα.
+- Το front-end δημιουργεί το `Questionnaire` και το `Response` μόνο από το
+  φιλτραρισμένο payload. Δεν φιλτράρει, δεν αποθηκεύει και δεν στέλνει το
+  `private`. Έτσι validation, completion, progress, scores και όλα τα υπόλοιπα
+  στατιστικά υπολογίζονται σαν οι ερωτήσεις που αφαιρέθηκαν να μην υπήρξαν ποτέ.
+- Στο save/submit, το backend δέχεται απαντήσεις μόνο για ερωτήσεις που ο
+  συγκεκριμένος χρήστης επιτρέπεται να βλέπει. Αν ενημερώνεται υπάρχον response,
+  συγχωνεύει τις ορατές απαντήσεις χωρίς να διαγράφει τυχόν αποθηκευμένες
+  απαντήσεις private ερωτήσεων που δεν περιλαμβάνονταν στο φιλτραρισμένο payload.
+- Αν στο μέλλον χρειαστεί διαφορετική εμφάνιση των private ερωτήσεων όταν
+  επιτρέπεται να σταλούν όλες, το front-end μπορεί κατ’ εξαίρεση να διαβάζει το
+  `private` μόνο για παρουσίαση (π.χ. CSS class ή badge). Η λογική του
+  `questionnaire.js`, του response και των στατιστικών δεν αλλάζει. Όταν το
+  backend έχει αφαιρέσει τις private ερωτήσεις, το front-end δεν μπορεί και δεν
+  πρέπει να γνωρίζει ότι υπήρχαν.
 
 ### Override του NOT_ANSWERED (προαιρετικό)
 
@@ -297,7 +351,7 @@ actions: {
   δίνει τα ίδια κουμπιά χωρίς τρίτο αποθηκευμένο αντικείμενο. Το `opts` μένει
   για ό,τι δηλώνεται/αποθηκεύεται ανεξάρτητα (templates).
 - **Όλα-ή-τίποτα (κλειδωμένο)**: αν το `actions` λείψει, ισχύει ΟΛΟΚΛΗΡΟ το
-  default (`DEFAULT_ACTIONS` του πυρήνα: cancel + save + submit, όπως
+  default (`Questionnaire.defaultActions`: cancel + save + submit, όπως
   παραπάνω). Αν δοθεί, χρησιμοποιείται ΩΣ ΕΧΕΙ — **χωρίς merge ανά κλειδί**:
   `actions` μόνο με `submit` σημαίνει φόρμα ΧΩΡΙΣ κουμπιά cancel/save. Κενό
   object = κανένα κουμπί.
@@ -319,6 +373,7 @@ actions: {
 | `answers` | AnswerSet **ή** string όνομα template | μόνο choice· string → επίλυση από `answerTemplates` |
 | `weight` | number (default 1) | μόνο choice |
 | `required` | boolean (default false) | id:0/κενό κείμενο = άκυρη υποβολή |
+| `private` | boolean (default false) | προαιρετικός κανόνας ορατότητας για φιλτράρισμα από το backend· δεν επηρεάζει required, scoring ή άλλη λογική της ερώτησης |
 | `comment` | `"text"` / `"textarea"` / false | μόνο choice — δηλώνει πεδίο σχολίου & τύπο input (default false) |
 | `files` | boolean (default false) | μόνο choice — δηλώνει upload αρχείων (το entry κρατά `files: [filenames]`) |
 | `tags` | string[] | π.χ. `["policies"]` για υπο-scores |
@@ -449,9 +504,22 @@ validation ή POST. Οι υπόλοιπες ενέργειες δεν κάνου
 
 ## Σύμβαση εξαγωγής
 
-- Κάθε αρχείο εκθέτει τα αντικείμενά του τόσο ως CommonJS export όσο και ως
-  browser global: ο πυρήνας τις κλάσεις (`AnswerSet`, `NOT_ANSWERED`,
-  `DEFAULT_ACTIONS`, `buildAnswerTemplates`, `Questionnaire`, `Section`,
-  `Question`, `Response`),
-  το ερωτηματολόγιο τα `cybersecurity`, `cybersecurityAnswers`,
-  `cybersecurityQuestionnaire`.
+- Το `questionnaire.js` είναι ES module και κάνει default export μόνο την κλάση:
+
+  ```js
+  import Questionnaire from "./questionnaire.js";
+  ```
+
+  Δεν κάνει named export `{ Questionnaire }` και δεν εξάγει χωριστά helpers,
+  constants ή εσωτερικές κλάσεις.
+- Στον browser εκθέτει μόνο το `globalThis.Questionnaire`. Δεν υπάρχουν
+  χωριστά globals όπως `globalThis.validateAnswerSet`.
+- Δημόσια static επιφάνεια της κλάσης:
+  - `Questionnaire.validateAnswerSet(sectionsJsonText, answersJsonText)` —
+    ελέγχει τις string αναφορές answer sets σε δύο JSON strings και επιστρέφει
+    `true`, `false` ή `null` για μη αναγνώσιμη/μη αναμενόμενη είσοδο.
+  - `Questionnaire.defaultActions` — το αντικείμενο των προεπιλεγμένων
+    `cancel`, `save` και `submit` actions.
+  - `Questionnaire.filterOutPrivate(sectionsArray, answersObj)` — δημιουργεί
+    το non-private definition/answers snapshot που επιτρέπεται να σταλεί στον
+    browser.

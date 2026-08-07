@@ -18,7 +18,7 @@
                                     answers: isValidJSON(this.answers),
                                     actions: isValidJSON(this.actions),
                                     get form() { return this.content && this.answers && this.actions },
-                                    get answerSet() { return window.validateAnswerSet($refs.content.value, $refs.answers.value); },
+                                    get answerSet() { return Questionnaire.validateAnswerSet($refs.content.value, $refs.answers.value); },
                                 };
                             }
                         }" 

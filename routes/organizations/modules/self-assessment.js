@@ -9,7 +9,7 @@
 import express from 'express';
 import Models from '../../../models/models.js';
 import log from '../../../lib/logger.js';
-import { Questionnaire } from '../../../lib/questionnaire.js';
+import Questionnaire from '../../../lib/questionnaire.js';
 import { can } from '../../../auth/roles.js';
 
 const codes = {

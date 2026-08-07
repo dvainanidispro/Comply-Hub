@@ -10,7 +10,6 @@ import express from 'express';
 
 import Models from '../../../models/models.js';
 import log from '../../../lib/logger.js';
-// import { Questionnaire } from '../../../models/questionnaire.js';
 
 const codes = {
     'NIS2': 'cybersecurity-self-assessment',
