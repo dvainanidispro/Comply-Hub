@@ -170,10 +170,14 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
         },
 
         /* ---- Ενέργειες φόρμας (cancel/save/submit, δυναμικά από questionnaire.actions) ---- */
-        async doAction(name) {
+        async performAction(name) {
             const action = this.actions[name];
             if (name === "cancel") {
                 window.history.back();
+                return;
+            }
+            if (window.theFormIsPreview) {
+                Q.alert("Η φόρμα είναι σε mode προεπισκόπησης. Δεν επιτρέπεται καμία ενέργεια.");
                 return;
             }
             if (name === "submit") {

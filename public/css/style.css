@@ -120,6 +120,7 @@
         max-width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
     }
     table.dim-table.auto-rows{
         table-layout: auto;

@@ -61,7 +61,6 @@
                                 <div>
                                     <span class="invalid-feedback">Μη έγκυρο JSON.</span>
                                     <span x-cloak x-show="invalidSequencesOf(content).length" class="text-danger">Μη έγκυροι χαρακτήρες: <span x-text="invalidSequencesOf(content)"></span></span>
-
                                 </div>
                             </div>
                             <div class="col-md-12 mb-3">
@@ -96,6 +95,12 @@
                                         <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
                                         <div>Αποθήκευση</div>
                                     </button>
+                                    {{#if (and questionnaire.definition questionnaire.answers)}}
+                                    <a class="btn btn-info btn-icon" href="{{baseUrl}}/preview" target="_blank">
+                                        <i class="bi bi-eye-fill"></i>
+                                        <div>Προεπισκόπηση αποθηκευμένου</div>
+                                    </a>
+                                    {{/if}}
                                     <bootstrap-spinner class="d-none"></bootstrap-spinner>
                                 </div>
                             </div>

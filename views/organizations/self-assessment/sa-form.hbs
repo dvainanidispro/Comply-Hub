@@ -7,6 +7,7 @@
      * φορτώνεται στο layout), στην οποία περνούν ως ορίσματα στο x-data. */
     window.questionnaireRecord = {{{objectify questionnaire}}};
     window.responseData = {{{objectify (check response response.data null)}}};
+    window.theFormIsPreview = {{#if preview}}true{{else}}false{{/if}};
 </script>
 
 <div class="row g-4 mt-2"

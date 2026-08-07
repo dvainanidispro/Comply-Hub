@@ -15,7 +15,18 @@ import log from '../../../lib/logger.js';
 const codes = {
     'NIS2': 'cybersecurity-self-assessment',
     'GDPR': 'gdpr-self-assessment',
+};
+
+async function fetchQuestionnaire(framework, code) {
+    return Models.Questionnaire.findOne({
+        where: {
+            definedBy: 'system',
+            framework,
+            code,
+        },
+    });
 }
+
 
 /**
  * Δημιουργεί router για διαχείριση του ερωτηματολογίου αυτοαξιολόγησης ενός συγκεκριμένου framework.
@@ -30,19 +41,12 @@ export function manageSelfAssessmentRouter(framework, label) {
     /* GET / - Φόρμα ορισμού του ερωτηματολογίου αυτοαξιολόγησης */
     selfAssessment.get('/', async (req, res) => {
         try {
-            const questionnaire = await Models.Questionnaire.findOne({
-                where: {
-                    definedBy: 'system',
-                    framework,
-                    code,
-                },
-            });
+            const questionnaire = await fetchQuestionnaire(framework, code);
 
             // log.dev(questionnaire);
 
-            res.render('frameworks/self-assessment', {
+            res.render('frameworks/questionnaire', {
                 framework,
-                user: req.user,
                 title: `${framework} - ${label}`,
                 baseUrl: req.baseUrl,
                 code,
@@ -54,7 +58,32 @@ export function manageSelfAssessmentRouter(framework, label) {
         }
     });
 
-    /* POST / - Ενημέρωση του ερωτηματολογίου αυτοαξιολόγησης */
+
+    /* GET /preview - Φόρμα προεπισκόπησης του ερωτηματολογίου αυτοαξιολόγησης */
+    selfAssessment.get('/preview', async (req, res) => {
+        try {
+            const questionnaire = await fetchQuestionnaire(framework, code);
+
+            // log.dev(questionnaire);
+
+            res.render('organizations/self-assessment/sa-form', {
+                framework,
+                title: `${framework} - ${label}`,
+                code,
+                questionnaire,
+                preview: true,
+                response: null,
+                formUrl: null,
+            });
+        } catch (error) {
+            log.error(`Error fetching self-assessment questionnaire for framework ${framework}: ${error.message}`);
+            res.status(500).render('errors/500');
+        }
+    });
+
+
+
+    /* POST / - Ενημέρωση-Αποθήκευση του ερωτηματολογίου αυτοαξιολόγησης */
     selfAssessment.post('/', async (req, res) => {
         try {
             const { title, public: isPublic, active, description, content, answers, actions } = req.body;

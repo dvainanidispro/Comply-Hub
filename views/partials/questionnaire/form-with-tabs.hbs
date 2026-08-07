@@ -7,6 +7,7 @@
                 <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
                 {{#if response.approvedAt}}<span class="badge bg-success">{{label 'status' 'approved'}}</span>{{/if}}
                 {{/if}}
+                {{#if preview}}<span class="badge bg-warning fs-6">⚠️ Προεπισκόπηση</span>{{/if}}
             </div>
             <div class="card-body">
                 <p class="text-muted" x-show="true" x-text="questionnaire.description"></p>
@@ -170,7 +171,7 @@
                                 class="btn btn-icon"
                                 :class="'btn-' + (action.color || 'outline-secondary')"
                                 :disabled="saving"
-                                @click="doAction(name)"
+                                @click="performAction(name)"
                             >
                                 <div x-text="action.text"></div>
                             </button>
