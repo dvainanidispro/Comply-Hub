@@ -18,7 +18,7 @@ const handlebarsConfig = {
         eq: (a, b) => a == b, 
         and: (...args) => args.slice(0, -1).every(Boolean), // Handlebars 'and' helper
         /* Check if array includes a value: {{#if (includes array 'value')}} */
-        includes: (array, value) => array.includes(value),
+        includes: (array, value) => array?.includes(value),
         /* "ternary" operator. example: {{check variable.length variable 'empty'}} */
         check: (condition, valueIfTrue, valueIfFalse) => condition ? valueIfTrue : valueIfFalse,
         /* example: {{or a b c}}, it needs c (Handlebars doesn't pass undefined). Use '' as third argument. */

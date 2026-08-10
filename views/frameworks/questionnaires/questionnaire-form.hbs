@@ -33,7 +33,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="code" class="form-label fw-bold">Κωδικός</label>
-                                <input type="text" class="form-control" id="code" value="{{code}}" disabled>
+                                <input type="text" class="form-control" id="code" name="code" value="{{code}}" {{#if (eq questionnaire.definedBy 'system')}}disabled{{/if}}>
                             </div>
                             <div class="col-md-8 mb-3">
                                 <label for="public" class="form-label fw-bold">Δημόσιο</label>
@@ -97,16 +97,16 @@
                                     </button>
                                     {{#if (and questionnaire.definition questionnaire.answers)}}
                                         {{#if questionnaire.public}}
-                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/preview/private" target="_blank">
+                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/private" target="_blank">
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου (ιδιωτικού)</div>
                                         </a>
-                                        <a class="btn btn-primary btn-icon" href="{{baseUrl}}/preview/public" target="_blank">
+                                        <a class="btn btn-primary btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/public" target="_blank">
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου (δημόσιου)</div>
                                         </a>
                                         {{else}}
-                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/preview" target="_blank">
+                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview" target="_blank">
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου</div>
                                         </a>
@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
-        await submitData(data, baseUrl, 'POST');
+        await submitData(data, baseUrl, 'PUT');
     });
 });
 </script>

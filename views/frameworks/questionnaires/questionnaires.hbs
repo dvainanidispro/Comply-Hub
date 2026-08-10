@@ -1,0 +1,60 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title h3">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        {{framework}} - Ερωτηματολόγια
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table dim-table auto-rows table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="sortable">ID</th>
+                                    {{!-- <th class="sortable">Defined By</th> --}}
+                                    <th class="sortable">Κωδικός</th>
+                                    <th class="sortable">Τίτλος</th>
+                                    <th class="sortable">Δημόσιο</th>
+                                    <th class="sortable">Ενεργό</th>
+                                    <th>Επεξεργασία</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each questionnaires}}
+                                <tr>
+                                    <td>{{this.id}}</td>
+                                    {{!-- <td>{{this.definedBy}}</td> --}}
+                                    <td>{{this.code}}</td>
+                                    <td class="fw-semibold">{{this.title}}</td>
+                                    <td>
+                                        {{#if this.public}}
+                                            <span title="Δημόσιο"><i class="bi bi-check-circle-fill text-primary"></i></span>
+                                        {{else}}
+                                            <span title="Μη δημόσιο"></span>
+                                        {{/if}}
+                                    </td>
+                                    <td>
+                                        {{#if this.active}}
+                                            <span title="Ενεργό"><i class="bi bi-check-circle-fill text-success"></i></span>
+                                        {{else}}
+                                            <span title="Ανενεργό"><i class="bi bi-x-circle text-dark"></i></span>
+                                        {{/if}}
+                                    </td>
+                                    <td>
+                                        <a href="{{../baseUrl}}/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">
+                                            <i class="ti-pencil text-success"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -82,8 +82,8 @@ export function manageSelfAssessmentRouter(framework, label) {
 
 
 
-    /* POST / - Ενημέρωση-Αποθήκευση του ερωτηματολογίου αυτοαξιολόγησης */
-    selfAssessment.post('/', async (req, res) => {
+    /* PUT /:id - Ενημέρωση-Αποθήκευση του ερωτηματολογίου αυτοαξιολόγησης */
+    selfAssessment.put('/:id', async (req, res) => {
         try {
             const { title, public: isPublic, active, description, content, answers, actions } = req.body;
 
