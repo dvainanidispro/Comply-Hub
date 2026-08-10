@@ -8,8 +8,8 @@
 
 import express from 'express';
 
-import Models from '../../../models/models.js';
-import log from '../../../lib/logger.js';
+import Models from '../../../../models/models.js';
+import log from '../../../../lib/logger.js';
 
 const codes = {
     'NIS2': 'cybersecurity-self-assessment',
@@ -44,7 +44,7 @@ export function manageSelfAssessmentRouter(framework, label) {
 
             // log.dev(questionnaire);
 
-            res.render('frameworks/questionnaire', {
+            res.render('frameworks/questionnaires/questionnaire-form', {
                 framework,
                 title: label,
                 baseUrl: req.baseUrl,

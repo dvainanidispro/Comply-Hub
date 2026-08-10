@@ -8,9 +8,9 @@
 
 import express from 'express';
 
-import Models from '../../../models/models.js';
-import log from '../../../lib/logger.js';
-import Questionnaire from '../../../lib/questionnaire.js';
+import Models from '../../../../models/models.js';
+import log from '../../../../lib/logger.js';
+import Questionnaire from '../../../../lib/questionnaire.js';
 
 const codes = {
     'NIS2': 'nis2-vendor-assessment',
@@ -42,7 +42,7 @@ export function manageVendorAssessmentRouter(framework, label) {
         try {
             const questionnaire = await fetchQuestionnaire(framework, code);
 
-            res.render('frameworks/questionnaire', {
+            res.render('frameworks/questionnaires/questionnaire-form', {
                 framework,
                 title: label,
                 baseUrl: req.baseUrl,

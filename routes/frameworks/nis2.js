@@ -2,7 +2,7 @@ import express from 'express';
 import { managePoliciesRouter } from './modules/policies.js';
 import { manageLegislationRouter } from './modules/legislation.js';
 import { manageKpiTemplatesRouter } from './modules/kpi.js';
-import { manageSelfAssessmentRouter } from './modules/self-assessment.js';
+import { manageSelfAssessmentRouter } from './modules/questionnaires/self-assessment.js';
 
 const nis2 = express.Router();
 
