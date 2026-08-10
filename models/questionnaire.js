@@ -14,7 +14,7 @@ const Questionnaire = db.define('questionnaire',
         definedBy: {
             type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 'organization',
+            defaultValue: 'central',
             comment: 'system ή central ή organization. Δηλώνει αν το questionnaire ορίζεται από το σύστημα (developer) ή από οργανισμό (χρήστη ή admin).',
         },
         framework: {

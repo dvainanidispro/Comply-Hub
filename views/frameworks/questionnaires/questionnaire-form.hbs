@@ -11,18 +11,19 @@
                 <div class="card-body">
                     <form id="form" 
                         x-data="{
-                            content: null, answers: null, actions: null,
+                            content: null, answers: null, actions: null, code: null,
                             get valid() {
                                 return {
                                     content: isValidJSON(this.content),
                                     answers: isValidJSON(this.answers),
                                     actions: isValidJSON(this.actions),
-                                    get form() { return this.content && this.answers && this.actions },
+                                    code: /^[a-z_-]+$/.test(this.code),
+                                    get form() { return this.content && this.answers && this.actions && this.code },
                                     get answerSet() { return Questionnaire.validateAnswerSet($refs.content.value, $refs.answers.value); },
                                 };
                             }
                         }" 
-                        x-init="content = $refs.content.value; answers = $refs.answers.value; actions = $refs.actions.value"
+                        x-init="content = $refs.content.value; answers = $refs.answers.value; actions = $refs.actions.value; code = $refs.code.value"
                     >
                         <input type="hidden" readonly name="id" value="{{questionnaire.id}}">
 
@@ -33,7 +34,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="code" class="form-label fw-bold">Κωδικός</label>
-                                <input type="text" class="form-control" id="code" name="code" value="{{code}}" {{#if (eq questionnaire.definedBy 'system')}}disabled{{/if}}>
+                                <input type="text" class="form-control" id="code" name="code" value="{{code}}" x-ref="code" @input="code = $el.value" :class="valid.code ? 'is-valid' : 'is-invalid'" {{#if (eq questionnaire.definedBy 'system')}}disabled{{/if}}>
                             </div>
                             <div class="col-md-8 mb-3">
                                 <label for="public" class="form-label fw-bold">Δημόσιο</label>

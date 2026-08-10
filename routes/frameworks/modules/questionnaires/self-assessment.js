@@ -59,7 +59,8 @@ export function manageSelfAssessmentRouter(framework, label) {
 
 
     /* GET /preview - Φόρμα προεπισκόπησης του ερωτηματολογίου αυτοαξιολόγησης */
-    selfAssessment.get('/preview', async (req, res) => {
+    selfAssessment.get(['/preview', '/:anything/preview'], async (req, res) => {
+        // Το anything είναι για να υποστηρίζεται η προεπισκόπηση από το /:id/preview
         try {
             const questionnaire = await fetchQuestionnaire(framework, code);
 

@@ -882,6 +882,9 @@
     .g-4{
         gap: 1.5rem;
     }
+    .mt-10{
+        margin-top: 5rem;
+    }
 
     .shake-it{
         animation: shake 3s ease-in-out;

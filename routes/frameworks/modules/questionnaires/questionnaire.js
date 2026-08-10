@@ -1,12 +1,10 @@
 /**
  * Γενική διαχείριση system questionnaires ανά framework.
  *
- * TODO επόμενων βημάτων:
- * - Υλοποίηση POST / για δημιουργία νέου ερωτηματολογίου.
- * - Διόρθωση του preview του self-assessment
  */
 
 import express from 'express';
+import { UniqueConstraintError } from 'sequelize';
 
 import Models from '../../../../models/models.js';
 import log from '../../../../lib/logger.js';
@@ -52,6 +50,38 @@ export function manageQuestionnairesRouter(framework, label) {
         } catch (error) {
             log.error(`${framework} questionnaires GET error: ${error}`);
             res.status(500).render('errors/500');
+        }
+    });
+
+    /* POST / - Δημιουργία νέου ερωτηματολογίου */
+    questionnaires.post('/', async (req, res) => {
+        try {
+            const { code, title } = req.body;
+
+            await Models.Questionnaire.create({
+                definedBy: 'central',
+                framework,
+                organizationId: null,
+                code,
+                public: false,
+                active: false,
+                title,
+                definition: {
+                    code,
+                    title,
+                    description: '',
+                    content: [],
+                },
+            });
+
+            res.json({ success: true, message: 'Το ερωτηματολόγιο δημιουργήθηκε επιτυχώς.' });
+        } catch (error) {
+            if (error instanceof UniqueConstraintError || error.name === 'SequelizeUniqueConstraintError') {
+                return res.status(400).json({ success: false, message: 'Υπάρχει ήδη ερωτηματολόγιο με τον ίδιο κωδικό.' });
+            }
+
+            log.error(`${framework} questionnaire POST error: ${error}`);
+            res.status(500).json({ success: false, message: 'Σφάλμα κατά τη δημιουργία του ερωτηματολογίου.' });
         }
     });
 

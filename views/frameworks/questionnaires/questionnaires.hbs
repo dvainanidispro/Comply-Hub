@@ -57,4 +57,39 @@
             </div>
         </div>
     </div>
+
+    <div class="row mt-10">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h5 mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Δημιουργία νέου ερωτηματολογίου
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form class="d-flex g-3 align-items-end" 
+                        x-data="{ 
+                            code: '', 
+                            title: '', 
+                            get valid() { return { code: /^[a-z_-]+$/.test(this.code), form: this.code && this.title.trim() }; }
+                        }
+                            " 
+                            @submit.prevent="submitData({ code, title }, '{{baseUrl}}', 'POST')">
+                        <div class="flex-fill">
+                            <label for="code" class="form-label small">Κωδικός <span class="fw-normal">(μικρά λατινικά γράμματα, παύλες και κάτω παύλες)</span></label>
+                            <input type="text" class="form-control" id="code" x-model="code" :class="code.length ? (valid.code ? 'is-valid' : 'is-invalid') : ''">
+                        </div>
+                        <div class="flex-fill">
+                            <label for="title" class="form-label small">Όνομα</label>
+                            <input type="text" class="form-control" id="title" x-model="title">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-action" :disabled="!valid.form" title="Δημιουργία">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
