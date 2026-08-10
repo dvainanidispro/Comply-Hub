@@ -26,7 +26,7 @@ const codes = {
  * @returns {Promise<{questionnaire: object, response: object|null}>}
  */
 async function fetchQuestionnaireWithResponse(framework, code, organizationId) {
-    //TODO: Ο πίνακας questionnaire να μπει στην cache
+    //TODO: Ο πίνακας questionnaires να μπει στην cache
     const questionnaire = await Models.Questionnaire.findOne({
         where: {
             definedBy: 'system',
