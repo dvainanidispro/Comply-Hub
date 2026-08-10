@@ -8,6 +8,6 @@ const gdpr = express.Router();
 gdpr.use('/policies', managePoliciesRouter('GDPR', 'policy', 'GDPR - Πρότυπα πολιτικών'));
 gdpr.use('/procedures', managePoliciesRouter('GDPR', 'procedure', 'GDPR - Πρότυπα διαδικασιών'));
 gdpr.use('/legislation', manageLegislationRouter('GDPR', 'GDPR - Νομοθεσία'));
-gdpr.use('/vendor-assessment', manageVendorAssessmentRouter('GDPR', 'GDPR - Ερωτηματολόγιο αξιολόγησης εξωτερικών συνεργατών'));
+gdpr.use('/vendor-assessment', manageVendorAssessmentRouter('GDPR', 'GDPR - Vendor assessment questionnaire'));
 
 export default gdpr;

@@ -10,6 +10,7 @@ import express from 'express';
 
 import Models from '../../../models/models.js';
 import log from '../../../lib/logger.js';
+import Questionnaire from '../../../lib/questionnaire.js';
 
 const codes = {
     'NIS2': 'nis2-vendor-assessment',
@@ -43,7 +44,7 @@ export function manageVendorAssessmentRouter(framework, label) {
 
             res.render('frameworks/questionnaire', {
                 framework,
-                title: `${framework} - ${label}`,
+                title: label,
                 baseUrl: req.baseUrl,
                 code,
                 questionnaire,
@@ -55,13 +56,26 @@ export function manageVendorAssessmentRouter(framework, label) {
     });
 
     /* GET /preview - Φόρμα προεπισκόπησης του ερωτηματολογίου αξιολόγησης εξωτερικών συνεργατών */
-    vendorAssessment.get('/preview', async (req, res) => {
+    vendorAssessment.get(['/preview', '/preview/public', '/preview/private'], async (req, res) => {
         try {
             const questionnaire = await fetchQuestionnaire(framework, code);
 
-            res.render('organizations/self-assessment/sa-form', {
+            const showPublic = !req.path.includes('/preview/private');
+
+            if (showPublic) {
+                const { filteredSectionsArray } = Questionnaire.filterOutPrivate(
+                    questionnaire.definition.content,
+                    {},
+                );
+                questionnaire.definition.content = filteredSectionsArray;       //Αντικατάσταση
+                // Προσοχή, να μην γίνει save διότι έχουμε πειράξει το Sequelize instance.
+            }
+
+            const view = showPublic ? 'organizations/vendor-forms/va-form-public' : 'organizations/vendor-forms/va-form-private';
+
+            res.render(view, {
                 framework,
-                title: `${framework} - ${label}`,
+                title: label,
                 code,
                 questionnaire,
                 preview: true,

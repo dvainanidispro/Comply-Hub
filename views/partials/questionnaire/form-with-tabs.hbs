@@ -2,12 +2,12 @@
     <div class="col-lg-10">
         <div class="card">
             <div class="card-header d-flex align-items-center g-2">
-                <h1 class="card-title h3 mb-0">{{title}}</h1>
+                <h1 class="card-title h3 mb-0">{{questionnaire.title}}</h1>
                 {{#if response}}
                 <span class="badge bg-{{label 'statusColor' response.status}}">{{label 'status' response.status}}</span>
                 {{#if response.approvedAt}}<span class="badge bg-success">{{label 'status' 'approved'}}</span>{{/if}}
                 {{/if}}
-                {{#if preview}}<span class="badge bg-warning fs-6">⚠️ Προεπισκόπηση</span>{{/if}}
+                {{#if preview}}<div class="badge bg-warning fs-6 ms-4">⚠️ Προεπισκόπηση</div>{{/if}}
             </div>
             <div class="card-body">
                 <p class="text-muted" x-show="true" x-text="questionnaire.description"></p>
@@ -43,7 +43,7 @@
 
                                     <!-- type:"choice" — επιλογή από AnswerSet, βαθμολογείται -->
                                     <template x-if="row.q.type === 'choice'">
-                                        <div class="card mb-2 bg-lavender-light" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                        <div class="card mb-2" :class="[row.q.private ? 'bg-lavender-dark' : 'bg-lavender-light', isProblem(row.q.id) ? 'border-danger' : '']">
                                             <div class="card-body py-2">
                                                 <label class="form-label mb-1" :for="'q-' + row.q.id">
                                                     <strong x-text="row.q.id"></strong>.
@@ -113,7 +113,7 @@
 
                                     <!-- type:"text" — ελεύθερο κείμενο, δεν βαθμολογείται -->
                                     <template x-if="row.q.type === 'text'">
-                                        <div class="card mb-2" :class="isProblem(row.q.id) ? 'border-danger' : ''">
+                                        <div class="card mb-2" :class="[row.q.private ? 'bg-lavender-dark' : 'bg-lavender-light', isProblem(row.q.id) ? 'border-danger' : '']">
                                             <div class="card-body py-2">
                                                 <label class="form-label mb-1" :for="'q-' + row.q.id">
                                                     <strong x-text="row.q.id"></strong>.

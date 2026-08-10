@@ -469,6 +469,9 @@
     .bg-lavender-light{
         background-color: hsl(240, 55%, 92%) !important;
     }
+    .bg-lavender-dark{
+        background-color: hsl(250, 55%, 84%) !important;
+    }
 
     a.text-primary, .btn-outline-primary, .btn-outline-primary i{
         color: #04c !important;

@@ -46,7 +46,7 @@ export function manageSelfAssessmentRouter(framework, label) {
 
             res.render('frameworks/questionnaire', {
                 framework,
-                title: `${framework} - ${label}`,
+                title: label,
                 baseUrl: req.baseUrl,
                 code,
                 questionnaire,
@@ -67,7 +67,7 @@ export function manageSelfAssessmentRouter(framework, label) {
 
             res.render('organizations/self-assessment/sa-form', {
                 framework,
-                title: `${framework} - ${label}`,
+                title: label,
                 code,
                 questionnaire,
                 preview: true,
