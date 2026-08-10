@@ -8,6 +8,7 @@ import { KpiTemplate } from "./kpi_template.js";
 import { Kpi } from "./kpi.js";
 import { Questionnaire } from "./questionnaire.js";
 import { Response } from "./response.js";
+import { Partner } from "./partner.js";
 
 import { db } from '../config/database.js';
 import log from '../lib/logger.js';
@@ -28,6 +29,9 @@ Organization.hasMany(Policy, { foreignKey: 'organizationId', as: 'policies' });
 Kpi.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
 Organization.hasMany(Kpi, { foreignKey: 'organizationId', as: 'kpis' });
 
+Partner.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
+Organization.hasMany(Partner, { foreignKey: 'organizationId', as: 'partners' });
+
 
 
 Questionnaire.belongsTo(Organization, { foreignKey: 'organizationId', as: 'organization' });
@@ -41,6 +45,9 @@ Organization.hasMany(Response, { foreignKey: 'organizationId', as: 'responses' }
 
 Response.belongsTo(User, { foreignKey: 'submittedByUserId', as: 'submittedByUser' });
 User.hasMany(Response, { foreignKey: 'submittedByUserId', as: 'submittedResponses' });
+
+Response.belongsTo(Partner, { foreignKey: 'submittedByPartnerId', as: 'submittedByPartner' });
+Partner.hasMany(Response, { foreignKey: 'submittedByPartnerId', as: 'submittedResponses', onDelete: 'RESTRICT' });
 
 Response.belongsTo(User, { foreignKey: 'approvedBy', as: 'approvedByUser' });
 User.hasMany(Response, { foreignKey: 'approvedBy', as: 'approvedResponses' });
@@ -76,6 +83,7 @@ export default {
     Legislation,
     KpiTemplate,
     Kpi,
+    Partner,
     Questionnaire,
     Response,
     Setting, // αν και κάνουμε χρήση του utility Settings

@@ -24,8 +24,18 @@ const Response = db.define('response',
         status: {
             type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 'draft',
-            comment: 'Κατάσταση υποβολής. Επιτρεπτές τιμές: draft, submitted.',
+            defaultValue: 'assigned',
+            comment: 'Κατάσταση υποβολής. Επιτρεπτές τιμές: assigned, draft, submitted.',
+        },
+        accessTokenHash: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            comment: 'Hash του κωδικού πρόσβασης στο συγκεκριμένο response μέσω public link. Null σημαίνει ότι η public πρόσβαση έχει ανακληθεί.',
+        },
+        lockedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            comment: 'Από αυτή τη στιγμή και μετά το response είναι μόνο για ανάγνωση μέσω public link.',
         },
         // data:
         data: {
@@ -50,6 +60,7 @@ const Response = db.define('response',
         submittedByPartnerId: {
             type: DataTypes.BIGINT,
             allowNull: true,
+            comment: 'Ο partner στον οποίο έχει ανατεθεί το response και ο οποίος το συμπληρώνει ή το υποβάλλει.',
         },
         // approval data:
         approvedAt: {
@@ -77,6 +88,15 @@ const Response = db.define('response',
             {
                 name: 'responses_submitted_by_user_id',
                 fields: ['submittedByUserId'],
+            },
+            {
+                name: 'responses_submitted_by_partner_id',
+                fields: ['submittedByPartnerId'],
+            },
+            {
+                name: 'responses_access_token_hash_unique',
+                unique: true,
+                fields: ['accessTokenHash'],
             },
             {
                 name: 'responses_approved_by',
