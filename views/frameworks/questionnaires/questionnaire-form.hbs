@@ -98,16 +98,16 @@
                                     </button>
                                     {{#if (and questionnaire.definition questionnaire.answers)}}
                                         {{#if questionnaire.public}}
-                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/private" target="_blank">
+                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/private">
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου (ιδιωτικού)</div>
                                         </a>
-                                        <a class="btn btn-primary btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/public" target="_blank">
+                                        <a class="btn btn-primary btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview/public" >
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου (δημόσιου)</div>
                                         </a>
                                         {{else}}
-                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview" target="_blank">
+                                        <a class="btn btn-info btn-icon" href="{{baseUrl}}/{{questionnaire.id}}/preview">
                                             <i class="bi bi-eye-fill"></i>
                                             <div>Προεπισκόπηση αποθηκευμένου</div>
                                         </a>

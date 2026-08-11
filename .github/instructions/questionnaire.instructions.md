@@ -17,6 +17,7 @@ applyTo: "**/*questionnaire*,**/*questionaire*"
 - Χρησιμοποίησε τα δημόσια static μέλη `Questionnaire.validateAnswerSet`, `Questionnaire.defaultActions` και `Questionnaire.filterOutPrivate` — όχι ξεχωριστά imports ή globals.
 - Βάλε τα δεδομένα κάθε ερωτηματολογίου σε ξεχωριστό αρχείο τύπου `cybersecurity.js`, `vendor-assessment.js` ή στη βάση δεδομένων.
 - Χτίζε πάντα το questionnaire από καθαρό JSON definition + ξεχωριστά answer templates.
+- Το `actions` είναι αποκλειστικά διατεταγμένο array. Η σειρά των στοιχείων είναι η σειρά εμφάνισης των κουμπιών και το `action.name` είναι το αναγνωριστικό της ενέργειας. Παλιό object δεν υποστηρίζεται.
 - Θεώρησε το `id: 0` / `value: null` ως το μοναδικό sentinel για `not answered`.
 - Μην προσθέτεις validation τύπων στον πυρήνα· το `validation` είναι hint μόνο για client-side HTML form validation.
 - Για submit έλεγχε `response.status.isValidated()`· το draft save επιτρέπεται και χωρίς πλήρη κάλυψη.
@@ -301,8 +302,13 @@ constructor του `Response` ΔΕΝ ελέγχει το data)· για response
 Το public `definition.content` είναι array από plain section objects, ενώ το
 `questionnaire.sections` είναι το εσωτερικό array από `Section` instances.
 Το `questionnaire.content` δίνει facade ως νέο array από plain JSON-compatible
-objects. Προς το παρόν το `Questionnaire.toJSON()` γράφει `sections` για
-συμβατότητα με τα υπάρχοντα persisted definitions.
+objects. Το `content` είναι το canonical πεδίο του definition: χρησιμοποιείται
+σε κάθε νέο definition και σε κάθε εγγραφή/serialization (`Questionnaire.toJSON()`
+γράφει `content`). Το `sections` δεν χρησιμοποιείται για write σε definitions,
+αλλά παραμένει το φυσικό runtime όνομα για ανάγνωση και loops στον κώδικα του
+front-end, π.χ. `questionnaire.sections`, όταν αυτό είναι πιο κατανοητό. Ο
+constructor δέχεται ακόμη `sections` ως legacy alias εισόδου, με προτεραιότητα
+στο `content` όταν υπάρχουν και τα δύο.
 
 Διάσχιση ερωτήσεων μιας ενότητας (`Section`) — ίδια σειρά (depth-first, όπως
 στον ορισμό) και στις δύο:
@@ -329,22 +335,27 @@ objects. Προς το παρόν το `Questionnaire.toJSON()` γράφει `se
 ### Ενέργειες φόρμας (`actions`) — στον ΟΡΙΣΜΟ, όχι στα opts
 
 Ο ορισμός του ερωτηματολογίου (το `def`, πρώτο όρισμα) δέχεται προαιρετικό
-πεδίο `actions` — τα κουμπιά ενεργειών που θα render-άρει η φόρμα:
+πεδίο `actions` — διατεταγμένο array με τα κουμπιά ενεργειών που θα render-άρει
+η φόρμα. H default μέθοδος για τα κουμπια είναι `POST`. Η σειρά των στοιχείων του array είναι η σειρά εμφάνισης των κουμπιών:
 
 ```js
-actions: {
-  cancel: { text: "Ακύρωση",                   color: "secondary" },
-  save:   { path: "/save",   text: "Προσωρινή Αποθήκευση", color: "secondary" },
-  submit: { path: "/submit", text: "Οριστική υποβολή",     color: "primary" },
-}
+actions: [
+  { name: "cancel", text: "Ακύρωση", color: "secondary" },
+  { name: "save", path: "/save", text: "Προσωρινή Αποθήκευση", color: "success" },
+  { name: "submit", path: "/submit", text: "Οριστική υποβολή", color: "primary" },
+]
 ```
 
-- Κάθε κλειδί = μία ενέργεια/κουμπί: συνήθως `path` (endpoint που χτυπά η
-  φόρμα), `text` (λεκτικό κουμπιού), `color` (Bootstrap variant). Η δεσμευμένη
-  action `cancel` δεν χρειάζεται `path`: εκτελεί `history.back()` στον browser,
-  χωρίς validation ή POST. **Κανένα validation περιεχομένου** — κάθε ενέργεια
-  μπορεί να έχει όποια keys χρειάζεται η φόρμα, και επιπλέον αυτών (π.χ. `icon`,
-  `confirm`).
+- Κάθε στοιχείο του array = μία ενέργεια/κουμπί. Το `name` είναι το αναγνωριστικό
+  της ενέργειας και ακολουθούν συνήθως `path` (endpoint που χτυπά η φόρμα),
+  `text` (λεκτικό κουμπιού) και `color` (Bootstrap variant). Η δεσμευμένη action
+  με `name: "cancel"` δεν χρειάζεται `path`: εκτελεί `history.back()` στον
+  browser, χωρίς validation ή POST. Πέρα από την υποχρεωτική array μορφή, ο
+  πυρήνας δεν κάνει validation του περιεχομένου των στοιχείων — κάθε ενέργεια
+  μπορεί να έχει όποια επιπλέον keys χρειάζεται η φόρμα (π.χ. `icon`, `confirm`).
+- **Καμία μεταβατική συμβατότητα**: object με ονόματα ενεργειών ως κλειδιά δεν
+  υποστηρίζεται. Το `buildActions()` απαιτεί array και αποτυγχάνει με `TypeError`
+  όταν το `def.actions` έχει την παλιά object μορφή.
 - **Απόφαση — ζει στο `def`**, όχι στο δεύτερο όρισμα (`opts`): είναι δηλωτικό
   περιεχόμενο της φόρμας (όπως τα `validation`/`comment`/`files`) και
   αποθηκεύεται μαζί με τον ορισμό στην JSONB — η ανασύσταση από την PostgreSQL
@@ -352,12 +363,13 @@ actions: {
   για ό,τι δηλώνεται/αποθηκεύεται ανεξάρτητα (templates).
 - **Όλα-ή-τίποτα (κλειδωμένο)**: αν το `actions` λείψει, ισχύει ΟΛΟΚΛΗΡΟ το
   default (`Questionnaire.defaultActions`: cancel + save + submit, όπως
-  παραπάνω). Αν δοθεί, χρησιμοποιείται ΩΣ ΕΧΕΙ — **χωρίς merge ανά κλειδί**:
-  `actions` μόνο με `submit` σημαίνει φόρμα ΧΩΡΙΣ κουμπιά cancel/save. Κενό
-  object = κανένα κουμπί.
-- Επεκτάσιμο: ελεύθερα ονόματα ενεργειών (π.χ. `print`, `export`) — η φόρμα
-  render-άρει ένα κουμπί ανά entry, με τη σειρά δήλωσης των κλειδιών.
-- Το resolved αντικείμενο είναι διαθέσιμο ως `questionnaire.actions`. Το
+  παραπάνω). Αν δοθεί, χρησιμοποιείται ΩΣ ΕΧΕΙ — **χωρίς merge ανά ενέργεια**:
+  array μόνο με στοιχείο `name: "submit"` σημαίνει φόρμα ΧΩΡΙΣ κουμπιά
+  cancel/save. Κενό array = κανένα κουμπί.
+- Επεκτάσιμο: ελεύθερα ονόματα ενεργειών στο `name` (π.χ. `print`, `export`) —
+  η φόρμα render-άρει ένα κουμπί ανά στοιχείο, ακριβώς με τη σειρά του array.
+  Αλλαγή της σειράς των στοιχείων αλλάζει σκόπιμα τη σειρά των κουμπιών.
+- Το resolved array είναι διαθέσιμο ως `questionnaire.actions`. Το
   `toJSON()` το γράφει **πάντα** (τα defaults υλοποιούνται ρητά — όπως τα
   `weight`/`required` της Question), ώστε ο αποθηκευμένος ορισμός να είναι
   αυτοτελής και ανεξάρτητος από μελλοντική αλλαγή των defaults του πυρήνα.
@@ -458,9 +470,10 @@ factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
   (`setChoice`/`setText`/`setComment`/`setFiles`, `textOf`/`commentOf`/
   `filesOf`/`optionLabel`/`hasScore`/`scoreBadge`), validation state
   (`problems`/`isProblem`), status/results (`flags`/`overall`/`perSection`/
-  `perTag`/`pct`/`pctOfMax`) και `doAction` (cancel/save/submit από τα
-  `questionnaire.actions`). Το αν θα γίνουν tabs οι ενότητες είναι θέμα
-  markup του view — η factory δεν αλλάζει.
+  `perTag`/`pct`/`pctOfMax`) και `performAction(action)` (cancel/save/submit από τα
+  στοιχεία του διατεταγμένου array `questionnaire.actions`, με αναγνωριστικό το
+  `action.name`). Το αν θα γίνουν tabs οι ενότητες είναι θέμα markup του view —
+  η factory δεν αλλάζει.
 - Debug: εκθέτει `window.questionnaire`/`window.response` (last-one-wins).
 
 ### ΚΛΕΙΔΩΜΕΝΕΣ συμβάσεις για κάθε Alpine μετατροπέα
@@ -489,12 +502,17 @@ factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
    και δεν θα έβλεπαν την αντικατάσταση.
 5. Στα `<select>` το sentinel id:0 είναι η ΠΡΩΤΗ επιλογή κάθε set — άρα και
    το φυσικό default του browser· τα κουμπιά ενεργειών βγαίνουν δυναμικά από
-   το `questionnaire.actions` (`x-for="(action, name) in actions"`).
+   το `questionnaire.actions`, με απευθείας διάσχιση του array
+   (`x-for="action in actions"`, `:key="action.name"`) και καλούν
+   `performAction(action)` με ολόκληρο το στοιχείο. Μην χρησιμοποιείς
+   `Object.entries()`, μην περιμένεις το όνομα ως δεύτερη τιμή του `x-for` και
+   μην καλείς το factory με σκέτο `action.name`.
 
-Συμπεριφορά ενεργειών στο demo: το `cancel` εκτελεί browser back χωρίς
-validation ή POST. Οι υπόλοιπες ενέργειες δεν κάνουν πραγματικό POST —
-εμφανίζεται το payload που ΘΑ στελνόταν στο `action.path`. Μόνο το submit
-απαιτεί `isValidated()` — το draft save επιτρέπεται σε κάθε κατάσταση.
+Συμπεριφορά ενεργειών στο demo: το `action.name === "cancel"` εκτελεί browser
+back χωρίς validation ή POST. Οι υπόλοιπες ενέργειες δεν κάνουν πραγματικό
+POST — εμφανίζεται το payload που ΘΑ στελνόταν στο `action.path`. Μόνο το
+`action.name === "submit"` απαιτεί `isValidated()` — το draft save επιτρέπεται
+σε κάθε κατάσταση.
 
 Επαληθευμένο σε browser (Chromium, 2026-07-10, με τις 19 ενότητες):
 1683/1683 με μέγιστες απαντήσεις (234 ερωτήσεις), tag policies 240/240,
@@ -518,8 +536,9 @@ validation ή POST. Οι υπόλοιπες ενέργειες δεν κάνου
   - `Questionnaire.validateAnswerSet(sectionsJsonText, answersJsonText)` —
     ελέγχει τις string αναφορές answer sets σε δύο JSON strings και επιστρέφει
     `true`, `false` ή `null` για μη αναγνώσιμη/μη αναμενόμενη είσοδο.
-  - `Questionnaire.defaultActions` — το αντικείμενο των προεπιλεγμένων
-    `cancel`, `save` και `submit` actions.
+  - `Questionnaire.defaultActions` — το διατεταγμένο array των προεπιλεγμένων
+    `cancel`, `save` και `submit` actions. Η σειρά του array είναι η σειρά
+    εμφάνισης και κάθε στοιχείο φέρει το αναγνωριστικό του στο `name`.
   - `Questionnaire.filterOutPrivate(sectionsArray, answersObj)` — δημιουργεί
     το non-private definition/answers snapshot που επιτρέπεται να σταλεί στον
     browser.

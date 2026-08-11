@@ -165,13 +165,13 @@
 
                     <!-- Κουμπιά ενεργειών — δυναμικά από το questionnaire.actions -->
                     <div class="d-flex g-2 my-4">
-                        <template x-for="(action, name) in actions" :key="name">
+                        <template x-for="action in actions" :key="action.name">
                             <button
                                 type="button"
                                 class="btn btn-icon"
                                 :class="'btn-' + (action.color || 'outline-secondary')"
                                 :disabled="saving"
-                                @click="performAction(name)"
+                                @click="performAction(action)"
                             >
                                 <div x-text="action.text"></div>
                             </button>

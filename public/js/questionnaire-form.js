@@ -13,6 +13,8 @@
  *   - Το Response ΔΕΝ μπαίνει στο x-data (κυκλικές αναφορές → σιωπηλό
  *     stack overflow) — ζει σε closure της factory.
  *   - Groups χωρίς αναδρομικά templates: section.flattenQuestions().
+ *   - Τα actions διασχίζονται ως διατεταγμένο array και αναγνωρίζονται από
+ *     το action.name — η σειρά του array είναι η σειρά εμφάνισης των κουμπιών.
  */
 
 /**
@@ -33,7 +35,7 @@
  *   maxAnswersShown         number  (5)      πόσα ids αναπάντητων δείχνει το flag
  *   baseUrl                 string  (null)   βάση των action paths· default το
  *                                            τρέχον path (αφαιρεί το /form ή /fill αν υπάρχει).
- *   Η δεσμευμένη action cancel δεν χρησιμοποιεί path: εκτελεί history.back().
+ *   Η δεσμευμένη action με name "cancel" δεν χρησιμοποιεί path: εκτελεί history.back().
  */
 function questionnaireForm(questionnaireRecord, responseData = null, config = {}) {
     const {
@@ -170,9 +172,8 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
         },
 
         /* ---- Ενέργειες φόρμας (cancel/save/submit, δυναμικά από questionnaire.actions) ---- */
-        async performAction(name) {
-            const action = this.actions[name];
-            if (name === "cancel") {
+        async performAction(action) {
+            if (action.name === "cancel") {
                 window.history.back();
                 return;
             }
@@ -180,9 +181,9 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
                 Q.alert("Η φόρμα είναι σε mode προεπισκόπησης. Δεν επιτρέπεται καμία ενέργεια.");
                 return;
             }
-            if (name === "submit") {
+            if (action.name === "submit") {
                 this.problems = response.status.validate();
-            } else if (name === "save") {
+            } else if (action.name === "save") {
                 this.problems = response.status.validate().filter((p) => p.kind === "invalid");
             } else {
                 this.problems = [];

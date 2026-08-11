@@ -37,27 +37,27 @@ const SecurityHeaders = (req, res, next) => {
  * Custom middleware to block non-GET requests from unauthorized origins.
  */
 const SecurityOrigin = (req, res, next) => {
-    // Allow GET requests to pass through
-    if (req.method === 'GET') {
+    // Allow safe, read-only requests to pass through
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
         return next();
     }
-    
-    // For non-GET requests, check origin
+
+    // For state-changing requests, require an exact origin match
     const origin = req.get('Origin');
     const allowedOrigin = process.env.LISTENINGURL;
-    
-    if (origin && origin.startsWith(allowedOrigin)) {
+
+    if (origin === allowedOrigin) {
         return next();
     }
-    
+
     // Block unauthorized non-GET requests
-    return res.status(403).json({ error: 'Forbidden: Unauthorized origin for non-GET request' });
+    return res.status(403).json({ error: 'Forbidden: Unauthorized origin' });
 };
 
 /**
  * Array of security middlewares to be used in Express app.
  * @type {Array<Function>}
  */
-const Security = [SecurityOrigin, SecurityHelmet, SecurityHeaders];
+const Security = [SecurityHelmet, SecurityHeaders, SecurityOrigin];
 
 export default Security;
