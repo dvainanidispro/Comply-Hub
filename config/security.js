@@ -6,17 +6,18 @@ import helmet from "helmet";
  * Defaults: https://www.npmjs.com/package/helmet
  */
 const SecurityHelmet = helmet({
-    contentSecurityPolicy: false,
-    /*contentSecurityPolicy: {
+    contentSecurityPolicy: {
         directives: {
             "default-src": ["'self'"],
             "style-src": ["'self'", "https:", "'unsafe-inline'", "ka-f.webawesome.com"],
             "script-src": ["'self'", "ka-f.webawesome.com", "www.gstatic.com", "ajax.googleapis.com", "cdn.jsdelivr.net", "cdn.sheetjs.com", "'unsafe-inline'", "'unsafe-eval'"], // 'unsafe-eval' for Alpine
             "script-src-attr": ["'unsafe-inline'"],     // 'none' prevent scripts in html attributes (onclick, img onerror, etc.)
+            "font-src": ["'self'", "cdn.jsdelivr.net"],
             "img-src": ["*", "data:"],      // without "data:", we get a Bootstrap svg error
+            "connect-src": ["'self'", "data:"],    // we need this for webAwesome icons 
             upgradeInsecureRequests: [],
         },
-    },*/
+    },
     referrerPolicy: { policy: "same-origin" },    // strict-origin-when-cross-origin (default) |  same-origin
     xFrameOptions: { action: "deny" },               // X-Frame-Options, deny framing
     // crossOriginEmbedderPolicy: true,        // if true, everything on my page is CORS (crossorigin="anonymous")
