@@ -14,6 +14,11 @@
         // }, 300);
     });
 
+    //# Flag menu items μόνο για administrators
+    document.querySelectorAll('.sidebar .sidebar-menu li.flag a').forEach(flagItem => {
+        flagItem.insertAdjacentHTML('beforeend', '<i class="bi bi-flag-fill c-red-500 ms-1"></i>');
+    });
+
     //# Sidebar Dropdown Menus
     document.querySelectorAll('.sidebar .sidebar-menu li a').forEach(link => {
         link.addEventListener('click', function (e) {

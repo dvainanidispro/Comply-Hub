@@ -133,6 +133,14 @@
         font-size: 1.2rem;
     }
 
+    .flag {
+        display: none;
+
+        .admin & {
+            display: revert;
+        }
+    }
+
     dialog {
         /* Προτεινόμενα */
         border: 1px solid darkgray;

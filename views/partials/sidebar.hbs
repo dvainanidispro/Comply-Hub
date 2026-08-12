@@ -1,4 +1,4 @@
-    <div class="sidebar">
+    <div class="sidebar {{#if (can "manage:platform")}}admin{{/if}}">
         <div class="sidebar-inner">
             <!-- ### $Sidebar Header with Logo ### -->
             <div class="sidebar-logo">
@@ -318,12 +318,12 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li>
+                                <li class="flag">
                                     <a class="sidebar-link" href="/organization/resources/partners">
                                         <span class="icon-holder">
                                             <i class="bi bi-people c-blue-500"></i>
                                         </span>
-                                        <span>Συνεργάτες</span>
+                                        <span>Συνεργάτες</span> 
                                     </a>
                                 </li>
                             </ul>
