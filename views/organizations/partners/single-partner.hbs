@@ -1,0 +1,145 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Breadcrumb -->
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/organization/resources/partners">Συνεργάτες</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{#if isNew}}Νέος Συνεργάτης{{else}}{{partnerDetails.name}}{{/if}}</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        {{#if isNew}}
+                        <i class="ti-plus me-2"></i>
+                        Νέος Συνεργάτης
+                        {{else}}
+                        <i class="ti-pencil me-2"></i>
+                        Επεξεργασία Συνεργάτη: {{partnerDetails.name}}
+                        {{/if}}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="form">
+                        {{#unless isNew}}
+                        <input type="hidden" id="editPartnerId" name="id" value="{{partnerDetails.id}}">
+                        {{/unless}}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editPartnerName" class="form-label fw-bold">Επωνυμία *</label>
+                                <input type="text" class="form-control" id="editPartnerName" name="name" value="{{partnerDetails.name}}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editPartnerUuid" class="form-label fw-bold">UUID συνεργάτη</label>
+                                <input type="text" class="form-control" id="editPartnerUuid" value="{{#if isNew}}Το uuid θα εμφανιστεί εδώ μετά τη δημιουργία του συνεργάτη{{else}}{{partnerDetails.uuid}}{{/if}}" disabled>
+                                <div class="form-text">Χρησιμοποιείται για την πρόσβαση του συνεργάτη σε λειτουργίες της πλατφόρμας.</div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="editPartnerEmail" class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="editPartnerEmail" name="email" value="{{partnerDetails.email}}">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="editPartnerPhone" class="form-label fw-bold">Τηλέφωνο</label>
+                                <input type="text" class="form-control" id="editPartnerPhone" name="phone" value="{{partnerDetails.phone}}">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="editPartnerAddress" class="form-label fw-bold">Διεύθυνση</label>
+                                <input type="text" class="form-control" id="editPartnerAddress" name="address" value="{{partnerDetails.address}}">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="editPartnerTaxId" class="form-label fw-bold">ΑΦΜ</label>
+                                <input type="text" class="form-control" id="editPartnerTaxId" name="taxId" value="{{partnerDetails.taxId}}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editPartnerActive" class="form-label fw-bold">Κατάσταση *</label>
+                                <select class="form-select" id="editPartnerActive" name="active">
+                                    <option value="true" {{#unless (eq partnerDetails.active false)}}selected{{/unless}}>Ενεργός</option>
+                                    <option value="false" {{#if (eq partnerDetails.active false)}}selected{{/if}}>Ανενεργός</option>
+                                </select>
+                                <div class="form-text">Καθορίζει αν ο συνεργάτης μπορεί να πραγματοποιήσει ενέργειες</div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>{{#if isNew}}Δημιουργία{{else}}Αποθήκευση{{/if}}</div>
+                                    </button>
+                                    <a href="/organization/resources/partners" class="btn btn-secondary btn-icon">
+                                        <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                        <div>Ακύρωση</div>
+                                    </a>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="ti-settings me-2"></i>
+                        Άλλες Ενέργειες
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid">
+                        {{#unless isNew}}
+                        <button type="button" class="btn btn-danger delete-partner-btn"
+                                data-partner-name="{{partnerDetails.name}}">
+                            <i class="ti-trash me-1"></i>
+                            Διαγραφή Συνεργάτη
+                        </button>
+
+                        <hr>
+                        {{/unless}}
+
+                        <a href="/organization/resources/partners" class="btn btn-secondary">
+                            <i class="ti-arrow-left me-1"></i>
+                            Επιστροφή στη Λίστα Συνεργατών
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+const isNew = {{isNew}};
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Form για επεξεργασία/δημιουργία συνεργάτη
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        await submitData(
+            this,
+            '/organization/resources/partners',
+            isNew ? 'POST' : 'PUT',
+            isNew ? '/organization/resources/partners' : null
+        );
+    });
+
+    {{#unless isNew}}
+    // Button για διαγραφή συνεργάτη
+    Q('.delete-partner-btn').on('click', async function() {
+        await deleteEntity(
+            `Είστε σίγουροι ότι θέλετε να διαγράψετε τον συνεργάτη "${this.dataset.partnerName}";`,
+            '/organization/resources/partners'
+        );
+    });
+    {{/unless}}
+});
+</script>

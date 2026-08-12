@@ -26,7 +26,7 @@ const Partner = db.define('partner',
 			type: DataTypes.JSONB,
 			allowNull: false,
 			defaultValue: {},
-			comment: 'Στοιχεία συνεργάτη, όπως όνομα, ΑΦΜ, διεύθυνση και τηλέφωνο.',
+			comment: 'Στοιχεία συνεργάτη, όπως όνομα, email επικοινωνίας, ΑΦΜ, διεύθυνση και τηλέφωνο.',
 		},
 		password: {
 			type: DataTypes.STRING,
@@ -43,6 +43,10 @@ const Partner = db.define('partner',
 	{
 		tableName: 'partners',
 		timestamps: true,
+        defaultScope: {
+            // By default, για λόγους ασφαλείας το password δεν έρχεται στα queries
+            attributes: { exclude: ['password'] },
+        },
 		indexes: [
 			{
 				name: 'partners_uuid_unique',

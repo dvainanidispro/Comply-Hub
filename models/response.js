@@ -76,6 +76,11 @@ const Response = db.define('response',
     {
         tableName: 'responses',
         timestamps: true,
+        defaultScope: {
+            // By default, για λόγους ασφαλείας το accessTokenHash δεν έρχεται στα queries
+            attributes: { exclude: ['accessTokenHash'] },
+            // Αν το θέλεις στο query, βάλε: attributes: { include: ['accessTokenHash'] }
+        },
         indexes: [
             {
                 name: 'responses_questionnaire_id',
