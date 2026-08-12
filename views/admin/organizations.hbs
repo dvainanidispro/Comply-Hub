@@ -37,11 +37,9 @@
                                         {{check (includes this.scope 'gdpr') 'GDPR' ''}} --}}
                                     </td>
                                     <td>
-                                        {{#if this.active}}
-                                            <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>
-                                        {{else}}
-                                            <span title="Ανενεργός"><i class="bi bi-x-circle text-dark"></i></span>
-                                        {{/if}}
+                                        <span title="{{label 'activeBooleanMasculine' this.active }}">
+                                            <i class="{{label 'activeIcon' this.active }}"></i>
+                                        </span>
                                     </td>
                                     <td>
                                         <a href="/admin/organizations/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">

@@ -136,8 +136,10 @@ const handlebarsConfig = {
             }
             return labels[category]?.[value] ?? '';
         },
-        /** Επιστρέφει array [{value, name}] για οποιαδήποτε κατηγορία labels (εκτός από functions), χρήσιμο για {{#each}} στα views.
-         * example: {{#each (labelEntries 'policyStatus')}} */
+        /** Επιστρέφει array [{value, name}] με όλες τις τιμές ενός αντικειμένου labels (που δεν είναι functions), 
+         * χρήσιμο για {{#each}} στα views, και κυρίως για <select> <options>.
+         * example: {{#each (labelEntries 'policyStatus')}} 
+         * */
         labelEntries: (category) => {
             const map = labels[category];
             if (!map || typeof map === 'function') return [];

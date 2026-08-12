@@ -247,6 +247,11 @@
         text-wrap: balance;
         text-align: center;
     }
+    wa-copy-button::part(button){
+        height: revert;
+        aspect-ratio: revert;
+    }
+    wa-copy-button::part(button):hover { background-color: inherit; }       /* To nesting δεν λειτουργεί σε ::part */
     /* wa-tab-group::part(scroll-button-end){
         --wa-color-on-quiet: crimson;
     } */

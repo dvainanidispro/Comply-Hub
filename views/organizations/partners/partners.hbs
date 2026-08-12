@@ -37,15 +37,13 @@
                                     <td>{{this.profile.taxId}}</td>
                                     <td>{{this.profile.phone}}</td>
                                     <td>
-                                        {{#if this.active}}
-                                            <span title="Ενεργός"><i class="bi bi-check-circle-fill text-success"></i></span>
-                                        {{else}}
-                                            <span title="Ανενεργός"><i class="bi bi-x-circle text-dark"></i></span>
-                                        {{/if}}
+                                        <span title="{{label 'activeBooleanMasculine' this.active }}">
+                                            <i class="{{label 'activeIcon' this.active }}"></i>
+                                        </span>
                                     </td>
                                     <td>
-                                        <a href="/organization/resources/partners/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">
-                                            <i class="ti-pencil text-success"></i>
+                                        <a href="/organization/resources/partners/{{this.id}}" class="btn btn-primary" title="Επεξεργασία">
+                                            <i class="ti-eye text-white"></i>
                                         </a>
                                     </td>
                                 </tr>

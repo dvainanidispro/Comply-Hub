@@ -30,22 +30,18 @@
                                     <td>{{this.code}}</td>
                                     <td class="fw-semibold">{{this.title}}</td>
                                     <td>
-                                        {{#if this.public}}
-                                            <span title="Δημόσιο"><i class="bi bi-check-circle-fill text-primary"></i></span>
-                                        {{else}}
-                                            <span title="Μη δημόσιο"></span>
-                                        {{/if}}
+                                        <span>
+                                            <i class="{{label 'checkIcon' this.active }}"></i>
+                                        </span>
                                     </td>
                                     <td>
-                                        {{#if this.active}}
-                                            <span title="Ενεργό"><i class="bi bi-check-circle-fill text-success"></i></span>
-                                        {{else}}
-                                            <span title="Ανενεργό"><i class="bi bi-x-circle text-dark"></i></span>
-                                        {{/if}}
+                                        <span title="{{label 'activeBooleanNeuter' this.active }}">
+                                            <i class="{{label 'activeIcon' this.active }}"></i>
+                                        </span>
                                     </td>
                                     <td>
-                                        <a href="{{../baseUrl}}/{{this.id}}" class="btn btn-outline-success" title="Επεξεργασία">
-                                            <i class="ti-pencil text-success"></i>
+                                        <a href="{{../baseUrl}}/{{this.id}}" class="btn btn-primary" title="Επεξεργασία">
+                                            <i class="ti-eye text-white"></i>
                                         </a>
                                     </td>
                                 </tr>

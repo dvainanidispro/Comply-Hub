@@ -36,7 +36,14 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="editPartnerUuid" class="form-label fw-bold">UUID συνεργάτη</label>
-                                <input type="text" class="form-control" id="editPartnerUuid" value="{{#if isNew}}Το uuid θα εμφανιστεί εδώ μετά τη δημιουργία του συνεργάτη{{else}}{{partnerDetails.uuid}}{{/if}}" disabled>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="editPartnerUuid" value="{{#if isNew}}Το uuid θα εμφανιστεί μετά τη δημιουργία του συνεργάτη{{else}}{{partnerDetails.uuid}}{{/if}}" disabled>
+                                    {{#unless isNew}}
+                                    <span class="input-group-text bg-lavender-dark">
+                                        <wa-copy-button value="{{partnerDetails.uuid}}" copy-label="Αντιγραφή UUID" success-label="Αντιγράφηκε!"></wa-copy-button>
+                                    </span>
+                                    {{/unless}}
+                                </div>
                                 <div class="form-text">Χρησιμοποιείται για την πρόσβαση του συνεργάτη σε λειτουργίες της πλατφόρμας.</div>
                             </div>
                             <div class="col-md-6 mb-4">
