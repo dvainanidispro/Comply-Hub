@@ -238,8 +238,6 @@
         padding: 0.5em 0.8em !important;
     }
 
-    .kpi-card.bg-warning-subtle { background-color: hsl(60,80%,88%) !important; }
-
 
     /* Το //part(initials) είναι για να επιλέγει το [part="initials"] μέσα στο wa-avatar! */
     wa-avatar::part(initials) {         
@@ -327,6 +325,7 @@
 
 
     .sidebar-menu *, .dropdown-menu *,  .dropdown-menu li,  .dropdown-menu a, .dropdown-menu div, .dropdown-menu span {
+        border-radius: 0.6rem;
         transition: all 0.5s ease-in-out !important;
     }
     .sidebar-menu li a, .dropdown-menu li a {
@@ -763,6 +762,7 @@
             height: var(--card-size);
             border-radius: 2rem;
             border-width: 3px;
+            box-shadow: 10px 10px 20px -5px rgba(0, 0, 0, 0.3);
             
             .card-body{
                 display: flex;
@@ -778,6 +778,9 @@
             }
             .kpi-card-value{
                 text-align: center;
+                /* div {
+                    text-shadow: 0px 0px 2px #666666;
+                } */
             }
             .kpi-card-header{
                 margin-block: 0.2rem;
@@ -878,6 +881,10 @@
     }
     .small-shadow{
         box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    .bg-gradient-sharp {
+        background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0)) !important;
     }
 
     .lg{

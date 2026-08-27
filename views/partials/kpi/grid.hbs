@@ -1,6 +1,6 @@
 <div class="kpi-grid" x-data="{kpis: {{objectify kpis}}, links: {{links}}, section: '{{or section 'grid'}}' }">
     <template x-for="kpi in kpis" :key="`${kpi.period}:${kpi.code}`">
-        <div class="card kpi-card" 
+        <div class="card kpi-card bg-gradient-sharp" 
             :class="`border-${kpi.color} bg-${kpi.color}-subtle ${links?'hand':''}`" 
             {{!-- :data-code="kpi.code" :data-period="kpi.period" :data-id="kpi.id" :data-submitted="kpi.submitted" --}}
             @click="links && $dispatch('edit-kpi', { object: kpi })">
