@@ -88,6 +88,10 @@ server.use(staticMiddleware);
 import loginRouter from './routes/login.js';
 server.use(loginRouter);
 
+// Public questionnaire routes
+import publicQuestionnairesRouter from './routes/public/questionnaires.js';
+server.use('/public/questionnaires', publicQuestionnairesRouter);
+
 
 
 ///////////////// ROUTES ΜΟΝΟ ΓΙΑ ΠΙΣΤΟΠΟΙΗΜΕΝΟΥΣ ΧΡΗΣΤΕΣ /////////////////

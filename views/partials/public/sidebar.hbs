@@ -1,0 +1,43 @@
+    <div class="sidebar {{#if (can "manage:platform")}}admin{{/if}}">
+        <div class="sidebar-inner">
+            <!-- ### $Sidebar Header with Logo ### -->
+            <div class="sidebar-logo">
+                <div class="peers ai-c fxw-nw">
+                    <div class="peer peer-greed">
+                        <a class="sidebar-link td-n" href="#">
+                            <div class="gap-2 logo-area justify-content-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="logo">
+                                        <img src="/resources/logo.png" alt="Logo ComplyHub" />
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="peer">
+                        <div class="mobile-toggle sidebar-toggle">
+                            <a href="" class="td-n">
+                                <i class="bi bi-arrow-left-circle"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <ul class="sidebar-menu scrollable pos-r">
+                    {{#each menu}}
+                        <li class="nav-item">
+                            <a class="sidebar-link" href="{{link}}">
+                                <span class="icon-holder">
+                                    <i class="{{icon}} c-blue-500"></i>
+                                </span>
+                                <span class="title">{{text}}</span>
+                            </a>
+                        </li>
+                    {{/each}}
+                </ul>
+            </nav>
+
+        </div>
+    </div>
