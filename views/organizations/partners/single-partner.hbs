@@ -144,7 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
     Q('.delete-partner-btn').on('click', async function() {
         await deleteEntity(
             `Είστε σίγουροι ότι θέλετε να διαγράψετε τον συνεργάτη "${this.dataset.partnerName}";`,
-            '/organization/resources/partners'
+            '/organization/resources/partners',
+            '/organization/resources/partners/{{partnerDetails.id}}'
         );
     });
     {{/unless}}

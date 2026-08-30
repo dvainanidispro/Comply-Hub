@@ -22,10 +22,10 @@
                                     <th class="sortable">ID</th>
                                     <th class="sortable">Επωνυμία</th>
                                     <th class="sortable">Email</th>
-                                    <th class="sortable">ΑΦΜ</th>
                                     <th class="sortable">Τηλέφωνο</th>
                                     <th class="sortable">Ενεργός</th>
-                                    <th class="">Επεξεργασία</th>
+                                    <th>Διαχείριση</th>
+                                    <th>Επεξεργασία</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,7 +34,6 @@
                                     <td>{{this.id}}</td>
                                     <td class="fw-semibold">{{this.profile.name}}</td>
                                     <td>{{this.profile.email}}</td>
-                                    <td>{{this.profile.taxId}}</td>
                                     <td>{{this.profile.phone}}</td>
                                     <td>
                                         <span title="{{label 'activeBooleanMasculine' this.active }}">
@@ -42,8 +41,13 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="/organization/resources/partners/{{this.id}}" class="btn btn-primary" title="Επεξεργασία">
+                                        <a href="/organization/resources/partners/{{this.id}}" class="btn btn-primary" title="Διαχείριση">
                                             <i class="ti-eye text-white"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/organization/resources/partners/{{this.id}}/edit" class="btn btn-secondary" title="Επεξεργασία">
+                                            <i class="ti-pencil"></i>
                                         </a>
                                     </td>
                                 </tr>
