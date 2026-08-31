@@ -12,5 +12,59 @@
         <div class="col-12">
             <h1 class="h3">Διαχείριση Συνεργάτη: {{partnerDetails.name}}</h1>
         </div>
+
+        <div class="col-12 my-3">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h5">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Προσκλήσεις Συμπλήρωσης Ερωτηματολογίων
+                    </h2>
+                    <div class="card-actions my-2">
+                        <a href="/organization/resources/partners/{{partnerDetails.id}}/questionnaire-assignments/new" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Νέα Πρόσκληση
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table dim-table auto-rows table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="sortable">Ερωτηματολόγιο</th>
+                                    <th class="sortable">Framework</th>
+                                    <th class="sortable">Κατάσταση</th>
+                                    <th class="sortable">Δημιουργία</th>
+                                    <th class="sortable">Υποβολή</th>
+                                    <th>Διαχείριση</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each assignments}}
+                                <tr>
+                                    <td class="fw-semibold">{{this.questionnaire.title}}</td>
+                                    <td>{{this.questionnaire.framework}}</td>
+                                    <td>
+                                        <span class="badge bg-{{label 'statusColor' this.status}}">
+                                            {{label 'status' this.status}}
+                                        </span>
+                                    </td>
+                                    <td>{{date this.createdAt}}</td>
+                                    <td>{{date this.submittedAt}}</td>
+                                    <td>
+                                        <a href="/organization/resources/partners/{{../partnerDetails.id}}/questionnaire-assignments/{{this.id}}" class="btn btn-primary" title="Διαχείριση">
+                                            <i class="ti-eye text-white"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+

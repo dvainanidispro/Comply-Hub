@@ -29,12 +29,19 @@ partner.get('/', async (req, res) => {
             return res.status(404).render('errors/404', { message: 'Ο συνεργάτης δεν βρέθηκε' });
         }
 
+        const assignments = await Models.Response.findAll({
+            where: { submittedByPartnerId: partnerRecord.id },
+            include: [{ model: Models.Questionnaire, as: 'questionnaire' }],
+            order: [['createdAt', 'DESC']],
+        });
+
         res.render('organizations/partners/manage-partner', {
             partnerDetails: {
                 id: partnerRecord.id,
                 active: partnerRecord.active,
                 ...partnerRecord.profile,
             },
+            assignments,
             title: `Διαχείριση Συνεργάτη: ${partnerRecord.profile?.name || ''}`,
         });
     } catch (error) {

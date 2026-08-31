@@ -1,0 +1,98 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/organization/resources/partners">Συνεργάτες</a></li>
+                    <li class="breadcrumb-item"><a href="/organization/resources/partners/{{partnerId}}">{{partnerName}}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{#if isNew}}Νέα Πρόσκληση{{else}}Πρόσκληση{{/if}}</li>
+                </ol>
+            </nav>
+        </div>
+
+        {{#if isNew}}
+
+        <h1 class="mb-3">{{partnerName}}</h1>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="ti-plus me-2"></i>
+                        Νέα Πρόσκληση Συμπλήρωσης Ερωτηματολογίου
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="form">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="newAssignmentQuestionnaire" class="form-label fw-bold">Ερωτηματολόγιο *</label>
+                                <select class="form-select" id="newAssignmentQuestionnaire" name="questionnaireId" required>
+                                    <option value="">Επιλέξτε ερωτηματολόγιο...</option>
+                                    {{#each availableQuestionnaires}}
+                                    <option value="{{this.id}}">{{this.framework}} - {{this.title}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>Δημιουργία</div>
+                                    </button>
+                                    <a href="/organization/resources/partners/{{partnerId}}" class="btn btn-secondary btn-icon">
+                                        <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                        <div>Ακύρωση</div>
+                                    </a>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#unless isNew}}
+        {{/unless}}
+    </div>
+</div>
+
+
+
+{{#if isNew}}
+<script type="module">
+document.addEventListener('DOMContentLoaded', function() {
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+
+        Q('bootstrap-spinner').show();
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/organization/resources/partners/{{partnerId}}/questionnaire-assignments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData)),
+            });
+
+            const result = await response.json();
+            Q('bootstrap-spinner').show(false);
+
+            if (result.success) {
+                window.location.href = `/organization/resources/partners/{{partnerId}}/questionnaire-assignments/${result.responseId}`;
+            } else {
+                showErrorModal(result.message);
+            }
+        } catch (error) {
+            Q('bootstrap-spinner').show(false);
+            showErrorModal("Σφάλμα δικτύου: " + error.message);
+        }
+    });
+});
+</script>
+{{/if}}
