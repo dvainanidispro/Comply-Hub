@@ -14,7 +14,7 @@
 
         <h1 class="mb-3">{{partnerName}}</h1>
 
-        <div class="col-lg-8">
+        <div class="col-lg-9">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">
@@ -58,12 +58,178 @@
         {{/if}}
 
         {{#unless isNew}}
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="ti-clipboard me-2"></i>
+                        {{assignment.questionnaire.framework}} - {{assignment.questionnaire.title}}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p>Οδηγίες:</p>
+                    <ol>
+                            <li>Αντιγράψτε και παραδώστε στο συνεργάτη σας το URL του ερωτηματολόγου και το token, ώστε να αποκτήσει πρόσβαση στο ερωηματολόγιο.</li>
+                            <li>Αν θέλετε να απαγορεύσετε στο συνεργάτη την πρόσβαση στο ερωτηματολόγιο (προσωρινά ή μόνιμα), μπορείτε να το κλειδώσετε μέσω της επιλογής κατάστασης παρακάτω.</li>
+                    </ol>
+
+                    <div class="">
+                        <table class="table table-primary table-bordered align-middle mb-2">
+                            <tbody>
+                                <tr style="height:3.5rem">
+                                    <td class="fw-bold">
+                                        URL Ερωτηματολόγιου
+                                    </td>
+                                    <td>
+                                        <div class="text-break"><span class="user-select-all">{{publicUrl}}</span></div>
+                                    </td>
+                                    <td class="text-center" style="width:20ch">
+                                        <wa-copy-button value="{{publicUrl}}" copy-label="Αντιγραφή URL" success-label="Αντιγράφηκε!"></wa-copy-button>
+                                    </td>
+                                </tr>
+                                <tr style="height:3.5rem">
+                                    <td class="fw-bold">
+                                        Token Πρόσβασης
+                                    </td>
+                                    <td class="">
+                                        <span id="tokenStatusText">{{#if hasAccessToken}}<span class="text-success">Το token έχει εκδοθεί.</span>{{else}}<span class="text-danger">Δεν έχει εκδοθεί το token.</span>{{/if}}</span>
+                                        <span id="tokenValueText" class="d-none"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" id="btnGenerateToken" class="btn btn-outline-primary btn-sm">
+                                            Δημιουργία νέου
+                                        </button>
+                                        <wa-copy-button id="tokenCopyButton" class="d-none" copy-label="Αντιγραφή token" success-label="Αντιγράφηκε!"></wa-copy-button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tokenNotice" class="alert alert-warning d-none mb-0">
+                        Αυτό το token δεν θα εμφανιστεί ξανά. Παρακαλώ, αποθηκεύστε το πριν απομακρυνθείτε από τη σελίδα. Σε περίπτωση που το χάσετε, θα πρέπει να εκδώσετε νέο.
+                    </div>
+
+                    <form id="form">
+                        <input type="hidden" name="id" value="{{assignment.id}}">
+
+                        <div class="row mt-4">
+                            <div class="col-12 mb-3">
+                                <label for="editAssignmentLocked" class="form-label fw-bold">Κατάσταση Πρόσβασης</label>
+                                <select class="form-select" id="editAssignmentLocked" name="locked">
+                                    <option value="false" {{#unless assignment.lockedAt}}selected{{/unless}}>Ξεκλείδωτο (ο συνεργάτης μπορεί να δει και να επεξεργαστεί τις απαντήσεις)</option>
+                                    <option value="true" {{#if assignment.lockedAt}}selected{{/if}}>Κλειδωμένο (ο συνεργάτης δεν μπορεί να δει το ερωτηματολόγιο)</option>
+                                </select>
+                                <div class="form-text">Το κλείδωμα εμποδίζει τον συνεργάτη να αλλάξει τις απαντήσεις του.</div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex g-2">
+                                    <button type="submit" class="btn btn-success btn-icon">
+                                        <bootstrap-icon icon="check-circle-fill"></bootstrap-icon>
+                                        <div>Αποθήκευση</div>
+                                    </button>
+                                    <a href="/organization/resources/partners/{{partnerId}}" class="btn btn-secondary btn-icon">
+                                        <bootstrap-icon icon="x-circle-fill"></bootstrap-icon>
+                                        <div>Ακύρωση</div>
+                                    </a>
+                                    <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="ti-settings me-2"></i>
+                        Άλλες Ενέργειες
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-danger" id="btnDeleteAssignment">
+                            <i class="ti-trash me-1"></i>
+                            Διαγραφή Πρόσκλησης
+                        </button>
+
+                        <hr>
+
+                        <a href="/organization/resources/partners/{{partnerId}}" class="btn btn-secondary">
+                            <i class="ti-arrow-left me-1"></i>
+                            Επιστροφή στη Διαχείριση Συνεργάτη
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         {{/unless}}
     </div>
 </div>
 
+{{#unless isNew}}
+<script type="module">
 
+    let invitationHasToken = {{check hasAccessToken 'true' 'false'}};
 
+    Q('#btnGenerateToken').on('click', async function() {
+
+        if (invitationHasToken) {
+            const confirmation = await Q.confirm("Το νέο token θα αντικαταστήσει το υπάρχον. Είστε σίγουροι ότι θέλετε να δημιουργήσετε νέο;")
+            if (!confirmation) { return }
+            else {invitationHasToken = true}
+        }
+
+        const token = createRandomString();
+        const hashedToken = await hash(token);
+
+        try {
+            const result = await Q.fetch.post(
+                '/organization/resources/partners/{{partnerId}}/questionnaire-assignments/{{assignment.id}}/access-token',
+                { accessTokenHash: hashedToken },
+            );
+
+            if (result.success) {
+                console.log("New token generated: ", token);
+                Q('#tokenStatusText').show(false);
+                Q('#tokenValueText').set(token);
+                Q('#tokenValueText').show(true);
+                Q('#btnGenerateToken').show(false);
+                Q('#tokenCopyButton').element.setAttribute('value', token);
+                Q('#tokenCopyButton').show(true);
+                Q('#tokenNotice').show(true);
+            } else {
+                showErrorModal(result.message);
+            }
+        } catch (error) {
+            showErrorModal("Σφάλμα δικτύου: " + error.message);
+        }
+    });
+
+    Q('#btnDeleteAssignment').on('click', async function() {
+        await deleteEntity(
+            'Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την πρόσκληση;',
+            '/organization/resources/partners/{{partnerId}}'
+        );
+    });
+
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+        await submitData(
+            this,
+            '/organization/resources/partners/{{partnerId}}/questionnaire-assignments',
+            'PUT',
+            null,
+        );
+    });
+</script>
+{{/unless}}
 {{#if isNew}}
 <script type="module">
 document.addEventListener('DOMContentLoaded', function() {

@@ -151,6 +151,7 @@ Q.fetch = async (URL,property=true) => {
 
 /**
  * Makes a POST request and returns the result as JSON
+ * We want this to throw an error, so that we can handle it appropriately in the calling code.
  * @param {string} URL The URL to make a POST request 
  * @param {object} data The data to send
  * @returns {Promise<object>} Returns the result as JSON
@@ -164,8 +165,7 @@ Q.fetch.post = async (URL, data) => {
     .then(response=>{
         if (!response.ok) {throw new Error('Q.fetch.post failed')} 
         else {return response.json()}
-    })
-    .catch(e=>{console.error(e)});     
+    });
 };
 
 /**
