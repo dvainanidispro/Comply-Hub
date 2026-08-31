@@ -15,7 +15,8 @@ const scopes = {
     },
 }
 
-
+const allScopesArray = Object.values(scopes).map(scope => scope.name);
+const allFrameworksArray = Object.values(scopes).map(scope => scope.framework);
 
 /** Middleware to check scopes for routes. Δέχεται string ή array (OR logic) */
 let scope = (requiredScope) => {
@@ -41,4 +42,12 @@ let userHasScope = (user, ...requiredScopes) => {
     return requiredScopes.some(s => userScopes.includes(s));
 };
 
-export { scopes, scope, userHasScope };
+/* Επιστρέφει τα frameworks που έχει ο χρήστης βάσει των scopes του */
+let frameworksOf = (user) => {
+    const userRole = user.role;
+    if (!userRole) return [];
+    if (!roles?.[userRole]?.canHaveScope) return allFrameworksArray;
+    return user?.scope?.map(s => scopes[s]?.framework).filter(Boolean) || [];
+};
+
+export { scopes, scope, userHasScope, frameworksOf };

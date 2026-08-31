@@ -58,6 +58,25 @@ function createCodeFromName(name) {
 }
 
 
+/** Υπολογίζει το SHA-256 hash ενός string (hex encoded) */
+async function hash(text) {
+    const bytes = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(hashBuffer), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/** Παράγει τυχαίο string από λατινικά γράμματα, αριθμούς, και προαιρετικά σύμβολα */
+function createRandomString(length = 16, symbols = false) {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const availableSymbols = '!@%^&()-+.';
+    const characters = letters + numbers + (symbols ? availableSymbols : '');
+
+    const randomValues = new Uint32Array(length);
+    crypto.getRandomValues(randomValues);
+    return Array.from(randomValues, value => characters[value % characters.length]).join('');
+}
+
 /** 
  * Φέρνει το gravatar image του χρήστη με βάση το email του 
  * Αποθηκεύει το αποτέλεσμα στο sessionStorage (URL ή '' - κενό string)
@@ -147,3 +166,4 @@ function kpiSuccessStatus(kpi) {
         deviation: success ? null : Math.abs( Number(kpi.value) - rule.target )
     };
 }
+

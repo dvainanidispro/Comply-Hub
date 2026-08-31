@@ -66,6 +66,7 @@
 - Use single quotes for strings that are critical to the code’s logic (e.g., object keys, SQL queries). Use double quotes for strings that can be changed freely without affecting functionality (e.g., UI text, log messages).
 - Avoid checking for null/undefined before accessing object properties. Use optional chaining (`obj?.prop`) if possible.
 - Avoid cheking for object types or existance before using them. Assume the data is correct unless there is a specific reason to validate it. For example, DO NOT use `if (typeof varName === 'string')` or `if (typeof confetti === 'undefined')` or `if (Array.isArray(varName))`. Instead, you can use `if (myArray.length)` or other checks that verify the content, not the type.
+- When a required object or value is missing, prefer an explicit error over optional chaining or a silent fallback that returns a seemingly valid value.
 
 ## Naming Conventions
 - Use `camelCase` for variables and functions. Maybe use `PascalCase` for very impotant objects.
