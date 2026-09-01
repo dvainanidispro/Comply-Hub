@@ -1,0 +1,57 @@
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">
+                    <i class="ti-lock me-2"></i>
+                    Πρόσβαση σε Ερωτηματολόγιο
+                </h4>
+            </div>
+            <div class="card-body">
+                <p>Για να αποκτήσετε πρόσβαση στο ερωτηματολόγιο, επικολλήστε το token πρόσβασης που σας δόθηκε από τον οργανισμό "{{organizationName}}".</p>
+
+                <form id="form">
+                    <div class="mb-3">
+                        <label for="accessToken" class="form-label fw-bold">Token Πρόσβασης</label>
+                        <input type="text" class="form-control" id="accessToken" name="accessToken" autocomplete="off" required>
+                    </div>
+
+                    <div class="d-flex g-2">
+                        <button type="submit" class="btn btn-primary btn-icon btn-icon">
+                            <i class="bi bi-unlock-fill"></i>
+                            <div>Είσοδος</div>
+                        </button>
+                        <bootstrap-spinner class="d-none"></bootstrap-spinner>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    Q('#form').on('submit', async function(e) {
+        e.preventDefault();
+
+        const token = Q('#accessToken').value.trim();
+        if (!token) { return; }
+
+        Q('bootstrap-spinner').show();
+
+        try {
+            const accessTokenHash = await hash(token);
+            const result = await Q.fetch.post(window.location.pathname, { accessTokenHash });
+
+            Q('bootstrap-spinner').show(false);
+
+            if (result.success) {
+                window.location.href = `${window.location.pathname}/form`;
+            } else {
+                showErrorModal(result.message);
+            }
+        } catch (error) {
+            Q('bootstrap-spinner').show(false);
+            showErrorModal("Σφάλμα δικτύου: " + error.message);
+        }
+    });
+</script>

@@ -150,7 +150,7 @@ Q.fetch = async (URL,property=true) => {
 };
 
 /**
- * Makes a POST request and returns the result as JSON
+ * Makes a POST request and returns the result as JSON. Use only when server responds with JSON. 
  * We want this to throw an error, so that we can handle it appropriately in the calling code.
  * @param {string} URL The URL to make a POST request 
  * @param {object} data The data to send
@@ -163,8 +163,7 @@ Q.fetch.post = async (URL, data) => {
         body: JSON.stringify(data)
     })
     .then(response=>{
-        if (!response.ok) {throw new Error('Q.fetch.post failed')} 
-        else {return response.json()}
+        return response.json()
     });
 };
 

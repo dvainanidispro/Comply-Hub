@@ -49,7 +49,7 @@
 
 Επιθυμητό αποτέλεσμα: οι εξωτερικές προσκλήσεις διαχειρίζονται μέσα από την περιοχή αναθέσεων του συγκεκριμένου partner, χωρίς να χάνεται το ιστορικό των responses.
 
-### 2. Ολοκλήρωση του public access flow, Δημιουργία public token gate και προσωρινού session και έλεγχοι ασφάλειας
+### 2. Ολοκλήρωση του public access flow, Δημιουργία public token gate και προσωρινού session και έλεγχοι ασφάλειας - Done!
 
 Σκοπός: το route `/public/questionnaires/vendors/:questionnaireId/:responseId` να λειτουργεί ως entry gate, να κάνει validation του `responseId` και του `questionnaireId`, να επιβεβαιώνει ότι το response ανήκει πράγματι στο questionnaire του URL και να μην αποκαλύπτει τίποτα πριν από την επιτυχή ταυτοποίηση.
 
