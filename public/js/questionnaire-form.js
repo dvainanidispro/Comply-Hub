@@ -55,12 +55,21 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
 
     function pendingAnswers() {
         const pending = response.status.pendingAnswers();
-        if (pending.length === 0) { return "—" }
-        if (pending.length > maxAnswersShown) {
-            return pending.slice(0, maxAnswersShown).join(', ') + ` ...`;
+        let text;
+        if (pending.length === 0) {
+            text = "—";
+        } else if (pending.length > maxAnswersShown) {
+            text = pending.slice(0, maxAnswersShown).join(', ') + ` ... (Πλήθος: ${pending.length})`;
         } else {
-            return pending.join(', ');
+            text = pending.join(', ');
         }
+        return text;
+    }
+
+    function answerProgress() {
+        const questions = [...questionnaire.allQuestions()].filter((q) => q.type !== "group");
+        const answered = questions.filter((q) => response.isAnswered(q.id)).length;
+        return `${answered}/${questions.length}`;
     }
 
     /* Τιμές των choice ερωτήσεων ΕΚΤΟΣ του response.data, ειδικά για x-model στα
@@ -147,6 +156,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
             const s = response.status;
             return [
                 { label: "Ξεκίνησε η συμπλήρωση", ok: s.isStarted() },
+                { label: "Απαντημένες ερωτήσεις", text: answerProgress() },
                 { label: "Οι απαντήσεις που δόθηκαν είναι έγκυρες", ok: s.isPartiallyValidated() },
                 { label: "Καλύπτονται οι υποχρεωτικές ερωτήσεις", ok: s.isCompleted() },
                 { label: "Υποχρεωτικές ερωτήσεις που δεν έχουν απαντηθεί", text: pendingAnswers() },

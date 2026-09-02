@@ -1,0 +1,18 @@
+<div class="card mb-3">
+    <div class="card-header py-2">Κατάσταση</div>
+    <ul class="list-group list-group-flush">
+        <template x-for="f in flags()" :key="f.label">
+            <li class="list-group-item py-1 d-flex justify-content-between align-items-center">
+                <small x-text="f.label"></small>
+                <template x-if="f.text">
+                    <span class="badge bg-info"
+                          x-text="f.text"></span>
+                </template>
+                <template x-if="!f.text && f.ok!=null">
+                    <span class="badge" :class="f.ok ? 'bg-success' : 'bg-secondary'"
+                          x-text="f.ok ? 'Ναι' : 'Όχι'"></span>
+                </template>
+            </li>
+        </template>
+    </ul>
+</div>
