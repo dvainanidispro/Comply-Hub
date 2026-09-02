@@ -63,9 +63,9 @@
 
 Επιθυμητό αποτέλεσμα: ο browser δεν μπορεί να χειραγωγήσει IDs, status, snapshot ή access state και όλα τα κρίσιμα checks γίνονται ξανά στον server, τόσο στο entry gate όσο και στο `/form` και στα public save or submit routes.
 
-### 3. Δημιουργία της public questionnaire φόρμας
+### 3. Δημιουργία της public questionnaire φόρμας - Done!
 
-Σκοπός: το protected route `/public/questionnaires/vendors/:questionnaireId/:responseId/form` να αποδίδει την κενή view του public questionnaire με τον υπάρχοντα κοινό form adapter και τις questionnaire partials, αλλά σε public περιβάλλον χωρίς organization controls.
+Σκοπός: το protected route `/public/questionnaires/vendors/:questionnaireId/:responseId/form` να εμφανίζει τη φόρμα του public questionnaire με τον υπάρχοντα κοινό form adapter και τις questionnaire partials, αλλά σε public περιβάλλον χωρίς organization controls.
 
 Επιθυμητό αποτέλεσμα: ο partner βλέπει μόνο τη φόρμα της δικής του πρόσκλησης, με καθαρή public εμπειρία, save/submit actions και χωρίς πρόσβαση σε άλλα δεδομένα του οργανισμού.
 
@@ -73,7 +73,7 @@
 
 Επιθυμητό αποτέλεσμα: το backend στέλνει μόνο φιλτραρισμένο questionnaire definition και φιλτραρισμένα response answers, ώστε validation, progress και scores να υπολογίζονται μόνο στις ορατές ερωτήσεις.
 
-### 4. Υλοποίηση draft save και final submit για partners
+### 4. Υλοποίηση draft save και final submit για partners - Done!
 
 Σκοπός: ο partner να συνεχίζει εργασία στο ίδιο response και ο server να ανακατασκευάζει και να ελέγχει τις απαντήσεις με βάση τον πραγματικό questionnaire definition.
 

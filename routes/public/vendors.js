@@ -1,6 +1,7 @@
 import express from 'express';
 import Models from '../../models/models.js';
 import log from '../../lib/logger.js';
+import Questionnaire from '../../lib/questionnaire.js';
 
 const vendorsRouter = express.Router();
 
@@ -78,6 +79,44 @@ async function fetchAndValidateInvitation(req) {
 }
 
 /**
+ * Επιστρέφει το data του public response αφού αφαιρέσει private και άγνωστες απαντήσεις.
+ * Το questionnaire code προέρχεται πάντα από τον πραγματικό ορισμό και όχι από το request.
+ */
+function buildPublicResponseData(questionnaire, submittedAnswers) {
+    const { filteredSectionsArray, filteredAnswersObj } = Questionnaire.filterOutPrivate(
+        questionnaire.definition.content,
+        submittedAnswers,
+    );
+    const publicDefinition = {
+        ...questionnaire.definition,
+        content: filteredSectionsArray,
+    };
+    const publicQuestionnaire = new Questionnaire(publicDefinition, { templates: questionnaire.answers });
+    const publicResponse = publicQuestionnaire.createResponse({
+        questionnaire: questionnaire.definition.code,
+        answers: filteredAnswersObj,
+    });
+
+    return { publicResponse, filteredSectionsArray };
+}
+
+/** Δημιουργεί το πλήρες questionnaire snapshot που αποθηκεύεται μόνο κατά την οριστική υποβολή. */
+function buildQuestionnaireSnapshot(questionnaire) {
+    return {
+        id: questionnaire.id,
+        definedBy: questionnaire.definedBy,
+        framework: questionnaire.framework,
+        organizationId: questionnaire.organizationId,
+        code: questionnaire.code,
+        public: questionnaire.public,
+        active: questionnaire.active,
+        title: questionnaire.title,
+        definition: questionnaire.definition,
+        answers: questionnaire.answers,
+    };
+}
+
+/**
  * GET /public/questionnaires/vendors/:questionnaireId/:responseId - Entry gate της πρόσκλησης.
  * Αν υπάρχει ήδη έγκυρο session cookie, προωθεί κατευθείαν στη φόρμα. Αλλιώς, εμφανίζει τη φόρμα εισαγωγής του access token.
  */
@@ -142,15 +181,129 @@ vendorsRouter.get('/:questionnaireId/:responseId/form', async (req, res) => {
             return res.redirect(`${req.baseUrl}/${req.params.questionnaireId}/${req.params.responseId}`);
         }
 
-        res.render('public/questionnaires/questionnaire', 
-            { 
-                layout: 'public', 
-                organizationName 
-            }
+        // Τα assigned/draft ακολουθούν τον τρέχοντα ορισμό. Μετά την υποβολή χρησιμοποιούμε το snapshot, αν υπάρχει.
+        const questionnaire = invitation.status === 'submitted' && invitation.questionnaireSnapshot
+            ? invitation.questionnaireSnapshot
+            : invitation.questionnaire;
+        const { definition } = questionnaire;
+        const { filteredSectionsArray, filteredAnswersObj } = Questionnaire.filterOutPrivate(
+            definition.content,
+            invitation.data?.answers ?? {},
         );
+
+        // Στέλνουμε μόνο τα πεδία της φόρμας, χωρίς το πλήρες invitation ή το αφιλτράριστο virtual content του model.
+        const publicQuestionnaire = {
+            id: questionnaire.id,
+            code: questionnaire.code,
+            title: questionnaire.title,
+            definition: {
+                code: definition.code,
+                title: definition.title,
+                description: definition.description,
+                actions: definition.actions,
+                content: filteredSectionsArray,
+            },
+            answers: questionnaire.answers,
+        };
+
+        res.render('public/questionnaires/questionnaire', {
+            layout: 'public',
+            organizationName,
+            title: publicQuestionnaire.title,
+            questionnaire: publicQuestionnaire,
+            response: {
+                status: invitation.status,
+                data: {
+                    questionnaire: definition.code,
+                    answers: filteredAnswersObj,
+                },
+            },
+            baseUrl: `${req.baseUrl}/${req.params.questionnaireId}/${req.params.responseId}`,
+        });
     } catch (error) {
         log.error(`Σφάλμα κατά την ανάκτηση φόρμας: ${error}`);
         res.status(500).render('errors/500', { layout: 'public' });
+    }
+});
+
+/**
+ * POST /public/questionnaires/vendors/:questionnaireId/:responseId/save
+ * POST /public/questionnaires/vendors/:questionnaireId/:responseId/submit
+ * Αποθηκεύει public draft ή κάνει οριστική υποβολή, πάντα πάνω στον τρέχοντα ορισμό της βάσης.
+ */
+vendorsRouter.post([
+    '/:questionnaireId/:responseId/save',
+    '/:questionnaireId/:responseId/submit',
+], async (req, res) => {
+    try {
+        const { invitation, validToken } = await fetchAndValidateInvitation(req);
+
+        //# Έλεγχοι
+
+        if (!invitation) {
+            return res.status(404).json({ success: false, message: 'Η πρόσκληση δεν είναι διαθέσιμη' });
+        }
+        //TODO: Εδώ θα στέλνεται συγκεκριμένο μήνυμα για expired token ώστε ο χρήστης να το αποτκά ξανά. 
+        if (!validToken) {
+            return res.status(401).json({ success: false, message: 'Η πρόσβαση στην πρόσκληση έχει λήξει' });
+        }
+
+        const submittedAnswers = req.body?.data?.answers;
+        if (!submittedAnswers || typeof submittedAnswers !== 'object' || Array.isArray(submittedAnswers)) {
+            return res.status(400).json({ success: false, message: 'Μη έγκυρα δεδομένα απαντήσεων' });
+        }
+
+        const { publicResponse } = buildPublicResponseData(invitation.questionnaire, submittedAnswers);
+        const isSubmit = req.path.endsWith('/submit');
+
+        // Αν submit:
+        if (isSubmit && !publicResponse.status.isValidated()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Το ερωτηματολόγιο δεν έχει συμπληρωθεί πλήρως ή σωστά για οριστική υποβολή.',
+            });
+        }
+        // Αν draft:
+        if (!isSubmit && !publicResponse.status.isPartiallyValidated()) {
+            return res.status(400).json({ success: false, message: 'Οι απαντήσεις περιέχουν μη έγκυρες τιμές.' });
+        }
+
+        //# Προετοιμασία δεδομένων και αποθήκευση
+
+        const validatedData = publicResponse.toJSON();
+
+        // Διατηρούνται οι private απαντήσεις και συγχωνεύονται με τις νέες validated απαντήσεις
+        invitation.data = {
+            questionnaire: invitation.questionnaire.definition.code,
+            answers: {
+                ...invitation.data?.answers,  // παλιές αποθηκευμένες απαντήσεις
+                ...validatedData.answers,   // νέες απαντήσεις - με προτεραιότητα
+            },
+        };
+        invitation.status = isSubmit ? 'submitted' : 'draft';
+
+        if (isSubmit) {
+            invitation.submittedAt = new Date();
+            invitation.questionnaireSnapshot = buildQuestionnaireSnapshot(invitation.questionnaire);
+        }
+
+        await invitation.save();
+
+        log.success(
+            isSubmit
+                ? `Η πρόσκληση υποβλήθηκε οριστικά: Response ${invitation.id} (Partner ${invitation.submittedByPartnerId})`
+                : `Αποθηκεύτηκε draft της πρόσκλησης: Response ${invitation.id} (Partner ${invitation.submittedByPartnerId})`,
+        );
+
+        res.json({
+            success: true,
+            message: isSubmit
+                ? 'Το ερωτηματολόγιο υποβλήθηκε επιτυχώς.'
+                : 'Η πρόοδος αποθηκεύτηκε επιτυχώς.',
+        });
+    } catch (error) {
+        log.error(`Σφάλμα κατά την αποθήκευση public questionnaire response: ${error}`);
+        res.status(500).json({ success: false, message: 'Σφάλμα κατά την αποθήκευση του ερωτηματολογίου' });
     }
 });
 
