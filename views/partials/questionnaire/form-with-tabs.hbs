@@ -79,7 +79,7 @@
                                                     <input
                                                         type="text"
                                                         class="form-control form-control-sm mt-2"
-                                                        placeholder="Παρατηρήσεις"
+                                                        {{!-- placeholder="Παρατηρήσεις" --}}
                                                         :value="commentOf(row.q)"
                                                         @input="setComment(row.q, $event.target.value)"
                                                     />
@@ -88,7 +88,7 @@
                                                     <textarea
                                                         class="form-control form-control-sm mt-2"
                                                         rows="2"
-                                                        placeholder="Παρατηρήσεις"
+                                                        {{!-- placeholder="Παρατηρήσεις" --}}
                                                         :value="commentOf(row.q)"
                                                         @input="setComment(row.q, $event.target.value)"
                                                     ></textarea>

@@ -243,9 +243,12 @@ vendorsRouter.post([
         if (!invitation) {
             return res.status(404).json({ success: false, message: 'Η πρόσκληση δεν είναι διαθέσιμη' });
         }
-        //TODO: Εδώ θα στέλνεται συγκεκριμένο μήνυμα για expired token ώστε ο χρήστης να το αποτκά ξανά. 
         if (!validToken) {
-            return res.status(401).json({ success: false, message: 'Η πρόσβαση στην πρόσκληση έχει λήξει' });
+            return res.status(401).json({
+                success: false,
+                event: 'public-session-expired',
+                message: 'Η πρόσβαση στην πρόσκληση έχει λήξει',
+            });
         }
 
         const submittedAnswers = req.body?.data?.answers;

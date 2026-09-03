@@ -119,6 +119,8 @@ async function submitData(formElementOrData, path, method, redirectPath = null) 
         
         if (result.success) {
             showSuccessModal(result.message, 2000, () => redirectOnSuccess(redirectPath));
+        } else if (result.event) {
+            window.dispatchEvent(new CustomEvent(result.event, { detail: result }));
         } else {
             showErrorModal(result.message);
         }

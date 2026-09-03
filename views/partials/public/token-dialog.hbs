@@ -1,0 +1,61 @@
+<wa-dialog id="token-dialog" label="Access token required" with-footer>
+    <p>Please enter the access token you were provided and then submit the form again.</p>
+
+    <wa-input
+        id="token-dialog-access-token"
+        label="Access token"
+        autocomplete="off"
+        autofocus>
+    </wa-input>
+
+    <div slot="footer" class="d-flex justify-content-end gap-2">
+        <wa-button id="token-dialog-cancel">Cancel</wa-button>
+        <wa-button id="token-dialog-ok" variant="brand">OK</wa-button>
+    </div>
+</wa-dialog>
+
+<script type="module">
+    const tokenDialog = document.querySelector('#token-dialog');
+    const tokenDialogInput = document.querySelector('#token-dialog-access-token');
+
+    Q('#token-dialog-cancel').on('click', () => {
+        tokenDialog.open = false;
+    });
+
+    Q('#token-dialog-ok').on('click', async () => {
+        const accessToken = tokenDialogInput.value.trim();
+        if (!accessToken) {
+            tokenDialog.open = true;
+            return;
+        }
+        const dialogClosed = new Promise(resolve => {
+            tokenDialog.addEventListener('wa-after-hide', resolve, { once: true });
+        });
+        tokenDialog.open = false;
+        await dialogClosed;
+
+        tokenDialogInput.value = '';
+
+        if (!accessToken) {
+            tokenDialog.open = true;
+            return;
+        }
+
+        try {
+            const accessTokenHash = await hash(accessToken);
+            const verificationUrl = window.location.pathname.replace(/\/(form|fill)\/?$/, '');
+            const result = await Q.fetch.post(verificationUrl, { accessTokenHash });
+
+            if (!result.success) {
+                tokenDialog.open = true;
+            }
+        } catch (error) {
+            tokenDialog.open = true;
+        }
+    });
+
+    // αυτό το event γίνεται trigger από τη συνάρτηση submitData, αν επιστραφεί result.event
+    window.addEventListener('public-session-expired', () => {
+        tokenDialog.open = true;
+    });
+</script>

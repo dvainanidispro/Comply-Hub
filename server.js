@@ -121,7 +121,7 @@ server.use('/account', account);
 
 // Catch-all route for 404 errors (must be last)
 server.use((req, res) => {
-    log.warn(`Ζητήθηκε ο μη υπάρχον πόρος ${req.path}`);
+    // log.warn(`Ζητήθηκε ο μη υπάρχον πόρος ${req.path}`);
     res.status(404).render('errors/404');
 });
 
