@@ -43,6 +43,11 @@ const Response = db.define('response',
             allowNull: true,
             comment: 'Το πλήρες plain object του Response όπως παράγεται από το JSON.stringify(response).',
         },
+        publicAnswers: {
+            type: DataTypes.JSONB,
+            allowNull: true,
+            comment: 'Οι public απαντήσεις, διατηρημένες ξεχωριστά από το editable data του οργανισμού.',
+        },
         questionnaireSnapshot: {
             type: DataTypes.JSONB,
             allowNull: true,

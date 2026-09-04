@@ -188,7 +188,7 @@ vendorsRouter.get('/:questionnaireId/:responseId/form', async (req, res) => {
         const { definition } = questionnaire;
         const { filteredSectionsArray, filteredAnswersObj } = Questionnaire.filterOutPrivate(
             definition.content,
-            invitation.data?.answers ?? {},
+            invitation.publicAnswers ?? invitation.data?.answers ?? {},
         );
 
         // Στέλνουμε μόνο τα πεδία της φόρμας, χωρίς το πλήρες invitation ή το αφιλτράριστο virtual content του model.
@@ -274,6 +274,9 @@ vendorsRouter.post([
         //# Προετοιμασία δεδομένων και αποθήκευση
 
         const validatedData = publicResponse.toJSON();
+
+        // Οι public απαντήσεις διατηρούνται ξεχωριστά από το editable data του οργανισμού.
+        invitation.publicAnswers = validatedData.answers;
 
         // Διατηρούνται οι private απαντήσεις και συγχωνεύονται με τις νέες validated απαντήσεις
         invitation.data = {

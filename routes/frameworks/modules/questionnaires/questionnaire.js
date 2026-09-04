@@ -114,10 +114,10 @@ export function manageQuestionnairesRouter(framework, label) {
                 return res.status(404).render('errors/404');
             }
 
-            const showPublic = !req.path.includes('/preview/private');
+            const isPublicPreview = !req.path.includes('/preview/private');
             const previewQuestionnaire = questionnaire.get({ plain: true });
 
-            if (showPublic) {
+            if (isPublicPreview) {
                 const { filteredSectionsArray } = Questionnaire.filterOutPrivate(
                     previewQuestionnaire.definition.content,
                     {},
@@ -128,7 +128,7 @@ export function manageQuestionnairesRouter(framework, label) {
                 };
             }
 
-            const view = showPublic ? 'organizations/vendor-forms/va-form-public' : 'organizations/vendor-forms/va-form-private';
+            const view = isPublicPreview ? 'organizations/vendor-forms/va-form-public' : 'organizations/vendor-forms/va-form-private';
 
             res.render(view, {
                 framework,
