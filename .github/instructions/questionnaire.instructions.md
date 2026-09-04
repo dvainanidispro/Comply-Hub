@@ -132,6 +132,11 @@ const answers = [
   Έτσι η λογική «αναπάντητο = id 0 / value null» μένει άθικτη.
 - Το entry αυτό ΔΕΝ γίνεται επιλέξιμο set (δεν μπαίνει στο registry).
 - Χωρίς τέτοιο entry ισχύει το default: `Δεν απαντήθηκε`.
+- Στην πράξη, το label του `not_answered` είναι αυτό που χρησιμοποιεί η
+  `questionnaire.language()` για να καθορίσει τη γλώσσα. Ο απλούστερος τρόπος
+  αλλαγής της γλώσσας ενός ερωτηματολογίου είναι να δηλωθεί το `not_answered`
+  με label στην επιθυμητή γλώσσα. Αν παραλειφθεί, το παραπάνω ελληνικό fallback
+  έχει ως αποτέλεσμα γλώσσα `el`.
 
 ## Ανασύσταση από αποθηκευμένα δεδομένα (PostgreSQL)
 
@@ -460,9 +465,11 @@ factory `questionnaireForm(questionnaireRecord, responseData, config?)` —
 - `questionnaireRecord`: το record από τη βάση (`.definition` + `.answers`) —
   στέλνεται και ως `questionnaireSnapshot` στα POST των actions.
 - `responseData`: το αποθηκευμένο plain data του response, ή `null` για νέο.
-- `config` (όλα προαιρετικά, με defaults): `showQuestionScoreBadge` (false),
+- `config` (όλα προαιρετικά, με defaults): `language`
+  (`questionnaire.language()`· ρητή τιμή `el`/`en` κάνει override),
+  `disablePublicAnswers` (false), `showQuestionScoreBadge` (false),
   `showOptionScore` (false), `maxAnswersShown` (5), `baseUrl` (default: το
-  τρέχον path χωρίς κατάληξη `/fill`).
+  τρέχον path χωρίς κατάληξη `/form` ή `/fill`).
 - Χρήση: `x-data="questionnaireForm(rec, data, {…})"` — ή με spread για
   view-specific extras: `x-data="{ ...questionnaireForm(rec, data), … }"`.
   Πολλά ερωτηματολόγια στην ίδια σελίδα = πολλές κλήσεις.
@@ -532,6 +539,7 @@ POST — εμφανίζεται το payload που ΘΑ στελνόταν στ
   constants ή εσωτερικές κλάσεις.
 - Στον browser εκθέτει μόνο το `globalThis.Questionnaire`. Δεν υπάρχουν
   χωριστά globals όπως `globalThis.validateAnswerSet`.
+- Δημόσια instance method `questionnaire.language()` — επιστρέφει `el` αν το label του sentinel του πρώτου διαθέσιμου answer set (δηλαδή το `Object.values(questionnaire.templates)[0].options[0].label`) περιέχει έστω έναν ελληνικό χαρακτήρα, διαφορετικά `en`.
 - Δημόσια static επιφάνεια της κλάσης:
   - `Questionnaire.validateAnswerSet(sectionsJsonText, answersJsonText)` —
     ελέγχει τις string αναφορές answer sets σε δύο JSON strings και επιστρέφει

@@ -30,22 +30,64 @@
  * @param {object|null} responseData  Το αποθηκευμένο plain data ενός
  *   response (JSONB) — ή null/undefined για νέο, κενό response.
  * @param {object} [config]  Προαιρετικές ρυθμίσεις — ΟΛΕΣ με defaults:
+ *   language                string  (auto)   γλώσσα περιβάλλοντος ('el' ή 'en')
+ *   disablePublicAnswers    boolean (false)  οι δημόσιες ερωτήσεις δεν θα υποβάλλονται
  *   showQuestionScoreBadge  boolean (false)  badge βαθμολογίας ανά ερώτηση
- *   showOptionScore         boolean (false)  το value δίπλα στο label των options
+ *   showOptionScore         boolean (false)  εμφάνιση value δίπλα στο label των options
  *   maxAnswersShown         number  (5)      πόσα ids αναπάντητων δείχνει το flag
  *   baseUrl                 string  (null)   βάση των action paths· default το
  *                                            τρέχον path (αφαιρεί το /form ή /fill αν υπάρχει).
  *   Η δεσμευμένη action με name "cancel" δεν χρησιμοποιεί path: εκτελεί history.back().
  */
 function questionnaireForm(questionnaireRecord, responseData = null, config = {}) {
-    const {
-        showQuestionScoreBadge = false,
-        showOptionScore = false,
-        maxAnswersShown = 5,
-        baseUrl = null,
-    } = config;
-
     const questionnaire = new Questionnaire(questionnaireRecord.definition, { templates: questionnaireRecord.answers });
+    const options = {
+        language: questionnaire.language(),
+        disablePublicAnswers: false,
+        showQuestionScoreBadge: false,
+        showOptionScore: false,
+        maxAnswersShown: 5,
+        baseUrl: null,
+        ...config,
+    };
+
+    const {
+        showQuestionScoreBadge,
+        showOptionScore,
+        maxAnswersShown,
+        baseUrl,
+    } = options;
+    const language = options.language === 'en' ? 'en' : 'el';
+    const translations = {
+        el: {
+            status: 'Κατάσταση',
+            yes: 'Ναι',
+            no: 'Όχι',
+            count: 'Πλήθος',
+            started: 'Ξεκίνησε η συμπλήρωση',
+            answeredQuestions: 'Απαντημένες ερωτήσεις',
+            answersValid: 'Οι απαντήσεις που δόθηκαν είναι έγκυρες',
+            requiredQuestionsCovered: 'Καλύπτονται οι υποχρεωτικές ερωτήσεις',
+            unansweredRequiredQuestions: 'Υποχρεωτικές ερωτήσεις που δεν έχουν απαντηθεί',
+            readyForSubmission: 'Έτοιμο για οριστική υποβολή',
+            previewAlert: 'Η φόρμα είναι σε mode προεπισκόπησης. Δεν επιτρέπεται καμία ενέργεια.',
+        },
+        en: {
+            status: 'Status',
+            yes: 'Yes',
+            no: 'No',
+            count: 'Count',
+            started: 'Form completion started',
+            answeredQuestions: 'Answered questions',
+            answersValid: 'The provided answers are valid',
+            requiredQuestionsCovered: 'Required questions are covered',
+            unansweredRequiredQuestions: 'Required questions that have not been answered',
+            readyForSubmission: 'Ready for final submission',
+            previewAlert: 'The form is in preview mode. No actions are allowed.',
+        },
+    };
+    const t = translations[language];
+
     const data = Alpine.reactive(responseData || { questionnaire: questionnaire.code, answers: {} });
     const response = questionnaire.createResponse(data);
 
@@ -59,7 +101,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
         if (pending.length === 0) {
             text = "—";
         } else if (pending.length > maxAnswersShown) {
-            text = pending.slice(0, maxAnswersShown).join(', ') + ` ... (Πλήθος: ${pending.length})`;
+            text = pending.slice(0, maxAnswersShown).join(', ') + ` ... (${t.count}: ${pending.length})`;
         } else {
             text = pending.join(', ');
         }
@@ -102,6 +144,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
 
         showQuestionScoreBadge,
         showOptionScore,
+        translations: t,
 
         problems: [],
         saving: false,
@@ -155,12 +198,12 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
         flags() {
             const s = response.status;
             return [
-                { label: "Ξεκίνησε η συμπλήρωση", ok: s.isStarted() },
-                { label: "Απαντημένες ερωτήσεις", text: answerProgress() },
-                { label: "Οι απαντήσεις που δόθηκαν είναι έγκυρες", ok: s.isPartiallyValidated() },
-                { label: "Καλύπτονται οι υποχρεωτικές ερωτήσεις", ok: s.isCompleted() },
-                { label: "Υποχρεωτικές ερωτήσεις που δεν έχουν απαντηθεί", text: pendingAnswers() },
-                { label: "Έτοιμο για οριστική υποβολή", ok: s.isValidated() },
+                { label: t.started, ok: s.isStarted() },
+                { label: t.answeredQuestions, text: answerProgress() },
+                { label: t.answersValid, ok: s.isPartiallyValidated() },
+                { label: t.requiredQuestionsCovered, ok: s.isCompleted() },
+                { label: t.unansweredRequiredQuestions, text: pendingAnswers() },
+                { label: t.readyForSubmission, ok: s.isValidated() },
             ];
         },
         overall() {
@@ -188,7 +231,7 @@ function questionnaireForm(questionnaireRecord, responseData = null, config = {}
                 return;
             }
             if (window.theFormIsPreview) {
-                Q.alert("Η φόρμα είναι σε mode προεπισκόπησης. Δεν επιτρέπεται καμία ενέργεια.");
+                Q.alert(t.previewAlert);
                 return;
             }
             if (action.name === "submit") {

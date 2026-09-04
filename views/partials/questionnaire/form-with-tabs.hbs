@@ -58,6 +58,7 @@
                                                             class="form-select form-select-sm"
                                                             :id="'q-' + row.q.id"
                                                             :class="isProblem(row.q.id) ? 'is-invalid' : ''"
+                                                            :disabled="disablePublicAnswers && !row.q.private"
                                                             @change="setChoice(row.q, $event.target.value)"
                                                         >
                                                             <template x-for="opt in row.q.answers.options" :key="opt.id">
@@ -81,6 +82,7 @@
                                                         class="form-control form-control-sm mt-2"
                                                         {{!-- placeholder="Παρατηρήσεις" --}}
                                                         :value="commentOf(row.q)"
+                                                        :disabled="disablePublicAnswers && !row.q.private"
                                                         @input="setComment(row.q, $event.target.value)"
                                                     />
                                                 </template>
@@ -90,6 +92,7 @@
                                                         rows="2"
                                                         {{!-- placeholder="Παρατηρήσεις" --}}
                                                         :value="commentOf(row.q)"
+                                                        :disabled="disablePublicAnswers && !row.q.private"
                                                         @input="setComment(row.q, $event.target.value)"
                                                     ></textarea>
                                                 </template>
@@ -101,6 +104,7 @@
                                                             type="file"
                                                             multiple
                                                             class="form-control form-control-sm"
+                                                            :disabled="disablePublicAnswers && !row.q.private"
                                                             @change="setFiles(row.q, $event.target.files)"
                                                         />
                                                         <div class="form-text" x-show="filesOf(row.q).length"
@@ -129,6 +133,7 @@
                                                         :type="row.q.validation ?? 'text'"
                                                         :class="isProblem(row.q.id) ? 'is-invalid' : ''"
                                                         :value="textOf(row.q)"
+                                                        :disabled="disablePublicAnswers && !row.q.private"
                                                         @input="setText(row.q, $event.target.value)"
                                                     />
                                                 </template>
@@ -139,6 +144,7 @@
                                                         rows="3"
                                                         :class="isProblem(row.q.id) ? 'is-invalid' : ''"
                                                         :value="textOf(row.q)"
+                                                        :disabled="disablePublicAnswers && !row.q.private"
                                                         @input="setText(row.q, $event.target.value)"
                                                     ></textarea>
                                                 </template>
